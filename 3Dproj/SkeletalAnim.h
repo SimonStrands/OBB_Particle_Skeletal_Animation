@@ -15,6 +15,17 @@ public:
 	Joint();
 };
 
+class Mesh {
+private:
+	DirectX::XMFLOAT3 position;
+	DirectX::XMFLOAT2 texCoords;
+	DirectX::XMFLOAT3 normal;
+	DirectX::XMINT3 jointIDs;
+	DirectX::XMFLOAT3 weights;
+public:
+	Mesh();
+};
+
 class AnimatedModel {
 private:
 	Joint jointHierarchy;
@@ -22,3 +33,5 @@ private:
 public:
 
 };
+
+//https://www.youtube.com/watch?v=f3Cr8Yx3GGA
