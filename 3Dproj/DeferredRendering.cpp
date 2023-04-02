@@ -132,8 +132,8 @@ void DeferredRendering::BindFirstPass(ID3D11DepthStencilView* depth)
 	gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[0], color);
 	gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[1], color);
 	gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[2], color);
-	//gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[3], color);
-	//gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[4], color);
+	gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[3], color);
+	gfx->get_IMctx()->ClearRenderTargetView(DeferredRTV[4], color);
 }
 
 void DeferredRendering::BindSecondPass(ID3D11ShaderResourceView*& ShadowMapping)

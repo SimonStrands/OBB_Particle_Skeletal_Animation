@@ -23,7 +23,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			std::istringstream a;
 			a.str(readWord);
 			a >> trash >> x >> y >> z;
-			vertecies.push_back(VolumetricVertex(x, y, z, (float)(c++%255)/255, (float)(c++%255)/255, (float)(c++%255)/255, 0.75f));
+			vertecies.push_back(VolumetricVertex(x, y, z, 0, 0, 255, 0.75f));
 			c++;
 		}
 	}

@@ -151,6 +151,8 @@ void Game::Update()
 		LightVisualizers[i]->setRot(vec3(0 , light[i]->getRotation().x, -light[i]->getRotation().y) + vec3(0,1.57f,0));
 	}
 	
+	particleModel->updateParticles(dt.dt(), gfx);
+
 	gfx->Update((float)dt.dt(), camera->getPos());
 
 #pragma region camera_settings
@@ -198,7 +200,7 @@ void Game::DrawToBuffer()
 
 void Game::ForwardDraw()
 {
-	particleModel->draw(gfx->get_IMctx());
+	particleModel->draw(gfx);
 }
 
 void Game::DrawAllShadowObject()

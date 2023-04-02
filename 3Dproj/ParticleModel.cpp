@@ -1,20 +1,21 @@
 #include "ParticleModel.h"
 #include "Random.h"
 
-//For skeletal animation later
-struct ParticleModelConstantBuffer : CB{
-	struct{
-	};
-};
 
-ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position)
+
+ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position):
+	positionMatris(
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        position.x, position.y, position.z, 1.0f
+    )
 {
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	loadParticleModel(vertecies, "obj/stormtrooper.obj");
 	this->nrOfVertecies = (UINT)vertecies.size();
-	
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
 	this->PS = gfx->getPS()[4];
@@ -26,7 +27,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	if (!CreateTexture("obj/Particle/SphereNormal.jpg", gfx->getDevice(), gfx->getTexture(), normalMapTexture)) {
 		std::cout << "cannot load particle normal" << std::endl;
 	}
-	
+	CreateVertexConstBuffer(gfx, this->Vg_pConstantBuffer);
 	//create UAV
 	D3D11_BUFFER_DESC buffDesc;
 	buffDesc.ByteWidth = sizeof(VolumetricVertex) * this->nrOfVertecies;
@@ -56,13 +57,16 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		printf("doesn't work create Buffer");
 		return;
 	}
+	if(!CreateConstBuffer(gfx, this->computeShaderConstantBuffer, sizeof(ComputerShaderParticleModelConstBuffer), &CSConstBuffer)){
+		std::cout << "stop" << std::endl;
+	}
+	this->CSConstBuffer.time.element = 0;
 }
 
 ParticleModel::~ParticleModel()
 {
-	//SRV->Release();//nullptr for now
 	cUpdate->Release();
-	//computeShaderConstantBuffer->Release();
+	computeShaderConstantBuffer->Release();
 	diffuseTexture->Release();
 	normalMapTexture->Release();
 	billUAV->Release();
@@ -71,6 +75,16 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
+	this->CSConstBuffer.dt.element = dt;
+	this->CSConstBuffer.time.element += dt;
+
+	//update computeshader const buffer
+	D3D11_MAPPED_SUBRESOURCE resource;
+	gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, &CSConstBuffer, sizeof(ComputerShaderParticleModelConstBuffer));
+	gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
+	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
 	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
 
@@ -78,27 +92,29 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 
-	gfx->get_IMctx()->Dispatch(1, 1, 1);//calc how many groups we need beacuse right now I do not know
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
 
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
 }
 
-void ParticleModel::draw(ID3D11DeviceContext*& immediateContext)
+void ParticleModel::draw(Graphics*& gfx)
 {
 	UINT offset = 0;
 	static UINT strid = sizeof(VolumetricVertex);
 
-	immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-	this->setShaders(immediateContext);
-	immediateContext->PSSetShaderResources(0, 1, &diffuseTexture);
-	immediateContext->PSSetShaderResources(1, 1, &normalMapTexture);
-	immediateContext->IASetInputLayout(this->inputLayout);
+	this->updateShaders(gfx);
+	this->setShaders(gfx->get_IMctx());
+	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &Vg_pConstantBuffer);
+	gfx->get_IMctx()->PSSetShaderResources(0, 1, &diffuseTexture);
+	gfx->get_IMctx()->PSSetShaderResources(1, 1, &normalMapTexture);
+	gfx->get_IMctx()->IASetInputLayout(this->inputLayout);
 
-	immediateContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
-	immediateContext->Draw(nrOfVertecies, 0);
+	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
+	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
@@ -108,4 +124,17 @@ void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
 	immediateContext->GSSetShader(this->GS, nullptr, 0);
 	immediateContext->HSSetShader(nullptr, nullptr, 0);
 	immediateContext->DSSetShader(nullptr, nullptr, 0);
+}
+
+void ParticleModel::updateShaders(Graphics*& gfx)
+{
+	gfx->getVertexconstbuffer()->transform.element = positionMatris;
+
+	//changing vertex Shader cBuffer
+	D3D11_MAPPED_SUBRESOURCE resource;
+
+	gfx->get_IMctx()->Map(Vg_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, gfx->getVertexconstbuffer(), sizeof(Vcb));
+	gfx->get_IMctx()->Unmap(Vg_pConstantBuffer, 0);
+	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 }

@@ -33,7 +33,7 @@ void main(
 {
     float4x4 modelView = mul(input[0].model, input[0].view);
 	float4x4 MVP = mul(modelView, input[0].projection);
-	float size = 0.3;
+	float size = 0.1;
 	float3 side = float3(modelView[0][0], modelView[1][0], modelView[2][0]);
 	float3 up = float3(modelView[0][1], modelView[1][1], modelView[2][1]);
 	float3 camToPos = float3(cameraPos.x, cameraPos.y, cameraPos.z)

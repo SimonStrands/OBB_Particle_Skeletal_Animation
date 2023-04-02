@@ -19,10 +19,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
 {
     
     const float4 diffuseTexture = diffuseTex.Sample(testSampler, input.uv).xyzw;
-    if (diffuseTexture.w == 0)
-    {
-        return float4(0,0,0,0);
-    }
+    clip(diffuseTexture.w < 0.1f ? -1 : 1);
     
     float3 nMapNormal;
     float3x3 TBN = float3x3(
@@ -69,5 +66,5 @@ float4 main(PixelShaderInput input) : SV_TARGET
         
     }
     
-    return float4(lightning);
+    return float4(lightning.xyz, input.color.w);
 }
