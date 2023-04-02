@@ -34,7 +34,8 @@ private:
 	ID3D11Buffer* vertexBuffer;
 
 	//2 textures for the particle one diffuse and one normal map
-	ID3D11ShaderResourceView* SRV;
+	ID3D11ShaderResourceView* diffuseTexture;
+	ID3D11ShaderResourceView* normalMapTexture;
 
 	//compute shader for updating particle position
 	ID3D11ComputeShader* cUpdate;

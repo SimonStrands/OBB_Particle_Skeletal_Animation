@@ -224,7 +224,7 @@ void Graphics::Update(float dt, vec3 camPos)
 	memcpy(resource.pData, &LCBG, sizeof(LCBGS));
 	immediateContext->Unmap(this->Pg_pConstantBuffer, 0);
 	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-	this->immediateContext->PSSetConstantBuffers(3, 1, &this->Pg_pConstantBuffer);
+	this->immediateContext->PSSetConstantBuffers(6, 1, &this->Pg_pConstantBuffer);
 	this->immediateContext->CSSetConstantBuffers(6, 1, &this->Pg_pConstantBuffer);
 
 	this->CPCB.cameraPos.element[0] = camPos.x;
@@ -341,6 +341,7 @@ void Graphics::setTransparant(bool transparance)
 void Graphics::takeLight(SpotLight** light, int nrOfLights)
 {
 	this->nrOfLights = nrOfLights;
+	LCBG.nrOfLights.element = this->nrOfLights;
 	this->light = light;
 }
 

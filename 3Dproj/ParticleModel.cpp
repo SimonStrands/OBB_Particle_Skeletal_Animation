@@ -13,13 +13,19 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	loadParticleModel(vertecies, "obj/stormtrooper.obj");
-	this->nrOfVertecies = vertecies.size();
+	this->nrOfVertecies = (UINT)vertecies.size();
 	
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
 	this->PS = gfx->getPS()[4];
 	this->inputLayout = gfx->getInputLayout()[2];
 	loadCShader("ParticleSkeletalAnimationComputeShader.cso", gfx->getDevice(), cUpdate);
+	if (!CreateTexture("obj/Particle/SphereDiff.png", gfx->getDevice(), gfx->getTexture(), diffuseTexture)) {
+		std::cout << "cannot load particle texture" << std::endl;
+	}
+	if (!CreateTexture("obj/Particle/SphereNormal.jpg", gfx->getDevice(), gfx->getTexture(), normalMapTexture)) {
+		std::cout << "cannot load particle normal" << std::endl;
+	}
 	
 	//create UAV
 	D3D11_BUFFER_DESC buffDesc;
@@ -57,6 +63,8 @@ ParticleModel::~ParticleModel()
 	//SRV->Release();//nullptr for now
 	cUpdate->Release();
 	//computeShaderConstantBuffer->Release();
+	diffuseTexture->Release();
+	normalMapTexture->Release();
 	billUAV->Release();
 	vertexBuffer->Release();
 }
@@ -85,7 +93,8 @@ void ParticleModel::draw(ID3D11DeviceContext*& immediateContext)
 	immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	this->setShaders(immediateContext);
-	immediateContext->PSSetShaderResources(0, 1, &SRV);
+	immediateContext->PSSetShaderResources(0, 1, &diffuseTexture);
+	immediateContext->PSSetShaderResources(1, 1, &normalMapTexture);
 	immediateContext->IASetInputLayout(this->inputLayout);
 
 	immediateContext->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
