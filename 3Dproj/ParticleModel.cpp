@@ -65,12 +65,14 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 ParticleModel::~ParticleModel()
 {
-	cUpdate->Release();
-	computeShaderConstantBuffer->Release();
+	vertexBuffer->Release();
+	Vg_pConstantBuffer->Release();
 	diffuseTexture->Release();
 	normalMapTexture->Release();
+	cUpdate->Release();
 	billUAV->Release();
-	vertexBuffer->Release();
+	computeShaderConstantBuffer->Release();
+	//->Release();
 }
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
