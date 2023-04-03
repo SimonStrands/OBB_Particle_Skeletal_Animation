@@ -222,6 +222,9 @@
     <ClCompile Include="ParticleModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OBBSkeleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D311Helper.h">
@@ -364,6 +367,9 @@
     </ClInclude>
     <ClInclude Include="BillBoardManager.h">
       <Filter>Header Files\Graphic\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="OBBSkeleton.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

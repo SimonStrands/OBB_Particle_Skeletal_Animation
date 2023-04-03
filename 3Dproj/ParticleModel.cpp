@@ -72,7 +72,6 @@ ParticleModel::~ParticleModel()
 	cUpdate->Release();
 	billUAV->Release();
 	computeShaderConstantBuffer->Release();
-	//->Release();
 }
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
