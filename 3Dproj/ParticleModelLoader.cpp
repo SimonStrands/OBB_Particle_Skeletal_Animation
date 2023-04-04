@@ -1,30 +1,30 @@
 #include "ParticleModelLoader.h"
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath)
 {
-	std::ifstream infile(filePath);
-	float x,y,z;
-	std::string trash;
-	std::string readWord;
-	bool useOfG = false;
-	bool first = true;
-	if (!infile.is_open()) {
-		std::cout << "cannot find file" << std::endl;
-		return;
-	}
+	Assimp::Importer AImporter;
+	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
 
-	int c = 0;
-	while (std::getline(infile, readWord)) {
-		if (readWord.substr(0, 2) == "v ") {
-			std::istringstream a;
-			a.str(readWord);
-			a >> trash >> x >> y >> z;
-			vertecies.push_back(VolumetricVertex(x, y, z, 0, 0, 255, 0.5f));
-			c++;
+	for(unsigned int i = 0; i < scene->mNumMeshes; i++){
+		if(scene->mMeshes[i]->HasBones()){
+			//load animations and bones
+			//need:
+			//name
+			//bone transformation
+			//inverse?
+			//for(unsigned int b = 0; b < scene->mMeshes[i]->mNumBones; i++){
+			//	scene->mMeshes[i]->mBones[b]->mName;
+			//	scene->mMeshes[i]->mBones[b]->mWeights;
+			//	scene->mMeshes[i]->mBones[b]->mOffsetMatrix;
+			//	scene->mMeshes[i]->
+			//}
+		}
+		for(unsigned int v = 0; v < scene->mMeshes[i]->mNumVertices; v++){
+			aiVector3D vertex = scene->mMeshes[i]->mVertices[v];
+			vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 		}
 	}
 }

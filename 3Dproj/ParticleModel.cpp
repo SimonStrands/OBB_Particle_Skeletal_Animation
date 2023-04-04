@@ -14,7 +14,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/stormtrooper.obj");
+	loadParticleModel(vertecies, "objects/testAnimation.fbx");
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
