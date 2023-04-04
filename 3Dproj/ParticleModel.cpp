@@ -14,17 +14,17 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "obj/stormtrooper.obj");
+	loadParticleModel(vertecies, "objects/stormtrooper.obj");
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
 	this->PS = gfx->getPS()[4];
 	this->inputLayout = gfx->getInputLayout()[2];
 	loadCShader("ParticleSkeletalAnimationComputeShader.cso", gfx->getDevice(), cUpdate);
-	if (!CreateTexture("obj/Particle/SphereDiff.png", gfx->getDevice(), gfx->getTexture(), diffuseTexture)) {
+	if (!CreateTexture("objects/Particle/SphereDiff.png", gfx->getDevice(), gfx->getTexture(), diffuseTexture)) {
 		std::cout << "cannot load particle texture" << std::endl;
 	}
-	if (!CreateTexture("obj/Particle/SphereNormal.jpg", gfx->getDevice(), gfx->getTexture(), normalMapTexture)) {
+	if (!CreateTexture("objects/Particle/SphereNormal.jpg", gfx->getDevice(), gfx->getTexture(), normalMapTexture)) {
 		std::cout << "cannot load particle normal" << std::endl;
 	}
 	CreateVertexConstBuffer(gfx, this->Vg_pConstantBuffer);

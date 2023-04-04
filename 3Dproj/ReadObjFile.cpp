@@ -92,7 +92,7 @@ bool getMatrialFromFile(std::string fileName, std::vector<Material*> &matrial, G
 		}
 	}
 	infile.close();
-	infile.open("obj/" + mtlname);
+	infile.open("objects/" + mtlname);
 	if (done && infile.is_open()) {
 		while (std::getline(infile, readWord)) {
 			if (readWord.substr(0, 6) == "newmtl") {
