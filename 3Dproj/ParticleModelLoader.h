@@ -2,4 +2,4 @@
 #include "vertex.h"
 #include <vector>
 
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath);
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, std::vector<DirectX::XMMATRIX> &Transformations, const std::string& filePath);

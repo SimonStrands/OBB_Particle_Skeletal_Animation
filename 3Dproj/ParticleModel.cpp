@@ -14,7 +14,11 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/testAnimation.fbx");
+
+	//DEBUG
+	std::vector<DirectX::XMMATRIX> Transformations;
+
+	loadParticleModel(vertecies, Transformations, "objects/testAnimation.fbx");
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -61,6 +65,14 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		std::cout << "stop" << std::endl;
 	}
 	this->CSConstBuffer.time.element = 0;
+
+	//if debug
+	std::vector<float> heights;
+	heights.reserve(Transformations.size());
+	for(int i = 0; i < Transformations.size(); i++){
+		heights.push_back(1);
+	}
+	this->OBBSkeleton = new OBBSkeletonDebug(Transformations, heights, gfx);
 }
 
 ParticleModel::~ParticleModel()
@@ -72,6 +84,7 @@ ParticleModel::~ParticleModel()
 	cUpdate->Release();
 	billUAV->Release();
 	computeShaderConstantBuffer->Release();
+	delete OBBSkeleton;
 }
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
@@ -116,6 +129,9 @@ void ParticleModel::draw(Graphics*& gfx)
 
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
+
+	//if debug
+	OBBSkeleton->draw(gfx);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)

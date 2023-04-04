@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "CreateBuffer.h"
 #include "ParticleModelLoader.h"
+#include "OBBSkeleton.h"
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : CB{
@@ -28,6 +29,7 @@ public:
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
+	OBBSkeletonDebug* OBBSkeleton;
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);
