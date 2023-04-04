@@ -283,7 +283,7 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 #pragma region shaderloading
 	if (loadVShader("VertexShader.cso", device, vShader[0], vShaderByteCode[0]) &&
 		loadVShader("VertexBillBoard.cso", device, vShader[1], vShaderByteCode[1]) &&
-		loadVShader("VertexDisplaysment.cso",device, vShader[2], vShaderByteCode[2])&&
+		loadVShader("DebugDrawOBBVertex.cso",device, vShader[2], vShaderByteCode[2])&&
 		loadVShader("VertexShadow.cso",device, vShader[3], vShaderByteCode[2])&&
 		loadVShader("VolumetricVertex.cso",device, vShader[4], vShaderByteCode[3])&&
 		loadGShader("GeometryShader.cso", device, gShader[0]) &&
@@ -292,7 +292,7 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		loadPShader("PSSHNormal.cso", device, pShader[0]) && 
 		loadPShader("PixelBillShader.cso", device, pShader[1])&&
 		loadPShader("PSSH.cso", device, pShader[2])&&
-		loadPShader("DynamicCubicPS.cso", device, pShader[3])&&
+		loadPShader("PixelShadow.cso", device, pShader[3])&&
 		loadPShader("VolumetricPixelShader.cso", device, pShader[4])&&
 		loadHShader("HullDisplaysment.cso", device, hShader[0])&&
 		loadHShader("PhongTessHull.cso", device, hShader[1])&&
@@ -325,7 +325,10 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
-	if(!CreateInputLayoutOwn(device, inputLayout[2], vShaderByteCode[3],inputDesc,nrOfEl))
+	if(!CreateInputLayoutOwn(device, inputLayout[2], vShaderByteCode[3],inputDesc,nrOfEl)){
+		std::cerr << "cant load own input layput 2" << std::endl;
+		return false;
+	}
 	if (!CreateSamplerState(device, sampler))
 	{
 		std::cerr << "cant load sampler" << std::endl;

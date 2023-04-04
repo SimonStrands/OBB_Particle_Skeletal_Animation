@@ -8,6 +8,6 @@ Texture2D SM : register(t4);
 float4 main(PixelShaderInput input) : SV_TARGET
 {
 	float4 a = input.position;
-	return float4(a.x,a.y,a.z,1);
+	return float4(1,0,0,0.5f);
 }
 

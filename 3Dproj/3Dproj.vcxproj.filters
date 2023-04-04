@@ -94,6 +94,9 @@
     <Filter Include="Resource Files\Shaders\Volumetric">
       <UniqueIdentifier>{ba63f5f0-58be-4679-954a-9c11d1a5b52c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders\DebugDrawObb">
+      <UniqueIdentifier>{2f87aa80-af5e-4a1b-b68b-5619ed360835}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -220,6 +223,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OBBSkeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -365,6 +371,9 @@
     <ClInclude Include="BillBoardManager.h">
       <Filter>Header Files\Graphic\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="OBBSkeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -449,6 +458,9 @@
     </FxCompile>
     <FxCompile Include="ParticleSkeletalAnimationComputeShader.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
+    <FxCompile Include="DebugDrawOBBVertex.hlsl">
+      <Filter>Resource Files\Shaders\DebugDrawObb</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
