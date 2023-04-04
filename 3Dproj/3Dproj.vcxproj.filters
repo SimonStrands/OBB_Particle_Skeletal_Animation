@@ -94,8 +94,8 @@
     <Filter Include="Resource Files\Shaders\Volumetric">
       <UniqueIdentifier>{ba63f5f0-58be-4679-954a-9c11d1a5b52c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphic\SkeletalAnimation">
-      <UniqueIdentifier>{c1e68709-2cbb-4b41-bd58-82f803c94b79}</UniqueIdentifier>
+    <Filter Include="Resource Files\Shaders\DebugDrawObb">
+      <UniqueIdentifier>{2f87aa80-af5e-4a1b-b68b-5619ed360835}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -225,13 +225,7 @@
     <ClCompile Include="ParticleModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Animator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SkeletalAnim.cpp">
+    <ClCompile Include="OBBSkeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -377,14 +371,8 @@
     <ClInclude Include="BillBoardManager.h">
       <Filter>Header Files\Graphic\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="SkeletalAnim.h">
-      <Filter>Header Files\Graphic\SkeletalAnimation</Filter>
-    </ClInclude>
-    <ClInclude Include="Animator.h">
-      <Filter>Header Files\Graphic\SkeletalAnimation</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>Header Files\Graphic\SkeletalAnimation</Filter>
+    <ClInclude Include="OBBSkeleton.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -471,8 +459,8 @@
     <FxCompile Include="ParticleSkeletalAnimationComputeShader.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
     </FxCompile>
-    <FxCompile Include="SkeletalAnimation.hlsl">
-      <Filter>Header Files\Graphic\SkeletalAnimation</Filter>
+    <FxCompile Include="DebugDrawOBBVertex.hlsl">
+      <Filter>Resource Files\Shaders\DebugDrawObb</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

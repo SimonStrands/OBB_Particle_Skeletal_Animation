@@ -43,6 +43,31 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	gfx->takeLight((SpotLight**)light, nrOfLight);
 	
 	lightNr = 0;
+
+	std::vector<DirectX::XMMATRIX> transforms = {
+		DirectX::XMMATRIX(
+		    1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+            1,0,0,1
+		),
+		DirectX::XMMATRIX(
+		    1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+            2,2,0,1
+		),
+		DirectX::XMMATRIX(
+		    1,0,0,0,
+			0,1,0,0,
+			0,0,1,0,
+            -2,-2,1,1
+		)
+	};
+	std::vector<float> height = {1, 2, 3};
+
+
+	OBBSkeleton = new OBBSkeletonDebug(transforms, height, gfx);
 }
 
 Game::~Game() 
@@ -70,6 +95,7 @@ Game::~Game()
 		delete obj[i];
 	}
 	delete particleModel;
+	delete OBBSkeleton;
 }
 
 
@@ -151,6 +177,8 @@ void Game::Update()
 		LightVisualizers[i]->setRot(vec3(0 , light[i]->getRotation().x, -light[i]->getRotation().y) + vec3(0,1.57f,0));
 	}
 	
+	particleModel->updateParticles(dt.dt(), gfx);
+
 	gfx->Update((float)dt.dt(), camera->getPos());
 
 #pragma region camera_settings
@@ -198,7 +226,8 @@ void Game::DrawToBuffer()
 
 void Game::ForwardDraw()
 {
-	particleModel->draw(gfx->get_IMctx());
+	particleModel->draw(gfx);
+	OBBSkeleton->draw(gfx);
 }
 
 void Game::DrawAllShadowObject()

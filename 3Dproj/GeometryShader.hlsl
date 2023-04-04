@@ -5,7 +5,8 @@ struct GSInput
     float4 position : SV_POSITION;
     float4 color : COLOR;
     float3 velocity : VELOCITY;
-    row_major float4x4 modelView : MODELVIEW;
+    row_major float4x4 model : MODEL;
+    row_major float4x4 view : VIEW;
     row_major float4x4 projection : PR;
 };
 struct GSOutput
@@ -16,7 +17,7 @@ struct GSOutput
 	float3 normal : NORMAL;
 	float3 tangent : TANGENT;
 	float3 bitangent : BITANGENT;
-	//float4 fragpos: FRAG_POS;//only have this if deffered rendering is enabled
+	float4 fragpos: FRAG_POS;
 };
 
 cbuffer CBuf
@@ -30,9 +31,9 @@ void main(
 	inout TriangleStream< GSOutput > output
 )
 {
-    float4x4 modelView = input[0].modelView;
+    float4x4 modelView = mul(input[0].model, input[0].view);
 	float4x4 MVP = mul(modelView, input[0].projection);
-	float size = 0.3;
+	float size = 0.1;
 	float3 side = float3(modelView[0][0], modelView[1][0], modelView[2][0]);
 	float3 up = float3(modelView[0][1], modelView[1][1], modelView[2][1]);
 	float3 camToPos = float3(cameraPos.x, cameraPos.y, cameraPos.z)
@@ -50,25 +51,25 @@ void main(
 
 	v = input[0].position - float4(side - up, 0.f) * size;
 	element.position = mul(v, MVP);
-	//element.fragpos = mul(v, input[0].model);
+	element.fragpos = mul(v, input[0].model);
 	element.uv = float2(0, 0);
 	output.Append(element);
 
 	v = input[0].position + float4(side + up, 0.f) * size;
 	element.position = mul(v, MVP);
-	//element.fragpos = mul(v, input[0].model);
+	element.fragpos = mul(v, input[0].model);
 	element.uv = float2(1, 0);
 	output.Append(element);
 
 	v = input[0].position - float4(side + up, 0.f) * size;
 	element.position = mul(v, MVP);
-	//element.fragpos = mul(v, input[0].model);
+	element.fragpos = mul(v, input[0].model);
 	element.uv = float2(0, 1);
 	output.Append(element);
 
 	v = input[0].position + float4(side - up, 0.f) * size;
 	element.position = mul(v, MVP);
-	//element.fragpos = mul(v, input[0].model);
+	element.fragpos = mul(v, input[0].model);
 	element.uv = float2(1, 1);
 	output.Append(element);
 

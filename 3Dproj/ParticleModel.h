@@ -5,7 +5,18 @@
 #include "CreateBuffer.h"
 #include "ParticleModelLoader.h"
 
-//TODO: standard color is empty/white
+//for skeletal animation and moving particles
+struct ComputerShaderParticleModelConstBuffer : CB{
+	struct{
+		float element;
+	}dt;
+	struct{
+		float element;
+	}time;
+	struct{
+		float element[2];
+	}padding;
+};
 
 class ParticleModel{
 public:
@@ -13,14 +24,13 @@ public:
 	~ParticleModel();
 	void addAnimation(const std::string& filePath);
 	void updateParticles(float dt, Graphics*& gfx);
-	void draw(ID3D11DeviceContext*& immediateContext);
+	void draw(Graphics*& gfx);
 private:
-	vec3 pos;
-	vec3 rot;
-	vec3 scale;
 	float voxelScale;
+	DirectX::XMMATRIX positionMatris;
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
+	void updateShaders(Graphics*& gfx);
 
 	ID3D11InputLayout* inputLayout;
 	UINT nrOfVertecies;
@@ -32,12 +42,15 @@ private:
 
 	//vertex buffer with position, velocity and color
 	ID3D11Buffer* vertexBuffer;
+	ID3D11Buffer* Vg_pConstantBuffer;
 
 	//2 textures for the particle one diffuse and one normal map
-	ID3D11ShaderResourceView* SRV;
+	ID3D11ShaderResourceView* diffuseTexture;
+	ID3D11ShaderResourceView* normalMapTexture;
 
 	//compute shader for updating particle position
 	ID3D11ComputeShader* cUpdate;
-	ID3D11Buffer* computeShaderConstantBuffer;
 	ID3D11UnorderedAccessView* billUAV;
+	ID3D11Buffer* computeShaderConstantBuffer;
+	ComputerShaderParticleModelConstBuffer CSConstBuffer;
 };
