@@ -46,7 +46,7 @@ void ResourceManager::loadThings(Graphics*& gfx)
 	};
 	for (int i = 0; i < _countof(names); i++) {
 		ModelObj* model = new ModelObj();
-		model->init("obj/" + names[i], gfx, this);
+		model->init("objects/" + names[i], gfx, this);
 		Models.insert(std::make_pair(names[i], model));
 	}
 	for (int i = 0; i < _countof(names); i++) {
@@ -70,7 +70,7 @@ ModelObj* ResourceManager::get_Models(std::string key, Graphics*& gfx)
 	if (Models.find(key) == Models.end()) {
 		//its not found try to add it to the library
 		ModelObj* model = new ModelObj();
-		model->init("obj/" + key, gfx, this);
+		model->init("objects/" + key, gfx, this);
 		Models.insert(std::make_pair(key, model));
 
 		
