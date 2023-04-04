@@ -199,6 +199,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="rotation.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="SkeletalAnim.cpp" />
     <ClCompile Include="TileAnimation.cpp" />
     <ClCompile Include="TrashCollector.cpp" />
     <ClCompile Include="Vec.cpp" />

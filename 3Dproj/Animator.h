@@ -13,15 +13,16 @@ private:
 	void applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform);
 	std::vector<KeyFrame> GetPreviousAndNextFrames();
 	float calculatProgression(KeyFrame previousFrame, KeyFrame nextFrame);
-	std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame);
+	std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression);
 	void incAnimationTime();
 
 public:
 	Animator();
+	//copyconstructor
 	~Animator();
 
 
 	void update();
-	
+	void DoAnimation(Animation animation);
 
 };

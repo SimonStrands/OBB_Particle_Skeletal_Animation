@@ -9,15 +9,15 @@ std::map<std::string, DirectX::XMMATRIX> Animator::GetCurrAnimPose()
 
 void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform)
 {
-	DirectX::XMMATRIX currLocalTransform = currentPose.Get(joint.name);
+	DirectX::XMMATRIX currLocalTransform = currentPose.at(joint.GetName());
 	DirectX::XMMATRIX currTransform = DirectX::XMMatrixMultiply(parentTransform, currLocalTransform);
-	for (Joint childJoint : joint.childJoints)
+	for (Joint childJoint : joint.GetChildJoints())
 	{
 		applyPoseToJoints(currentPose, childJoint, currTransform);
 
 	}
 	currTransform= DirectX::XMMatrixMultiply(currTransform, joint.GetInverseBindTransform());
-	joint.setAnimationTransform(currTransform);
+	joint.SetAnimationTransform(currTransform);
 }
 
 std::vector<KeyFrame> Animator::GetPreviousAndNextFrames()
@@ -50,6 +50,25 @@ float Animator::calculatProgression(KeyFrame previousFrame, KeyFrame nextFrame)
 	return (this->animationTime - previousFrame.GetTimeStamp()) / timeDiff;
 }
 
+std::map<std::string, DirectX::XMMATRIX> Animator::calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression)
+{
+	std::map<std::string, DirectX::XMMATRIX> currentPose;// = hashmap
+
+	std::vector<std::string> keys;
+	for (auto it = previousFrame.GetJointKeyFrames().begin(); it != previousFrame.GetJointKeyFrames().end(); it++)
+	{
+		keys.push_back(it->first);
+	}
+
+
+	for (std::string jointname : keys)
+	{
+		JointTransform previousPose = previousFrame.GetJointKeyFrames().at(jointname);
+		JointTransform nextPose = nextFrame.GetJointKeyFrames().at(jointname);
+	}
+	return std::map<std::string, DirectX::XMMATRIX>();
+}
+
 void Animator::incAnimationTime()
 {
 	this->animationTime += 0; // deltatime
@@ -69,7 +88,7 @@ Animator::~Animator()
 {
 }
 
-void Animator::update()
+void Animator::Update()
 {
 	if (currentAnim == nullptr)
 	{

@@ -1,8 +1,9 @@
 #pragma once
-//#include <d3d11.h>
 #include <DirectXMath.h>
 #include <list>
 #include <string>
+
+#include "Animator.h"
 
 class Joint {
 
@@ -10,28 +11,60 @@ private:
 	std::list<Joint> childJoints;
 	int id;
 	std::string name;
-	DirectX::XMMATRIX transform;
+	DirectX::XMMATRIX localBindTransform;
+
+	DirectX::XMMATRIX inverseBindTransform;
+	DirectX::XMMATRIX animatedTransform;
 public:
 	Joint();
+	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform);
+	Joint(Joint & obj);
+
+
+	int GetId();
+	std::string GetName();
+	void addChild(Joint child);
+	std::list<Joint> GetChildJoints();
+	
+	DirectX::XMMATRIX GetAnimatedTransform();
+	void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
+	DirectX::XMMATRIX GetInverseBindTransform();
+	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
+	
 };
 
 class Mesh {
 private:
 	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT2 texCoords;
-	DirectX::XMFLOAT3 normal;
+	DirectX::XMFLOAT2 texCoords; //
+	DirectX::XMFLOAT3 normal; //
 	DirectX::XMINT3 jointIDs;
 	DirectX::XMFLOAT3 weights;
 public:
 	Mesh();
+
+
 };
 
 class AnimatedModel {
 private:
 	Joint jointHierarchy;
-	//mesh
+	Mesh mesh;
+	//texture;
+	Joint rootJoint;
+	int jointCount;
+	Animator animator;
 public:
+	AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount);
+	
+	Mesh GetMesh();
+	//tEXTURE GetTexture();
+	Joint GetRootJoint();
+	//void DeleteProperties();
 
+
+	void DoAnimation(Animation animation);
+	void Update();
 };
 
 //https://www.youtube.com/watch?v=f3Cr8Yx3GGA
