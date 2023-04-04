@@ -1,15 +1,43 @@
 #pragma once
 #include "Vec.h"
+#include <vector>
+#include "Graphics.h"
+#include "point.h"
 
-//This is probably not how it should look in final build
-class OBB{
+struct OBBSkeletonOBBBuffer : CB{
+	struct{
+		DirectX::XMMATRIX element[50];
+	}transform;
+	struct{
+		DirectX::XMMATRIX element;
+	}view;
+	struct{
+		DirectX::XMMATRIX element;
+	}projection;
+};
+
+static const float OBBWidth = 1;
+static const float OBBDepth = 1;
+
+class OBBSkeletonDebug{
 public:
-	OBB(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR rot, float height);
-	OBB(DirectX::XMMATRIX localTransform, float height);
+	OBBSkeletonDebug(std::vector<DirectX::XMMATRIX>& transform, std::vector<float>& height, Graphics*& gfx);
+	~OBBSkeletonDebug();
+	void setTransformations(std::vector<DirectX::XMMATRIX>& transform);
+	void draw(Graphics*& gfx);
+
 private:
-	DirectX::XMFLOAT3 position;
-	DirectX::XMVECTOR rotation; //rotation in quaternion
-	const float width = 20;
-	const float depth = 20;
-	const float height;
+	
+	std::vector<DirectX::XMMATRIX> transform;//rotation position
+	std::vector<DirectX::XMMATRIX> size;//the size of the OBB
+	int nrOfBones;
+	void update(Graphics*& gfx);
+private:
+	std::vector<point> verteciesPoints;
+	std::vector<DWORD> indecies;
+	ID3D11Buffer* vertexBuffer;
+	ID3D11Buffer* indeciesBuffer;
+	ID3D11Buffer* constantBuffer;
+	OBBSkeletonOBBBuffer constBufferConverter;
+	
 };

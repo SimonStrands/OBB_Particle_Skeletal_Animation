@@ -37,7 +37,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     currentVelocity *= (1 - drag);
     //DEBUG
     //currentVelocity += float3(sin(time) + , cos(time) * 1, 0);
-    currentVelocity += float3(sin(time) + currPos.x * currPos.y, cos(time) * 1, 0);
+    currentVelocity += float3(0, 0, 0);
     currPos += currentVelocity * dt;
    
 
