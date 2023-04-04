@@ -1,6 +1,6 @@
 #include "SkeletalAnim.h"
 
-Joint::Joint()
+Joint::Joint() //maybe make it impossible to make default joints? and only pointer to Joints?
 {
     this->id = -1;
     this->name = "default";
@@ -101,6 +101,22 @@ void AnimatedModel::DoAnimation(Animation animation)
 void AnimatedModel::Update()
 {
     animator.Update();
+}
+
+std::vector<DirectX::XMMATRIX> AnimatedModel::GetJointTransforms()
+{
+    std::vector<DirectX::XMMATRIX> jointMatrices;
+    jointMatrices.resize(jointCount);
+    AddJointsToArray(rootJoint, jointMatrices);
+    return jointMatrices;
+}
+
+void AnimatedModel::AddJointsToArray(Joint headJoint, std::vector<DirectX::XMMATRIX> jointMatrices)
+{
+    jointMatrices[headJoint.GetId()] = headJoint.GetAnimatedTransform();
+    for (Joint childJoint : headJoint.GetChildJoints()) {
+        AddJointsToArray(childJoint, jointMatrices);
+    }
 }
 
 //void AnimatedModel::DeleteProperties()

@@ -18,7 +18,7 @@ private:
 public:
 	Joint();
 	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform);
-	Joint(Joint & obj);
+	Joint(const Joint & obj);
 
 
 	int GetId();
@@ -65,6 +65,12 @@ public:
 
 	void DoAnimation(Animation animation);
 	void Update();
+
+	std::vector<DirectX::XMMATRIX> GetJointTransforms();
+	void AddJointsToArray(Joint headJoint, std::vector<DirectX::XMMATRIX> jointMatrices);
+
 };
 
+
+//modified version and based on video link
 //https://www.youtube.com/watch?v=f3Cr8Yx3GGA

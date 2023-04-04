@@ -5,7 +5,7 @@
 class Animator {
 private:
 
-	AnimatedModel entity;
+	AnimatedModel* entity;
 	Animation* currentAnim;
 	float animationTime;
 
@@ -16,13 +16,15 @@ private:
 	std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression);
 	void incAnimationTime();
 
+	
 public:
 	Animator();
-	//copyconstructor
+	Animator(AnimatedModel entity);
+	Animator(const Animator& obj);
 	~Animator();
 
 
-	void update();
+	void Update();
 	void DoAnimation(Animation animation);
 
 };

@@ -21,13 +21,13 @@ public:
 
 class KeyFrame {
 private:
-	std::map<std::string, JointTransform> jointKeyframes;
+	std::map<std::string, JointTransform> jointKeyframes; //pose
 	float timeStamp;
 public:
 	KeyFrame(float timeStamp, std::map<std::string, JointTransform> jointKeyframes);
 
 	float GetTimeStamp();
-	std::map<std::string, JointTransform> GetJointKeyFrames();
+	std::map<std::string, JointTransform> GetJointKeyFrames(); //pose
 
 };
 

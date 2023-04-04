@@ -61,13 +61,16 @@ std::map<std::string, DirectX::XMMATRIX> Animator::calculateCurrentPose(KeyFrame
 	}
 
 
-	for (std::string jointname : keys)
+	for (std::string jointName : keys)
 	{
-		JointTransform previousPose = previousFrame.GetJointKeyFrames().at(jointname);
-		JointTransform nextPose = nextFrame.GetJointKeyFrames().at(jointname);
+		JointTransform previousTransform = previousFrame.GetJointKeyFrames().at(jointName);
+		JointTransform nextTransform = nextFrame.GetJointKeyFrames().at(jointName);
+		JointTransform currentTransform = currentTransform.Interpolate(previousTransform, nextTransform, progression);
+		currentPose.emplace(jointName, currentTransform.GetLocalTransform());
 	}
-	return std::map<std::string, DirectX::XMMATRIX>();
+	return currentPose;
 }
+
 
 void Animator::incAnimationTime()
 {
@@ -81,7 +84,25 @@ void Animator::incAnimationTime()
 
 Animator::Animator()
 {
+	this->entity = nullptr;
+	this->currentAnim = nullptr;
+	this->animationTime = 0.f;
+}
 
+Animator::Animator(AnimatedModel entity)
+{
+	this->entity = &entity;
+	this->currentAnim = nullptr;
+	this->animationTime = 0.f;
+}
+
+Animator::Animator(const Animator& obj)
+{
+	if(obj.entity!=nullptr)
+		*this->entity = *obj.entity;
+	if (obj.currentAnim != nullptr)
+		*this->currentAnim = *obj.currentAnim;
+	this->animationTime = obj.animationTime;
 }
 
 Animator::~Animator()
@@ -96,7 +117,13 @@ void Animator::Update()
 	}
 	incAnimationTime();
 	std::map<std::string, DirectX::XMMATRIX> currentPose = GetCurrAnimPose();
-	applyPoseToJoints(currentPose, entity.GetRootJoints()), rotations);
+	applyPoseToJoints(currentPose, entity->GetRootJoint(), DirectX::XMMATRIX());
+}
+
+void Animator::DoAnimation(Animation animation)
+{
+	this->animationTime = 0;
+	this->currentAnim = &animation;
 }
 
 
