@@ -12,7 +12,7 @@ void readBoneHiarchy(aiNode *pNode, const aiMatrix4x4& parentMatrix, std::vector
 					m.a1, m.b1, m.c1, m.d1,
 					m.a2, m.b2, m.c2, m.d2,
 					m.a3, m.b3, m.c3, m.d3,
-					m.a4, m.b4, m.c4, m.d4
+					m.a4 * 0.01f, m.b4 * 0.01f, m.c4 * 0.01f, m.d4
 				));
 	for(int i = 0; i < pNode->mNumChildren; i++){
 		readBoneHiarchy(pNode->mChildren[i], newParentMatrix, Transformations);

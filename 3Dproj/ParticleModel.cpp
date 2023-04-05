@@ -70,7 +70,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::vector<float> heights;
 	heights.reserve(Transformations.size());
 	for(int i = 0; i < Transformations.size(); i++){
-		heights.push_back(1);
+		heights.push_back(0.01f);
 	}
 	this->OBBSkeleton = new OBBSkeletonDebug(Transformations, heights, gfx);
 }
