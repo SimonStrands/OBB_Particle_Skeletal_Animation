@@ -7,17 +7,17 @@ std::map<std::string, DirectX::XMMATRIX> Animator::GetCurrAnimPose()
 	return calculateCurrentPose(frames[0], frames[1], progression);
 }
 
-void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform)
+void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint* joint, DirectX::XMMATRIX parentTransform)
 {
-	DirectX::XMMATRIX currLocalTransform = currentPose.at(joint.GetName());
+	DirectX::XMMATRIX currLocalTransform = currentPose.at(joint->GetName());
 	DirectX::XMMATRIX currTransform = DirectX::XMMatrixMultiply(parentTransform, currLocalTransform);
-	for (Joint childJoint : joint.GetChildJoints())
+	for (Joint* childJoint : joint->GetChildJoints())
 	{
 		applyPoseToJoints(currentPose, childJoint, currTransform);
 
 	}
-	currTransform= DirectX::XMMatrixMultiply(currTransform, joint.GetInverseBindTransform());
-	joint.SetAnimationTransform(currTransform);
+	currTransform= DirectX::XMMatrixMultiply(currTransform, joint->GetInverseBindTransform());
+	joint->SetAnimationTransform(currTransform);
 }
 
 std::vector<KeyFrame> Animator::GetPreviousAndNextFrames()

@@ -15,38 +15,38 @@ Joint::Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform)
 
 }
 
-Joint::Joint(Joint& obj)
+Joint::Joint(const Joint& obj)
 {
-    this->childJoints = obj.childJoints;
+    childJoints = obj.childJoints;
 
-    this->id = obj.id;
-    this->name = obj.name;
-    this->localBindTransform = obj.localBindTransform;
+    id = obj.id;
+    name = obj.name;
+    localBindTransform = obj.localBindTransform;
 
-    this->inverseBindTransform = obj.inverseBindTransform;
-    this->animatedTransform = obj.animatedTransform;
+    inverseBindTransform = obj.inverseBindTransform;
+    animatedTransform = obj.animatedTransform;
 }
 
 void Joint::addChild(Joint child)
 {
     this->childJoints.push_back(child);
 }
-std::list<Joint> Joint::GetChildJoints()
+std::list<Joint> Joint::GetChildJoints() const
 {
     return this->childJoints;
 }
-int Joint::GetId()
+int Joint::GetId() const
 {
     return this->id;
 }
 
-std::string Joint::GetName()
+std::string Joint::GetName() const
 {
     return this->name;
 }
 
 
-DirectX::XMMATRIX Joint::GetAnimatedTransform()
+DirectX::XMMATRIX Joint::GetAnimatedTransform() const
 {
     return this->animatedTransform;
 }
@@ -56,7 +56,7 @@ void Joint::SetAnimationTransform(DirectX::XMMATRIX animationTransform)
     this->animatedTransform = animatedTransform;
 }
 
-DirectX::XMMATRIX Joint::GetInverseBindTransform()
+DirectX::XMMATRIX Joint::GetInverseBindTransform() const
 {
     return this->inverseBindTransform;
 }
@@ -83,24 +83,24 @@ AnimatedModel::AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, i
     rootJoint.CalcInverseBindTransform(DirectX::XMMATRIX());
 }
 
-Mesh AnimatedModel::GetMesh()
+Mesh AnimatedModel::GetMesh() const
 {
     return this->mesh;
 }
 
-Joint AnimatedModel::GetRootJoint()
+Joint* AnimatedModel::GetRootJoint() const
 {
     return this->rootJoint;
 }
 
 void AnimatedModel::DoAnimation(Animation animation)
 {
-    animator.DoAnimation(animation);
+    animator->DoAnimation(animation);
 }
 
 void AnimatedModel::Update()
 {
-    animator.Update();
+    animator->Update();
 }
 
 std::vector<DirectX::XMMATRIX> AnimatedModel::GetJointTransforms()
@@ -111,10 +111,10 @@ std::vector<DirectX::XMMATRIX> AnimatedModel::GetJointTransforms()
     return jointMatrices;
 }
 
-void AnimatedModel::AddJointsToArray(Joint headJoint, std::vector<DirectX::XMMATRIX> jointMatrices)
+void AnimatedModel::AddJointsToArray(Joint* headJoint, std::vector<DirectX::XMMATRIX> jointMatrices)
 {
-    jointMatrices[headJoint.GetId()] = headJoint.GetAnimatedTransform();
-    for (Joint childJoint : headJoint.GetChildJoints()) {
+    jointMatrices[headJoint->GetId()] = headJoint->GetAnimatedTransform();
+    for (Joint* childJoint : headJoint->GetChildJoints()) {
         AddJointsToArray(childJoint, jointMatrices);
     }
 }

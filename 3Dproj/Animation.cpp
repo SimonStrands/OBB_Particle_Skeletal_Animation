@@ -1,5 +1,6 @@
 #include "Animation.h"
 
+using namespace DirectX;
 
 Animation::Animation(float length, std::vector<KeyFrame> frames)
 {
@@ -33,18 +34,18 @@ std::map<std::string, JointTransform> KeyFrame::GetJointKeyFrames()
     return this->jointKeyframes;
 }
 
-JointTransform::JointTransform(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR rot)
+JointTransform::JointTransform(XMFLOAT3 pos, XMVECTOR rot)
 {
     this->position = pos;
     this->rotation = rot;
 }
 
-JointTransform::JointTransform(DirectX::XMMATRIX localTransform)
+JointTransform::JointTransform(XMMATRIX localTransform)
 {
-    DirectX::XMFLOAT4X4 localTransform4x4;
-    DirectX::XMStoreFloat4x4(&localTransform4x4, localTransform);
-    this->position = DirectX::XMFLOAT3(localTransform4x4._31, localTransform4x4._32, localTransform4x4._33);
-    this->rotation = DirectX::XMQuaternionRotationMatrix(localTransform);
+    XMFLOAT4X4 localTransform4x4;
+    XMStoreFloat4x4(&localTransform4x4, localTransform);
+    this->position = XMFLOAT3(localTransform4x4._31, localTransform4x4._32, localTransform4x4._33);
+    this->rotation = XMQuaternionRotationMatrix(localTransform);
 
 }
 
@@ -52,27 +53,29 @@ JointTransform::~JointTransform()
 {
 }
 
-DirectX::XMFLOAT3 JointTransform::GetPosition()
+XMFLOAT3 JointTransform::GetPosition()
 {
     return this->position;
 }
 
-DirectX::XMVECTOR JointTransform::GetRotation()
+XMVECTOR JointTransform::GetRotation()
 {
     return this->rotation;
 }
 
-DirectX::XMMATRIX JointTransform::GetLocalTransform()
+XMMATRIX JointTransform::GetLocalTransform()
 {
-    DirectX::XMMATRIX localtransform = DirectX::XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
+    XMMATRIX localtransform = DirectX::XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
     localtransform = DirectX::XMMatrixMultiply(localtransform, DirectX::XMMatrixRotationQuaternion(this->rotation));
     return localtransform;
 }
 
 JointTransform JointTransform::Interpolate(JointTransform frameA, JointTransform frameB, float progression)
 {
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMVECTOR posV = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&frameA.GetPosition()), DirectX::XMLoadFloat3(&frameB.GetPosition()), progression);
+    XMFLOAT3 pos;
+    XMFLOAT3 posA = frameA.GetPosition(); 
+    XMFLOAT3 posB = frameB.GetPosition();
+    DirectX::XMVECTOR posV = DirectX::XMVectorLerp(XMLoadFloat3(&posA), XMLoadFloat3(&posB), progression);
     DirectX::XMStoreFloat3(&pos, posV);
     DirectX::XMVECTOR rot = DirectX::XMQuaternionSlerp(frameA.GetRotation(), frameB.GetRotation(), progression);
     return JointTransform(pos, rot);

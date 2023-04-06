@@ -1,4 +1,7 @@
-#pragma once
+#ifndef SKELETALANIM_H
+#define SKELETALANIM_H
+
+
 #include <DirectXMath.h>
 #include <list>
 #include <string>
@@ -21,14 +24,14 @@ public:
 	Joint(const Joint & obj);
 
 
-	int GetId();
-	std::string GetName();
+	int GetId() const;
+	std::string GetName() const;
 	void addChild(Joint child);
-	std::list<Joint> GetChildJoints();
+	std::list<Joint> GetChildJoints() const;
 	
-	DirectX::XMMATRIX GetAnimatedTransform();
+	DirectX::XMMATRIX GetAnimatedTransform() const;
 	void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
-	DirectX::XMMATRIX GetInverseBindTransform();
+	DirectX::XMMATRIX GetInverseBindTransform() const;
 	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
 	
 };
@@ -51,15 +54,15 @@ private:
 	Joint jointHierarchy;
 	Mesh mesh;
 	//texture;
-	Joint rootJoint;
+	Joint* rootJoint;
 	int jointCount;
-	Animator animator;
+	Animator* animator;
 public:
 	AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount);
 	
-	Mesh GetMesh();
+	Mesh GetMesh() const;
 	//tEXTURE GetTexture();
-	Joint GetRootJoint();
+	Joint* GetRootJoint() const;
 	//void DeleteProperties();
 
 
@@ -67,9 +70,11 @@ public:
 	void Update();
 
 	std::vector<DirectX::XMMATRIX> GetJointTransforms();
-	void AddJointsToArray(Joint headJoint, std::vector<DirectX::XMMATRIX> jointMatrices);
+	void AddJointsToArray(Joint* headJoint, std::vector<DirectX::XMMATRIX> jointMatrices);
 
 };
+#endif
+
 
 
 //modified version and based on video link

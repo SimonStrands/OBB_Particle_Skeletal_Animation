@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
@@ -44,3 +46,5 @@ public:
 	std::vector<KeyFrame> GetKeyFrames();
 
 };
+
+#endif // !ANIMATION_H

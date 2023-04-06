@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ANIMATOR_H
+#define ANIMATOR_H
+
 #include "Animation.h"
 #include "SkeletalAnim.h"
 #include <cmath>
@@ -10,7 +12,7 @@ private:
 	float animationTime;
 
 	std::map<std::string, DirectX::XMMATRIX> GetCurrAnimPose();
-	void applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform);
+	void applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint* joint, DirectX::XMMATRIX parentTransform);
 	std::vector<KeyFrame> GetPreviousAndNextFrames();
 	float calculatProgression(KeyFrame previousFrame, KeyFrame nextFrame);
 	std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression);
@@ -28,3 +30,5 @@ public:
 	void DoAnimation(Animation animation);
 
 };
+
+#endif
