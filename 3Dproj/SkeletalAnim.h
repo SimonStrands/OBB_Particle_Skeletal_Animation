@@ -1,17 +1,18 @@
 #ifndef SKELETALANIM_H
 #define SKELETALANIM_H
 
-
+#include <vector>
 #include <DirectXMath.h>
 #include <list>
 #include <string>
 
-#include "Animator.h"
+class Animation;
+class Animator;
 
 class Joint {
 
 private:
-	std::list<Joint> childJoints;
+	std::list<Joint*> childJoints;
 	int id;
 	std::string name;
 	DirectX::XMMATRIX localBindTransform;
@@ -26,8 +27,8 @@ public:
 
 	int GetId() const;
 	std::string GetName() const;
-	void addChild(Joint child);
-	std::list<Joint> GetChildJoints() const;
+	void addChild(Joint* child);
+	std::list<Joint*> GetChildJoints() const;
 	
 	DirectX::XMMATRIX GetAnimatedTransform() const;
 	void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
@@ -45,20 +46,21 @@ private:
 	DirectX::XMFLOAT3 weights;
 public:
 	Mesh();
+	~Mesh();
 
 
 };
 
 class AnimatedModel {
 private:
-	Joint jointHierarchy;
+	Joint* jointHierarchy;
 	Mesh mesh;
 	//texture;
 	Joint* rootJoint;
 	int jointCount;
 	Animator* animator;
 public:
-	AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount);
+	AnimatedModel(Mesh model, /*Texture texture,*/ Joint* rootJoint, int jointCount);
 	
 	Mesh GetMesh() const;
 	//tEXTURE GetTexture();

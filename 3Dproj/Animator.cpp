@@ -1,5 +1,6 @@
 #include "Animator.h"
-
+#include "SkeletalAnim.h"
+#include "Animation.h"
 std::map<std::string, DirectX::XMMATRIX> Animator::GetCurrAnimPose()
 {
 	std::vector<KeyFrame> frames = GetPreviousAndNextFrames();
@@ -11,6 +12,8 @@ void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> curren
 {
 	DirectX::XMMATRIX currLocalTransform = currentPose.at(joint->GetName());
 	DirectX::XMMATRIX currTransform = DirectX::XMMatrixMultiply(parentTransform, currLocalTransform);
+	
+	//for(int i<0;i<joint.get)
 	for (Joint* childJoint : joint->GetChildJoints())
 	{
 		applyPoseToJoints(currentPose, childJoint, currTransform);
@@ -89,9 +92,9 @@ Animator::Animator()
 	this->animationTime = 0.f;
 }
 
-Animator::Animator(AnimatedModel entity)
+Animator::Animator(AnimatedModel* entity)
 {
-	this->entity = &entity;
+	*this->entity = *entity;
 	this->currentAnim = nullptr;
 	this->animationTime = 0.f;
 }

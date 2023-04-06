@@ -1,4 +1,5 @@
 #include "SkeletalAnim.h"
+#include "Animator.h"
 
 Joint::Joint() //maybe make it impossible to make default joints? and only pointer to Joints?
 {
@@ -27,11 +28,11 @@ Joint::Joint(const Joint& obj)
     animatedTransform = obj.animatedTransform;
 }
 
-void Joint::addChild(Joint child)
+void Joint::addChild(Joint* child)
 {
     this->childJoints.push_back(child);
 }
-std::list<Joint> Joint::GetChildJoints() const
+std::list<Joint*> Joint::GetChildJoints() const
 {
     return this->childJoints;
 }
@@ -66,21 +67,21 @@ void Joint::CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform)
     DirectX::XMMATRIX bindTransform = DirectX::XMMatrixMultiply(parentBindTransform, localBindTransform);
     
     inverseBindTransform = DirectX::XMMatrixInverse(nullptr, bindTransform);
-    for (Joint child : childJoints)
+    for (Joint* child : childJoints)
     {
-        child.CalcInverseBindTransform(bindTransform);
+        child->CalcInverseBindTransform(bindTransform);
     }
 
 }
 
-AnimatedModel::AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount)
+AnimatedModel::AnimatedModel(Mesh model, /*Texture texture,*/ Joint* rootJoint, int jointCount)
 {
     this->mesh = model;
     //this->texture = texture;
     this->rootJoint = rootJoint;
     this->jointCount = jointCount;
     //this->animator = new Animator(this);
-    rootJoint.CalcInverseBindTransform(DirectX::XMMATRIX());
+    rootJoint->CalcInverseBindTransform(DirectX::XMMATRIX());
 }
 
 Mesh AnimatedModel::GetMesh() const
@@ -124,4 +125,10 @@ void AnimatedModel::AddJointsToArray(Joint* headJoint, std::vector<DirectX::XMMA
 //    //delete this->mesh
 //}
 
+Mesh::Mesh()
+{
+}
 
+Mesh::~Mesh()
+{
+}

@@ -2,11 +2,15 @@
 #define ANIMATOR_H
 
 #include "Animation.h"
-#include "SkeletalAnim.h"
+
 #include <cmath>
+
+class Joint;
+class Mesh;
+class AnimatedModel;
+
 class Animator {
 private:
-
 	AnimatedModel* entity;
 	Animation* currentAnim;
 	float animationTime;
@@ -21,7 +25,7 @@ private:
 	
 public:
 	Animator();
-	Animator(AnimatedModel entity);
+	Animator(AnimatedModel* entity);
 	Animator(const Animator& obj);
 	~Animator();
 
