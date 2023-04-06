@@ -76,7 +76,7 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	//draw
 	//gfx->get_IMctx()->Draw(verteciesPoints.size(), 0);
 	//gfx->get_IMctx()->DrawIndexed(indecies.size(), 0, 0);
-	gfx->get_IMctx()->DrawIndexedInstanced(indecies.size(), size.size(), 0, 0, 0);
+	gfx->get_IMctx()->DrawIndexedInstanced((UINT)indecies.size(), (UINT)size.size(), 0, 0, 0);
 
 }
 

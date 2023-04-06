@@ -1,4 +1,4 @@
-#include "Animator.h"
+/*#include "Animator.h"
 
 std::map<std::string, DirectX::XMMATRIX> Animator::GetCurrAnimPose()
 {
@@ -125,5 +125,6 @@ void Animator::DoAnimation(Animation animation)
 	this->animationTime = 0;
 	this->currentAnim = &animation;
 }
+*/
 
 

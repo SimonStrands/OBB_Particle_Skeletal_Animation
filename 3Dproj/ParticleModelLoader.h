@@ -6,6 +6,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include "SkeletalAnim.h"
+#include "Animation.h"
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
 void Nodes(int& nrTotal, std::vector<DirectX::XMMATRIX>& arr, aiNode* walker);
