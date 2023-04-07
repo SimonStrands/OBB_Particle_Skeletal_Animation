@@ -1,7 +1,6 @@
 #include "ParticleModelLoader.h"
 #include <iostream>
 
-
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
 	DirectX::XMFLOAT4X4 mat4;
@@ -52,8 +51,9 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Joint child;
-			readSkeleton(boneInfo, child, node->mChildren[i]);
-			joint.addChild(child);
+			if(readSkeleton(boneInfo, child, node->mChildren[i])){
+				joint.addChild(child);
+			}
 		}
 		return true;
 	}
@@ -166,7 +166,7 @@ bool loadAnimation(const aiScene* scene, Animation& animation){
 	return true;
 }
 
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath)
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, DirectX::XMMATRIX &globalInverseTransform, Joint& rootJoint)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
@@ -182,15 +182,14 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	aiMesh* mesh = scene->mMeshes[0];
 	uint16_t boneCount = 0;
 	uint16_t vao = 0;//?
-	Joint rootJoint;
-	Animation animation;
+	
 	
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 	}
-	DirectX::XMMATRIX globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
+	globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
 	globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);
 
 	//load Bones

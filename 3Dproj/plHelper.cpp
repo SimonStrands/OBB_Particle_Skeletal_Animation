@@ -285,7 +285,11 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		loadVShader("VertexBillBoard.cso", device, vShader[1], vShaderByteCode[1]) &&
 		loadVShader("DebugDrawOBBVertex.cso",device, vShader[2], vShaderByteCode[2])&&
 		loadVShader("VertexShadow.cso",device, vShader[3], vShaderByteCode[2])&&
+#ifdef TRADITIONALSKELETALANIMATION
+		loadVShader("VolumetrixVertexTraditionalSkeletalAnimaiton.cso",device, vShader[4], vShaderByteCode[3])&&
+#else
 		loadVShader("VolumetricVertex.cso",device, vShader[4], vShaderByteCode[3])&&
+#endif
 		loadGShader("GeometryShader.cso", device, gShader[0]) &&
 		loadGShader("Debugging_test.cso", device, gShader[1]) &&
 		loadGShader("VoxelCreator.cso", device, gShader[2]) &&//Volumetric
@@ -318,12 +322,21 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		std::cerr << "cant load inputlayout2" << std::endl;
 		return false;
 	}
+	#ifdef TRADITIONALSKELETALANIMATION
+	const int nrOfEl = 5;
+    #else
 	const int nrOfEl = 3;
+    #endif
 	D3D11_INPUT_ELEMENT_DESC inputDesc[nrOfEl] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		//#ifdef TRADITIONALSKELETALANIMATION
+		,
+		{"BONEID", 0, DXGI_FORMAT_R32G32B32A32_SINT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BoneWeight", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        //#endif
 	};
 	if(!CreateInputLayoutOwn(device, inputLayout[2], vShaderByteCode[3],inputDesc,nrOfEl)){
 		std::cerr << "cant load own input layput 2" << std::endl;

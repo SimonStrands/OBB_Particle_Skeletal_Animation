@@ -392,6 +392,9 @@
     <ClInclude Include="SkeletalAnim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BuildDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -480,7 +483,6 @@
     <FxCompile Include="DebugDrawOBBVertex.hlsl">
       <Filter>Resource Files\Shaders\DebugDrawObb</Filter>
     </FxCompile>
-    <FxCompile Include="SkeletalAnimation.hlsl" />
     <FxCompile Include="VolumetrixVertexTraditionalSkeletalAnimaiton.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
     </FxCompile>

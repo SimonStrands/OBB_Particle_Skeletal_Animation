@@ -11,4 +11,10 @@
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
 void Nodes(int& nrTotal, std::vector<DirectX::XMMATRIX>& arr, aiNode* walker);
 
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath);
+void loadParticleModel(
+	std::vector<VolumetricVertex>& vertecies, 
+	const std::string& filePath,
+	Animation& animation,
+	DirectX::XMMATRIX &globalInverseTransform,
+	Joint& rootJoint
+);

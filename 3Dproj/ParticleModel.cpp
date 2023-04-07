@@ -1,7 +1,63 @@
 #include "ParticleModel.h"
 #include "Random.h"
 
+std::pair<unsigned int, float> getTimeFraction(std::vector<float>& times, float& dt) {
+	unsigned int segment = 0;
+	while (dt > times[times.size() - 1]){
+		dt -= times[times.size() - 1];
+	}
+	while (dt > times[segment]){
+		segment++;
+	}
+	float start = times[segment - 1];
+	float end = times[segment];
+	float frac = (dt - start) / (end - start);
+	return {segment, frac};
+}
 
+void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform){
+
+	if(!(joint.GetId() > -1)){
+		return;
+	}
+	KeyFrame boneFrame = anim.keyFrames.find(joint.GetName())->second;
+	time = std::fmod(time, anim.length);
+	std::pair<unsigned int, float> fp;
+
+	fp = getTimeFraction(boneFrame.positionTimestamps, time);
+
+	DirectX::XMFLOAT3 pos1 = boneFrame.positions[fp.first - 1];
+	DirectX::XMFLOAT3 pos2 = boneFrame.positions[fp.first];
+	
+	DirectX::XMVECTOR ThePosition = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&pos1), DirectX::XMLoadFloat3(&pos2), fp.second);
+
+	DirectX::XMFLOAT4 rot1 = boneFrame.rotations[fp.first - 1];
+	DirectX::XMFLOAT4 rot2 = boneFrame.rotations[fp.first];
+	
+	DirectX::XMVECTOR TheRotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rot1), DirectX::XMLoadFloat4(&rot2), fp.second);
+
+	DirectX::XMFLOAT3 scale1 = boneFrame.scales[fp.first - 1];
+	DirectX::XMFLOAT3 scale2 = boneFrame.scales[fp.first];
+	
+	DirectX::XMVECTOR TheScale = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&pos1), DirectX::XMLoadFloat3(&pos2), fp.second);
+
+	
+	DirectX::XMStoreFloat3(&pos1,ThePosition);
+	DirectX::XMMATRIX positionMat = DirectX::XMMatrixTranslation(pos1.x, pos1.y, pos1.z);
+	
+	DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationQuaternion(TheRotation);
+	
+	DirectX::XMMATRIX localTransform = positionMat * rotationMat;
+	DirectX::XMMATRIX GlobalTransformation = parentTransform * localTransform;
+
+	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * GlobalTransformation * joint.getOffsetMatrix();
+	std::cout << SkeletonConstBufferConverter.Transformations.element[0].r->m128_f32[5] << std::endl;
+
+
+	for(int i = 0; i < joint.GetChildJoints().size(); i++){
+		getPose(joint.GetChildJoints()[i], anim, time, GlobalTransformation);
+	}
+}
 
 ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position):
 	positionMatris(
@@ -14,7 +70,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/testAnimation.fbx");
+	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -51,7 +107,11 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	UavDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	UavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 	UavDesc.Buffer.FirstElement = 0;
+#ifdef TRADITIONALSKELETALANIMATION
+	UavDesc.Buffer.NumElements = nrOfVertecies * 18;
+#else
 	UavDesc.Buffer.NumElements = nrOfVertecies * 10;
+#endif // DEBUG
 	UavDesc.Buffer.Flags = 0;
 	if (FAILED(gfx->getDevice()->CreateUnorderedAccessView(vertexBuffer, &UavDesc, &billUAV))) {
 		printf("doesn't work create Buffer");
@@ -59,6 +119,9 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	}
 	if(!CreateConstBuffer(gfx, this->computeShaderConstantBuffer, sizeof(ComputerShaderParticleModelConstBuffer), &CSConstBuffer)){
 		std::cout << "stop" << std::endl;
+	}
+	if(!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstBufferConverter), &SkeletonConstBufferConverter)){
+		std::cout << "failed to create const buffer" << std::endl;
 	}
 	this->CSConstBuffer.time.element = 0;
 }
@@ -72,13 +135,25 @@ ParticleModel::~ParticleModel()
 	cUpdate->Release();
 	billUAV->Release();
 	computeShaderConstantBuffer->Release();
+	SkeletonConstBuffer->Release();
 }
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
+	time += dt;
+	getPose(rootJoint, animation, time);
+	
+	D3D11_MAPPED_SUBRESOURCE resource;
+	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, &SkeletonConstBufferConverter, sizeof(ComputerShaderParticleModelConstBuffer));
+	gfx->get_IMctx()->Unmap(SkeletonConstBuffer, 0);
+	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	
+	gfx->get_IMctx()->VSSetConstantBuffers(1, 1, &SkeletonConstBuffer);
+
 	this->CSConstBuffer.dt.element = dt;
 	this->CSConstBuffer.time.element += dt;
-
+	#ifndef TRADITIONALSKELETALANIMATION
 	//update computeshader const buffer
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
@@ -98,6 +173,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+#endif
 }
 
 void ParticleModel::draw(Graphics*& gfx)

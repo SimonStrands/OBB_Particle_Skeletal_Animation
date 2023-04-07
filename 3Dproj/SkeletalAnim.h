@@ -9,7 +9,7 @@
 class Joint {
 
 private:
-	std::list<Joint> childJoints;
+	std::vector<Joint> childJoints;
 	int id;
 	std::string name;
 	DirectX::XMMATRIX offset;
@@ -22,7 +22,7 @@ public:
 	int &GetId();
 	std::string &GetName();
 	void addChild(Joint child);
-	std::list<Joint> GetChildJoints() const;
+	std::vector<Joint> GetChildJoints() const;
 	
 	DirectX::XMMATRIX& getOffsetMatrix();
 	
