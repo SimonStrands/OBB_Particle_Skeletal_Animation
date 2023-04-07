@@ -15,8 +15,12 @@ std::pair<unsigned int, float> getTimeFraction(std::vector<float>& times, float&
 	return {segment, frac};
 }
 
-void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform){
+DirectX::XMMATRIX t(DirectX::XMMATRIX m, float f){
+	return m * f;
+}
 
+void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform){
+	/*
 	if(!(joint.GetId() > -1)){
 		return;
 	}
@@ -51,11 +55,42 @@ void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, Dir
 	DirectX::XMMATRIX GlobalTransformation = parentTransform * localTransform;
 
 	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * GlobalTransformation * joint.getOffsetMatrix();
-	std::cout << SkeletonConstBufferConverter.Transformations.element[0].r->m128_f32[5] << std::endl;
-
 
 	for(int i = 0; i < joint.GetChildJoints().size(); i++){
 		getPose(joint.GetChildJoints()[i], anim, time, GlobalTransformation);
+	}*/
+	KeyFrame& btt = animation.keyFrames[joint.GetName()];
+	time = fmod(time, animation.length);
+	std::pair<unsigned int, float> fp;
+	//calculate interpolated position
+	fp = getTimeFraction(btt.positionTimestamps, time);
+
+	DirectX::XMFLOAT3 position1 = btt.positions[fp.first - 1];
+	DirectX::XMFLOAT3 position2 = btt.positions[fp.first];
+
+	DirectX::XMVECTOR position = DirectX::XMVectorLerp( DirectX::XMLoadFloat3(&position1), DirectX::XMLoadFloat3(&position2), fp.second);
+
+	//calculate interpolated rotation
+	fp = getTimeFraction(btt.rotationTimestamps, time);
+	DirectX::XMFLOAT4 rotation1 = btt.rotations[fp.first - 1];
+	DirectX::XMFLOAT4 rotation2 = btt.rotations[fp.first];
+
+	DirectX::XMVECTOR rotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rotation1), DirectX::XMLoadFloat4(&rotation2), fp.second);
+
+	DirectX::XMMATRIX positionMat = DirectX::XMMATRIX(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+
+
+	// calculate localTransform
+	//positionMat = glm::translate(positionMat, position);
+	DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationQuaternion(rotation);
+	DirectX::XMMATRIX localTransform = positionMat * rotationMat;
+	DirectX::XMMATRIX globalTransform = parentTransform * localTransform;
+
+	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * globalTransform * joint.getOffsetMatrix();
+	//update values for children bones
+	for (Joint& child : joint.GetChildJoints()) {
+		//getPose(animation, child, dt, output, globalTransform, globalInverseTransform);
+		getPose(child, anim, time, globalTransform);
 	}
 }
 

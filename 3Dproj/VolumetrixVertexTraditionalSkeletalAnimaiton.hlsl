@@ -49,14 +49,7 @@ VertexShaderOutput main(VertexShaderInput input)
     boneTransform += mul(Transformations[int(input.bondIDS.z)], input.boneWeights.z);
     boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
     
-    if (input.bondIDS.x > 0.f || input.bondIDS.y > 0.f || input.bondIDS.z > 0.f || input.bondIDS.w > 0.f)
-    {
-        output.color = float4(1,0,0,1);
-    }
-    else
-    {
-        output.color = input.color;
-    }
+    output.color = input.color;
     
     output.position = mul(float4(input.position, 1.0f), boneTransform);
     output.velocity = input.velocity;
