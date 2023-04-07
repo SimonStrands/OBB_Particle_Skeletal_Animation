@@ -32,7 +32,7 @@ void Joint::addChild(Joint* child)
 {
     this->childJoints.push_back(child);
 }
-std::list<Joint*> Joint::GetChildJoints() const
+std::vector<Joint*> Joint::GetChildJoints() const
 {
     return this->childJoints;
 }

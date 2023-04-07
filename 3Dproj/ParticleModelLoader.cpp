@@ -24,14 +24,26 @@ DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 	DirectX::XMMATRIX xmat = DirectX::XMLoadFloat4x4(&mat4);
 	return xmat;
 }
-void Nodes(int & nrTotal, std::vector<DirectX::XMMATRIX> &arr, aiNode* walker)
+void Nodes(int & nrTotal, Joint* parent, aiNode* walker)
 {
-	arr.push_back(AiMatrixToXMMATRIX(walker->mTransformation));
+	std::string name = walker->mName.C_Str();
+	DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(walker->mTransformation);
+	
 
 	for (int i = 0; i < walker->mNumChildren; i++)
 	{
+		nrTotal++;
+
 		aiNode* temp = walker->mChildren[i];
-		Nodes(nrTotal, arr, temp);
+
+		std::string name = temp->mName.C_Str();
+		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(temp->mTransformation);
+		Joint childJoint = Joint(nrTotal, name, mat);
+
+		parent->addChild(&childJoint);
+		Joint* nextJoint = parent->GetChildJoints()[i]; //traverse
+
+		Nodes(nrTotal, nextJoint, temp);
 	}
 	
 	
@@ -41,7 +53,13 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
 
+
 	for(unsigned int i = 0; i < scene->mNumMeshes; i++){
+		
+		for (unsigned int v = 0; v < scene->mMeshes[i]->mNumVertices; v++) {
+			aiVector3D vertex = scene->mMeshes[i]->mVertices[v];
+			vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
+		}
 		if(scene->mMeshes[i]->HasBones()){
 
 			//load animations and bones
@@ -55,23 +73,24 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			//if (scene->HasAnimations())
 			//	std::cout << "test";
 			//scene->mAnimations
-			std::string name = scene->mRootNode->mName.C_Str();
-			DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation); //first keyframe
 			
 			
 			//scene->mR
-			std::vector<DirectX::XMMATRIX> arr;
-			aiNode* walker = scene->mRootNode; // ->mChildren[0]->mTransformation
-			int nrC = scene->mRootNode->mNumChildren;
 			
-			//int totalNr
 
-			//for(int i=0;i<)
-			Joint(0,name, mat);
+			int totalnr = 0;
+			aiNode* walker = scene->mRootNode; //pointer to current node ->mChildren[0]->mTransformation
+
+			std::string name = walker->mName.C_Str();
+			DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(walker->mTransformation);
+			Joint rootJoint = Joint(totalnr, name, mat);
+
+			Nodes(totalnr, &rootJoint, walker);
+
 
 			//parant matrix mul current
 
-			for(unsigned int b = 0; b < scene->mMeshes[i]->mNumBones; i++){
+			for(unsigned int b = 0; b < scene->mMeshes[i]->mNumBones; b++){
 				
 
 				std::string name = scene->mMeshes[i]->mBones[b]->mName.C_Str();
@@ -82,12 +101,32 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 
 				
 				//scene->mMeshes[i]->mBones[b]->mNumWeights;
-				Joint temp(b,name,xmat);
+				//Joint temp(b,name,xmat);
 			}
 		}
-		for(unsigned int v = 0; v < scene->mMeshes[i]->mNumVertices; v++){
-			aiVector3D vertex = scene->mMeshes[i]->mVertices[v];
-			vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
+		
+	}
+}
+
+void loadSkeletalModel(Joint*& root, const std::string& filePath)
+{
+
+	Assimp::Importer AImporter;
+	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
+	for (unsigned int i = 0; i < scene->mNumMeshes; i++) 
+	{
+		if (scene->mMeshes[i]->HasBones()) 
+		{
+			int totalnr = 0;
+			aiNode* walker = scene->mRootNode; //pointer to current node ->mChildren[0]->mTransformation
+
+			std::string name = walker->mName.C_Str();
+			DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(walker->mTransformation);
+			Joint rootJoint = Joint(totalnr, name, mat);
+
+			Nodes(totalnr,&rootJoint, walker);
+		
+
 		}
 	}
 }

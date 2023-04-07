@@ -12,7 +12,7 @@ class Animator;
 class Joint {
 
 private:
-	std::list<Joint*> childJoints;
+	std::vector<Joint*> childJoints;
 	int id;
 	std::string name;
 	DirectX::XMMATRIX localBindTransform;
@@ -28,7 +28,7 @@ public:
 	int GetId() const;
 	std::string GetName() const;
 	void addChild(Joint* child);
-	std::list<Joint*> GetChildJoints() const;
+	std::vector<Joint*> GetChildJoints() const;
 	
 	DirectX::XMMATRIX GetAnimatedTransform() const;
 	void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
@@ -37,6 +37,7 @@ public:
 	
 };
 
+//vertex
 class Mesh {
 private:
 	DirectX::XMFLOAT3 position;
@@ -53,7 +54,7 @@ public:
 
 class AnimatedModel {
 private:
-	Joint* jointHierarchy;
+	//Joint* jointHierarchy;
 	Mesh mesh;
 	//texture;
 	Joint* rootJoint;

@@ -8,6 +8,7 @@
 #include "SkeletalAnim.h"
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
-void Nodes(int& nrTotal, std::vector<DirectX::XMMATRIX>& arr, aiNode* walker);
+void Nodes(int& nrTotal,Joint * parent, aiNode* walker);
 
 void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath);
+void loadSkeletalModel(Joint*& root, const std::string& filePath);

@@ -27,7 +27,7 @@ bool CreateInsterface(UINT width, UINT height, HWND wnd, ID3D11Device*& device, 
 
     UINT flags = 0;
     #ifdef _DEBUG
-        flags = D3D11_CREATE_DEVICE_DEBUG;
+        //flags = D3D11_CREATE_DEVICE_DEBUG;
     #endif
     D3D_FEATURE_LEVEL featureLvl[] = { D3D_FEATURE_LEVEL_11_0 };
 
