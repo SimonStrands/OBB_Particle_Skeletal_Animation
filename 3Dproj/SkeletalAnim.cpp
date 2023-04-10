@@ -1,14 +1,15 @@
 #include "SkeletalAnim.h"
-#include "Animator.h"
+
+using namespace DirectX;
 
 Joint::Joint() //maybe make it impossible to make default joints? and only pointer to Joints?
 {
     this->id = -1;
     this->name = "default";
-    this->localBindTransform = DirectX::XMMATRIX();
+    this->localBindTransform = XMMATRIX();
 }
 
-Joint::Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform)
+Joint::Joint(int index, std::string name, XMMATRIX bindLocalTransform)
 {
     this->id = index;
     this->name = name;
@@ -28,11 +29,18 @@ Joint::Joint(const Joint& obj)
     animatedTransform = obj.animatedTransform;
 }
 
-void Joint::addChild(Joint* child)
+Joint Joint::operator=(const Joint& obj)
+{
+
+	Joint temp(obj.id, obj.name, obj.localBindTransform);
+	return temp;
+}
+
+void Joint::addChild(Joint child)
 {
     this->childJoints.push_back(child);
 }
-std::vector<Joint*> Joint::GetChildJoints()
+std::vector<Joint> Joint::GetChildJoints()
 {
     return this->childJoints;
 }
@@ -47,41 +55,41 @@ std::string Joint::GetName() const
 }
 
 
-DirectX::XMMATRIX Joint::GetAnimatedTransform() const
+XMMATRIX Joint::GetAnimatedTransform() const
 {
     return this->animatedTransform;
 }
 
-void Joint::SetAnimationTransform(DirectX::XMMATRIX animationTransform)
+void Joint::SetAnimationTransform(XMMATRIX animationTransform)
 {
     this->animatedTransform = animatedTransform;
 }
 
-DirectX::XMMATRIX Joint::GetInverseBindTransform() const
+XMMATRIX Joint::GetInverseBindTransform() const
 {
     return this->inverseBindTransform;
 }
 
-void Joint::CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform)
+void Joint::CalcInverseBindTransform(XMMATRIX parentBindTransform)
 {
-    DirectX::XMMATRIX bindTransform = DirectX::XMMatrixMultiply(parentBindTransform, localBindTransform);
+	XMMATRIX bindTransform = XMMatrixMultiply(parentBindTransform, localBindTransform);
     
-    inverseBindTransform = DirectX::XMMatrixInverse(nullptr, bindTransform);
-    for (Joint* child : childJoints)
+    inverseBindTransform = XMMatrixInverse(nullptr, bindTransform);
+    for (Joint child : childJoints)
     {
-        child->CalcInverseBindTransform(bindTransform);
+        child.CalcInverseBindTransform(bindTransform);
     }
 
 }
 
-AnimatedModel::AnimatedModel(Mesh model, /*Texture texture,*/ Joint* rootJoint, int jointCount)
+AnimatedModel::AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount)
 {
     this->mesh = model;
     //this->texture = texture;
     this->rootJoint = rootJoint;
     this->jointCount = jointCount;
     //this->animator = new Animator(this);
-    rootJoint->CalcInverseBindTransform(DirectX::XMMATRIX());
+    rootJoint.CalcInverseBindTransform(XMMATRIX());
 }
 
 Mesh AnimatedModel::GetMesh() const
@@ -89,7 +97,7 @@ Mesh AnimatedModel::GetMesh() const
     return this->mesh;
 }
 
-Joint* AnimatedModel::GetRootJoint() const
+Joint AnimatedModel::GetRootJoint() const
 {
     return this->rootJoint;
 }
@@ -104,18 +112,18 @@ void AnimatedModel::Update()
     animator->Update();
 }
 
-std::vector<DirectX::XMMATRIX> AnimatedModel::GetJointTransforms()
+std::vector<XMMATRIX> AnimatedModel::GetJointTransforms()
 {
-    std::vector<DirectX::XMMATRIX> jointMatrices;
+    std::vector<XMMATRIX> jointMatrices;
     jointMatrices.resize(jointCount);
     AddJointsToArray(rootJoint, jointMatrices);
     return jointMatrices;
 }
 
-void AnimatedModel::AddJointsToArray(Joint* headJoint, std::vector<DirectX::XMMATRIX> jointMatrices)
+void AnimatedModel::AddJointsToArray(Joint headJoint, std::vector<XMMATRIX> jointMatrices)
 {
-    jointMatrices[headJoint->GetId()] = headJoint->GetAnimatedTransform();
-    for (Joint* childJoint : headJoint->GetChildJoints()) {
+    jointMatrices[headJoint.GetId()] = headJoint.GetAnimatedTransform();
+    for (Joint childJoint : headJoint.GetChildJoints()) {
         AddJointsToArray(childJoint, jointMatrices);
     }
 }
@@ -133,7 +141,7 @@ Mesh::~Mesh()
 {
 }
 
-using namespace DirectX;
+
 
 Animation::Animation()
 {
@@ -209,8 +217,8 @@ XMVECTOR JointTransform::GetRotation()
 
 XMMATRIX JointTransform::GetLocalTransform()
 {
-    XMMATRIX localtransform = DirectX::XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
-    localtransform = DirectX::XMMatrixMultiply(localtransform, DirectX::XMMatrixRotationQuaternion(this->rotation));
+    XMMATRIX localtransform = XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
+    localtransform = XMMatrixMultiply(localtransform, XMMatrixRotationQuaternion(this->rotation));
     return localtransform;
 }
 
@@ -219,32 +227,32 @@ JointTransform JointTransform::Interpolate(JointTransform frameA, JointTransform
     XMFLOAT3 pos;
     XMFLOAT3 posA = frameA.GetPosition();
     XMFLOAT3 posB = frameB.GetPosition();
-    DirectX::XMVECTOR posV = DirectX::XMVectorLerp(XMLoadFloat3(&posA), XMLoadFloat3(&posB), progression);
-    DirectX::XMStoreFloat3(&pos, posV);
-    DirectX::XMVECTOR rot = DirectX::XMQuaternionSlerp(frameA.GetRotation(), frameB.GetRotation(), progression);
+    XMVECTOR posV = XMVectorLerp(XMLoadFloat3(&posA), XMLoadFloat3(&posB), progression);
+    XMStoreFloat3(&pos, posV);
+    XMVECTOR rot = XMQuaternionSlerp(frameA.GetRotation(), frameB.GetRotation(), progression);
     return JointTransform(pos, rot);
 }
 
-std::map<std::string, DirectX::XMMATRIX> Animator::GetCurrAnimPose()
+std::map<std::string, XMMATRIX> Animator::GetCurrAnimPose()
 {
 	std::vector<KeyFrame> frames = GetPreviousAndNextFrames();
 	float progression = calculatProgression(frames[0], frames[1]);
 	return calculateCurrentPose(frames[0], frames[1], progression);
 }
 
-void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint* joint, DirectX::XMMATRIX parentTransform)
+void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform)
 {
-	DirectX::XMMATRIX currLocalTransform = currentPose.at(joint->GetName());
-	DirectX::XMMATRIX currTransform = DirectX::XMMatrixMultiply(parentTransform, currLocalTransform);
+	XMMATRIX currLocalTransform = currentPose.at(joint.GetName());
+	XMMATRIX currTransform = XMMatrixMultiply(parentTransform, currLocalTransform);
 
 	//for(int i<0;i<joint.get)
-	for (Joint* childJoint : joint->GetChildJoints())
+	for (Joint childJoint : joint.GetChildJoints())
 	{
 		applyPoseToJoints(currentPose, childJoint, currTransform);
 
 	}
-	currTransform = DirectX::XMMatrixMultiply(currTransform, joint->GetInverseBindTransform());
-	joint->SetAnimationTransform(currTransform);
+	currTransform = XMMatrixMultiply(currTransform, joint.GetInverseBindTransform());
+	joint.SetAnimationTransform(currTransform);
 }
 
 std::vector<KeyFrame> Animator::GetPreviousAndNextFrames()
@@ -277,9 +285,9 @@ float Animator::calculatProgression(KeyFrame previousFrame, KeyFrame nextFrame)
 	return (this->animationTime - previousFrame.GetTimeStamp()) / timeDiff;
 }
 
-std::map<std::string, DirectX::XMMATRIX> Animator::calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression)
+std::map<std::string, XMMATRIX> Animator::calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression)
 {
-	std::map<std::string, DirectX::XMMATRIX> currentPose;// = hashmap
+	std::map<std::string, XMMATRIX> currentPose;// = hashmap
 
 	std::vector<std::string> keys;
 	for (auto it = previousFrame.GetJointKeyFrames().begin(); it != previousFrame.GetJointKeyFrames().end(); it++)
@@ -343,8 +351,8 @@ void Animator::Update()
 		return;
 	}
 	incAnimationTime();
-	std::map<std::string, DirectX::XMMATRIX> currentPose = GetCurrAnimPose();
-	applyPoseToJoints(currentPose, entity->GetRootJoint(), DirectX::XMMATRIX());
+	std::map<std::string, XMMATRIX> currentPose = GetCurrAnimPose();
+	applyPoseToJoints(currentPose, entity->GetRootJoint(), XMMATRIX());
 }
 
 void Animator::DoAnimation(Animation animation)

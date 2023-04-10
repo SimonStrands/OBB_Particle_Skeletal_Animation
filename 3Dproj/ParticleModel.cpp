@@ -1,14 +1,14 @@
 #include "ParticleModel.h"
 #include "Random.h"
 
-void getTransforms(std::vector<DirectX::XMMATRIX>& v, Joint* joint, DirectX::XMMATRIX parent) {
+void getTransforms(std::vector<DirectX::XMMATRIX>& v, Joint joint, DirectX::XMMATRIX parent) {
 
-	v.push_back(joint->localBindTransform);
+	v.push_back(joint.localBindTransform);
 
 	DirectX::XMMATRIX newParent = v[v.size() - 1];
 
-	for (int i = 0; i < joint->GetChildJoints().size(); i++) {
-		getTransforms(v, joint->GetChildJoints()[i], newParent);
+	for (int i = 0; i < joint.GetChildJoints().size(); i++) {
+		getTransforms(v, joint.GetChildJoints()[i], newParent);
 	}
 }
 
@@ -23,7 +23,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/testAnimation.fbx");
+	loadParticleModel(vertecies, "objects/testAnimation.fbx",rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];

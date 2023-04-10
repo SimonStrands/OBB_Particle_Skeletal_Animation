@@ -61,6 +61,6 @@ private:
 	ComputerShaderParticleModelConstBuffer CSConstBuffer;
 	
 	float time;
-	Joint* rootJoint;
+	Joint rootJoint;
 
 };
