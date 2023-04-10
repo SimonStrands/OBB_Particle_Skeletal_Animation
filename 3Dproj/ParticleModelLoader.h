@@ -1,6 +1,8 @@
 #pragma once
 #include "vertex.h"
 #include <vector>
+//#include <map>
+#include <string>
 
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>

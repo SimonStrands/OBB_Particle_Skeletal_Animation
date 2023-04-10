@@ -4,6 +4,8 @@
 #include "Graphics.h"
 #include "CreateBuffer.h"
 #include "ParticleModelLoader.h"
+#include "OBBSkeleton.h"
+
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : CB{
@@ -17,7 +19,7 @@ struct ComputerShaderParticleModelConstBuffer : CB{
 		float element[2];
 	}padding;
 };
-
+//class Animation;
 class ParticleModel{
 public:
 	ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position);
@@ -28,6 +30,10 @@ public:
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
+	OBBSkeletonDebug* OBBSkeleton;
+
+	
+	Animation animation;
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);
@@ -53,4 +59,8 @@ private:
 	ID3D11UnorderedAccessView* billUAV;
 	ID3D11Buffer* computeShaderConstantBuffer;
 	ComputerShaderParticleModelConstBuffer CSConstBuffer;
+	
+	float time;
+	Joint* rootJoint;
+
 };

@@ -1,7 +1,16 @@
 #include "ParticleModel.h"
 #include "Random.h"
 
+void getTransforms(std::vector<DirectX::XMMATRIX>& v, Joint* joint, DirectX::XMMATRIX parent) {
 
+	v.push_back(joint->localBindTransform);
+
+	DirectX::XMMATRIX newParent = v[v.size() - 1];
+
+	for (int i = 0; i < joint->GetChildJoints().size(); i++) {
+		getTransforms(v, joint->GetChildJoints()[i], newParent);
+	}
+}
 
 ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position):
 	positionMatris(
@@ -61,6 +70,17 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		std::cout << "stop" << std::endl;
 	}
 	this->CSConstBuffer.time.element = 0;
+
+	std::vector<float> heightTest;
+	//animation
+	for (int i = 0; i < animation.GetKeyFrames().size(); i++) {
+		heightTest.push_back(2);
+	}
+	std::vector<DirectX::XMMATRIX> trans;
+	DirectX::XMMATRIX p(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	getTransforms(trans, rootJoint, p);
+
+	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
 
 ParticleModel::~ParticleModel()

@@ -6,20 +6,20 @@ DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
 	DirectX::XMFLOAT4X4 mat4;
 	mat4._11 = mat.a1;
-	mat4._12 = mat.a2;
-	mat4._13 = mat.a3;
-	mat4._14 = mat.a4;
-	mat4._21 = mat.b1;
+	mat4._12 = mat.b1;
+	mat4._13 = mat.c1;
+	mat4._14 = mat.d1;
+	mat4._21 = mat.a2;
 	mat4._22 = mat.b2;
-	mat4._23 = mat.b3;
-	mat4._24 = mat.b4;
-	mat4._31 = mat.c1;
-	mat4._32 = mat.c2;
+	mat4._23 = mat.c2;
+	mat4._24 = mat.d2;
+	mat4._31 = mat.a3;
+	mat4._32 = mat.b3;
 	mat4._33 = mat.c3;
-	mat4._34 = mat.c4;
-	mat4._41 = mat.d1;
-	mat4._42 = mat.d2;
-	mat4._43 = mat.d3;
+	mat4._34 = mat.d3;
+	mat4._41 = mat.a4;
+	mat4._42 = mat.b4;
+	mat4._43 = mat.c4;
 	mat4._44 = mat.d4;
 	DirectX::XMMATRIX xmat = DirectX::XMLoadFloat4x4(&mat4);
 	return xmat;
@@ -60,6 +60,53 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			aiVector3D vertex = scene->mMeshes[i]->mVertices[v];
 			vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 		}
+		if (scene->HasAnimations())
+		{
+			for (int a = 0; a < scene->mNumAnimations; a++)
+			{
+				for (int c = 0; c < scene->mAnimations[a]->mNumChannels;c++)
+				{
+					int nrofpos = scene->mAnimations[a]->mChannels[c]->mNumPositionKeys;
+					int nrofrot = scene->mAnimations[a]->mChannels[c]->mNumRotationKeys;
+					
+					std::map<std::string, JointTransform> keyframes;
+					//scene->mAnimations[a]->mChannels[c]->mNodeName
+					//scene->mAnimations[a]->mChannels[c]->
+					aiNodeAnim test1;
+					aiNode test2;
+					for (int p = 0;p < scene->mAnimations[a]->mChannels[c]->mNumPositionKeys; p++)
+					{
+						DirectX::XMFLOAT3 pos;
+						
+						pos.x = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mValue.x;
+						pos.y = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mValue.y;
+						pos.z = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mValue.z;
+						float timeP = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mTime;
+					//}
+					//for (int r = 0; r < scene->mAnimations[a]->mChannels[c]->mNumRotationKeys; r++)
+					//{
+						DirectX::XMVECTOR rot;
+						DirectX::XMFLOAT4 rot4;
+						rot4.x = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.x;
+						rot4.y = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.y;
+						rot4.z = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.z;
+						rot4.w = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.w;
+						rot = DirectX::XMLoadFloat4(&rot4);
+
+						float timeR = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mTime;
+						//what to do with joint transform? save them into keyframes and createa animation object
+						JointTransform temp = JointTransform(pos, rot);
+
+					}
+					
+					
+
+					
+				}
+				
+			}
+		}
+
 		if(scene->mMeshes[i]->HasBones()){
 
 			//load animations and bones
@@ -70,9 +117,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			//scene->mMeshes[i].
 			//scene->mMeshes[i].
 			
-			//if (scene->HasAnimations())
-			//	std::cout << "test";
-			//scene->mAnimations
+
 			
 			
 			//scene->mR
@@ -95,7 +140,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 
 				std::string name = scene->mMeshes[i]->mBones[b]->mName.C_Str();
 				//scene->mMeshes[i]->mBones[b]->mWeights;
-
+				
 			
 				DirectX::XMMATRIX xmat = AiMatrixToXMMATRIX(scene->mMeshes[i]->mBones[b]->mOffsetMatrix);
 
