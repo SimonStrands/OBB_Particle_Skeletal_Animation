@@ -23,7 +23,8 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/testAnimation.fbx",rootJoint);
+	loadParticleModel(vertecies, "objects/testAnimation.fbx",animation, rootJoint);
+	
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -73,14 +74,14 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 	std::vector<float> heightTest;
 	//animation
-	for (int i = 0; i < animation.GetKeyFrames().size(); i++) {
+	for (int i = 0; i < animation.keyFrames.size(); i++) {
 		heightTest.push_back(2);
 	}
 	std::vector<DirectX::XMMATRIX> trans;
 	DirectX::XMMATRIX p(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	getTransforms(trans, rootJoint, p);
 
-	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+	//OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
 
 ParticleModel::~ParticleModel()

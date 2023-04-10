@@ -1,6 +1,12 @@
 #include "ParticleModelLoader.h"
 
-
+DirectX::XMFLOAT3 AiVector3ToXMFLOAT3(const aiVector3D& vec3) {
+	return DirectX::XMFLOAT3(vec3.x, vec3.y, vec3.z);
+}
+DirectX::XMFLOAT4 AiQuadToXMFLOAT4(const aiQuaternion& quad) {
+	//return DirectX::XMFLOAT4(quad.x,quad.y,quad.z, quad.w);
+	return DirectX::XMFLOAT4(quad.x, quad.y, quad.z, quad.w);
+}
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
@@ -48,12 +54,12 @@ void Nodes(int & nrTotal, Joint parent, aiNode* walker)
 	
 	
 }
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Joint & rootJoint)
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Joint & rootJoint)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
-
-
+	loadAnimation(scene, animation);
+	
 	for(unsigned int i = 0; i < scene->mNumMeshes; i++){
 		
 		for (unsigned int v = 0; v < scene->mMeshes[i]->mNumVertices; v++) {
@@ -62,49 +68,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		}
 		if (scene->HasAnimations())
 		{
-			for (int a = 0; a < scene->mNumAnimations; a++)
-			{
-				for (int c = 0; c < scene->mAnimations[a]->mNumChannels;c++)
-				{
-					int nrofpos = scene->mAnimations[a]->mChannels[c]->mNumPositionKeys;
-					int nrofrot = scene->mAnimations[a]->mChannels[c]->mNumRotationKeys;
-					
-					std::map<std::string, JointTransform> keyframes;
-					//scene->mAnimations[a]->mChannels[c]->mNodeName
-					//scene->mAnimations[a]->mChannels[c]->
-					aiNodeAnim test1;
-					aiNode test2;
-					for (int p = 0;p < scene->mAnimations[a]->mChannels[c]->mNumPositionKeys; p++)
-					{
-						DirectX::XMFLOAT3 pos;
-						
-						pos.x = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mValue.x;
-						pos.y = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mValue.y;
-						pos.z = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mValue.z;
-						float timeP = scene->mAnimations[a]->mChannels[c]->mPositionKeys[p].mTime;
-					//}
-					//for (int r = 0; r < scene->mAnimations[a]->mChannels[c]->mNumRotationKeys; r++)
-					//{
-						DirectX::XMVECTOR rot;
-						DirectX::XMFLOAT4 rot4;
-						rot4.x = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.x;
-						rot4.y = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.y;
-						rot4.z = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.z;
-						rot4.w = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mValue.w;
-						rot = DirectX::XMLoadFloat4(&rot4);
-
-						float timeR = scene->mAnimations[a]->mChannels[c]->mRotationKeys[p].mTime;
-						//what to do with joint transform? save them into keyframes and createa animation object
-						JointTransform temp = JointTransform(pos, rot);
-
-					}
-					
-					
-
-					
-				}
-				
-			}
+			
 		}
 
 		if(scene->mMeshes[i]->HasBones()){
@@ -116,13 +80,9 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			//inverse?
 			//scene->mMeshes[i].
 			//scene->mMeshes[i].
-			
 
-			
-			
 			//scene->mR
-			
-
+		
 			int totalnr = 0;
 			aiNode* walker = scene->mRootNode; //pointer to current node ->mChildren[0]->mTransformation
 
@@ -131,26 +91,13 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			Joint newRoot = Joint(totalnr, name, mat);
 
 			Nodes(totalnr, newRoot, walker);
-
 			rootJoint = newRoot;
-			//parant matrix mul current
-
-			for(unsigned int b = 0; b < scene->mMeshes[i]->mNumBones; b++){
-				
-
-				std::string name = scene->mMeshes[i]->mBones[b]->mName.C_Str();
-				//scene->mMeshes[i]->mBones[b]->mWeights;
-				
 			
-				DirectX::XMMATRIX xmat = AiMatrixToXMMATRIX(scene->mMeshes[i]->mBones[b]->mOffsetMatrix);
-
-				
-				//scene->mMeshes[i]->mBones[b]->mNumWeights;
-				//Joint temp(b,name,xmat);
-			}
+	
 		}
 		
 	}
+	
 }
 
 void loadSkeletalModel(Joint*& root, const std::string& filePath)
@@ -174,4 +121,39 @@ void loadSkeletalModel(Joint*& root, const std::string& filePath)
 
 		}
 	}
+}
+
+bool loadAnimation(const aiScene* scene, Animation& animation)
+{
+	aiAnimation* anim = scene->mAnimations[0];
+
+	if (anim->mTicksPerSecond != 0.0f) {
+		animation.tick = (float)anim->mTicksPerSecond;
+	}
+	else {
+		animation.tick = (float)anim->mTicksPerSecond;
+	}
+	animation.length = (float)(anim->mDuration * anim->mTicksPerSecond);
+	animation.keyFrames = {};
+
+	for (unsigned int i = 0; i < anim->mNumChannels; i++) {
+		aiNodeAnim* channel = anim->mChannels[i];
+		KeyFrame track;
+		for (unsigned int j = 0; j < channel->mNumPositionKeys; j++) {
+			track.positionTimestamps.push_back((float)channel->mPositionKeys[j].mTime);
+			track.positions.push_back(AiVector3ToXMFLOAT3(channel->mPositionKeys[j].mValue));
+		}
+		for (unsigned int j = 0; j < channel->mNumRotationKeys; j++) {
+			track.rotationTimestamps.push_back((float)channel->mRotationKeys[j].mTime);
+			track.rotations.push_back(AiQuadToXMFLOAT4(channel->mRotationKeys[j].mValue));
+
+		}
+		for (unsigned int j = 0; j < channel->mNumScalingKeys; j++) {
+			track.scaleTimestamps.push_back((float)channel->mScalingKeys[j].mTime);
+			track.scales.push_back(AiVector3ToXMFLOAT3(channel->mScalingKeys[j].mValue));
+
+		}
+		animation.keyFrames[channel->mNodeName.C_Str()] = track;
+	}
+	return true;
 }

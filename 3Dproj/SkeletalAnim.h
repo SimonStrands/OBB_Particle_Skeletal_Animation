@@ -7,49 +7,67 @@
 #include <list>
 #include <string>
 #include <map>
+#include <unordered_map>
 
+//class JointTransform {
+//private:
+//	DirectX::XMFLOAT3 position;
+//	DirectX::XMVECTOR rotation; //rotation in quaternion
+//public:
+//	JointTransform(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR rot);
+//	JointTransform(DirectX::XMMATRIX localTransform);
+//	~JointTransform();
+//
+//	DirectX::XMFLOAT3 GetPosition();
+//	DirectX::XMVECTOR GetRotation();
+//	DirectX::XMMATRIX GetLocalTransform();
+//	JointTransform Interpolate(JointTransform frameA, JointTransform frameB, float progression);
+//};
+//
+//class KeyFrame {
+//private:
+//	std::map<std::string, JointTransform> jointKeyframes; //pose
+//	float timeStamp;
+//public:
+//	KeyFrame(float timeStamp, std::map<std::string, JointTransform> jointKeyframes);
+//
+//	float GetTimeStamp();
+//	std::map<std::string, JointTransform> GetJointKeyFrames(); //pose
+//
+//};
+//
+//class Animation {
+//private:
+//	float length;
+//	std::vector<KeyFrame> keyFrames;
+//public:
+//	Animation();
+//	Animation(float length, std::vector<KeyFrame> frames);
+//
+//
+//	float GetLength();
+//	void SetLength(float length);
+//	std::vector<KeyFrame> GetKeyFrames();
+//
+//};
+struct KeyFrame {
+	std::vector<float> positionTimestamps;
+	std::vector<float> rotationTimestamps;
+	std::vector<float> scaleTimestamps;
 
-class JointTransform {
-private:
-	DirectX::XMFLOAT3 position;
-	DirectX::XMVECTOR rotation; //rotation in quaternion
-public:
-	JointTransform(DirectX::XMFLOAT3 pos, DirectX::XMVECTOR rot);
-	JointTransform(DirectX::XMMATRIX localTransform);
-	~JointTransform();
-
-	DirectX::XMFLOAT3 GetPosition();
-	DirectX::XMVECTOR GetRotation();
-	DirectX::XMMATRIX GetLocalTransform();
-	JointTransform Interpolate(JointTransform frameA, JointTransform frameB, float progression);
-};
-
-class KeyFrame {
-private:
-	std::map<std::string, JointTransform> jointKeyframes; //pose
-	float timeStamp;
-public:
-	KeyFrame(float timeStamp, std::map<std::string, JointTransform> jointKeyframes);
-
-	float GetTimeStamp();
-	std::map<std::string, JointTransform> GetJointKeyFrames(); //pose
-
+	std::vector<DirectX::XMFLOAT3> positions = {};
+	std::vector<DirectX::XMFLOAT4> rotations = {};
+	std::vector<DirectX::XMFLOAT3> scales = {};
 };
 
 class Animation {
-private:
-	float length;
-	std::vector<KeyFrame> keyFrames;
 public:
-	Animation();
-	Animation(float length, std::vector<KeyFrame> frames);
-
-
-	float GetLength();
-	void SetLength(float length);
-	std::vector<KeyFrame> GetKeyFrames();
-
+	float length;
+	float tick = 1.0f;
+	std::unordered_map<std::string, KeyFrame> keyFrames;
 };
+
+
 class Joint;
 class AnimatedModel;
 class Animator {
@@ -58,11 +76,11 @@ private:
 	Animation* currentAnim;
 	float animationTime;
 
-	std::map<std::string, DirectX::XMMATRIX> GetCurrAnimPose();
+	//std::map<std::string, DirectX::XMMATRIX> GetCurrAnimPose();
 	void applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform);
-	std::vector<KeyFrame> GetPreviousAndNextFrames();
-	float calculatProgression(KeyFrame previousFrame, KeyFrame nextFrame);
-	std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression);
+	//std::vector<KeyFrame> GetPreviousAndNextFrames();
+	float calculatProgression(float previousFrame, float nextFrame);
+	//std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression);
 	void incAnimationTime();
 
 
@@ -73,7 +91,7 @@ public:
 	~Animator();
 
 
-	void Update();
+	//void Update();
 	void DoAnimation(Animation animation);
 
 };

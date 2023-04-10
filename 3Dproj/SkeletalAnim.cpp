@@ -109,7 +109,7 @@ void AnimatedModel::DoAnimation(Animation animation)
 
 void AnimatedModel::Update()
 {
-    animator->Update();
+    //animator->Update();
 }
 
 std::vector<XMMATRIX> AnimatedModel::GetJointTransforms()
@@ -128,11 +128,6 @@ void AnimatedModel::AddJointsToArray(Joint headJoint, std::vector<XMMATRIX> join
     }
 }
 
-//void AnimatedModel::DeleteProperties()
-//{
-//    //delete this->mesh
-//}
-
 Mesh::Mesh()
 {
 }
@@ -143,109 +138,18 @@ Mesh::~Mesh()
 
 
 
-Animation::Animation()
-{
-	this->length = 0;
-	this->keyFrames.clear();
-}
+//std::map<std::string, XMMATRIX> Animator::GetCurrAnimPose()
+//{
+//	std::vector<KeyFrame> frames = GetPreviousAndNextFrames();
+//	float progression = calculatProgression(frames[0], frames[1]);
+//	return calculateCurrentPose(frames[0], frames[1], progression);
+//}
 
-Animation::Animation(float length, std::vector<KeyFrame> frames)
-{
-    this->keyFrames = frames;
-    this->length = length;
-}
-
-float Animation::GetLength()
-{
-    return this->length;
-}
-
-void Animation::SetLength(float length)
-{
-	this->length = length;
-}
-
-std::vector<KeyFrame> Animation::GetKeyFrames()
-{
-    return this->keyFrames;
-}
-
-KeyFrame::KeyFrame(float timeStamp, std::map<std::string, JointTransform> jointKeyframes)
-{
-    this->timeStamp = timeStamp;
-    this->jointKeyframes = jointKeyframes;
-}
-
-float KeyFrame::GetTimeStamp()
-{
-    return this->timeStamp;
-}
-
-std::map<std::string, JointTransform> KeyFrame::GetJointKeyFrames()
-{
-    return this->jointKeyframes;
-}
-
-JointTransform::JointTransform(XMFLOAT3 pos, XMVECTOR rot)
-{
-    this->position = pos;
-    this->rotation = rot;
-}
-
-JointTransform::JointTransform(XMMATRIX localTransform)
-{
-    XMFLOAT4X4 localTransform4x4;
-    XMStoreFloat4x4(&localTransform4x4, localTransform);
-    this->position = XMFLOAT3(localTransform4x4._31, localTransform4x4._32, localTransform4x4._33);
-    this->rotation = XMQuaternionRotationMatrix(localTransform);
-
-}
-
-JointTransform::~JointTransform()
-{
-}
-
-XMFLOAT3 JointTransform::GetPosition()
-{
-    return this->position;
-}
-
-XMVECTOR JointTransform::GetRotation()
-{
-    return this->rotation;
-}
-
-XMMATRIX JointTransform::GetLocalTransform()
-{
-    XMMATRIX localtransform = XMMatrixTranslation(this->position.x, this->position.y, this->position.z);
-    localtransform = XMMatrixMultiply(localtransform, XMMatrixRotationQuaternion(this->rotation));
-    return localtransform;
-}
-
-JointTransform JointTransform::Interpolate(JointTransform frameA, JointTransform frameB, float progression)
-{
-    XMFLOAT3 pos;
-    XMFLOAT3 posA = frameA.GetPosition();
-    XMFLOAT3 posB = frameB.GetPosition();
-    XMVECTOR posV = XMVectorLerp(XMLoadFloat3(&posA), XMLoadFloat3(&posB), progression);
-    XMStoreFloat3(&pos, posV);
-    XMVECTOR rot = XMQuaternionSlerp(frameA.GetRotation(), frameB.GetRotation(), progression);
-    return JointTransform(pos, rot);
-}
-
-std::map<std::string, XMMATRIX> Animator::GetCurrAnimPose()
-{
-	std::vector<KeyFrame> frames = GetPreviousAndNextFrames();
-	float progression = calculatProgression(frames[0], frames[1]);
-	return calculateCurrentPose(frames[0], frames[1], progression);
-}
-
-void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform)
+void Animator::applyPoseToJoints(std::map<std::string, XMMATRIX> currentPose, Joint joint, XMMATRIX parentTransform)
 {
 	XMMATRIX currLocalTransform = currentPose.at(joint.GetName());
 	XMMATRIX currTransform = XMMatrixMultiply(parentTransform, currLocalTransform);
 
-	//for(int i<0;i<joint.get)
 	for (Joint childJoint : joint.GetChildJoints())
 	{
 		applyPoseToJoints(currentPose, childJoint, currTransform);
@@ -255,64 +159,65 @@ void Animator::applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> curren
 	joint.SetAnimationTransform(currTransform);
 }
 
-std::vector<KeyFrame> Animator::GetPreviousAndNextFrames()
+//std::vector<KeyFrame> Animator::GetPreviousAndNextFrames()
+//{
+//	KeyFrame* prevFrame = nullptr;
+//	KeyFrame* nextFrame = nullptr;
+//	for (KeyFrame frame : currentAnim->keyFrames)
+//	{
+//		if (frame.GetTimeStamp() > animationTime)
+//		{
+//			nextFrame = &frame;
+//			break;
+//		}
+//		prevFrame = &frame;
+//	}
+//	if (prevFrame == nullptr)
+//	{
+//		prevFrame = nextFrame;
+//	}
+//	else if (nextFrame == nullptr)
+//	{
+//		nextFrame = prevFrame;
+//	}
+//	return std::vector<KeyFrame>(prevFrame, nextFrame);
+//}
+
+float Animator::calculatProgression(float previousFrame, float nextFrame)
 {
-	KeyFrame* prevFrame = nullptr;
-	KeyFrame* nextFrame = nullptr;
-	for (KeyFrame frame : currentAnim->GetKeyFrames())
-	{
-		if (frame.GetTimeStamp() > animationTime)
-		{
-			nextFrame = &frame;
-			break;
-		}
-		prevFrame = &frame;
-	}
-	if (prevFrame == nullptr)
-	{
-		prevFrame = nextFrame;
-	}
-	else if (nextFrame == nullptr)
-	{
-		nextFrame = prevFrame;
-	}
-	return std::vector<KeyFrame>(prevFrame, nextFrame);
+	float timeDiff = nextFrame - previousFrame;
+	return (this->animationTime - previousFrame) / timeDiff;
 }
 
-float Animator::calculatProgression(KeyFrame previousFrame, KeyFrame nextFrame)
-{
-	float timeDiff = nextFrame.GetTimeStamp() - previousFrame.GetTimeStamp();
-	return (this->animationTime - previousFrame.GetTimeStamp()) / timeDiff;
-}
-
-std::map<std::string, XMMATRIX> Animator::calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression)
-{
-	std::map<std::string, XMMATRIX> currentPose;// = hashmap
-
-	std::vector<std::string> keys;
-	for (auto it = previousFrame.GetJointKeyFrames().begin(); it != previousFrame.GetJointKeyFrames().end(); it++)
-	{
-		keys.push_back(it->first);
-	}
-
-
-	for (std::string jointName : keys)
-	{
-		JointTransform previousTransform = previousFrame.GetJointKeyFrames().at(jointName);
-		JointTransform nextTransform = nextFrame.GetJointKeyFrames().at(jointName);
-		JointTransform currentTransform = currentTransform.Interpolate(previousTransform, nextTransform, progression);
-		currentPose.emplace(jointName, currentTransform.GetLocalTransform());
-	}
-	return currentPose;
-}
+//std::map<std::string, XMMATRIX> Animator::calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression)
+//{
+//	std::map<std::string, XMMATRIX> currentPose;// = hashmap
+//
+//	std::vector<std::string> keys;
+//	for (auto it = previousFrame.GetJointKeyFrames().begin(); it != previousFrame.GetJointKeyFrames().end(); it++)
+//	{
+//		keys.push_back(it->first);
+//	}
+//
+//
+//	for (std::string jointName : keys)
+//	{ 
+//		//use keyframes positin instead
+//		JointTransform previousTransform = previousFrame.GetJointKeyFrames().at(jointName);
+//		JointTransform nextTransform = nextFrame.GetJointKeyFrames().at(jointName);
+//		JointTransform currentTransform = currentTransform.Interpolate(previousTransform, nextTransform, progression);
+//		currentPose.emplace(jointName, currentTransform.GetLocalTransform());
+//	}
+//	return currentPose;
+//}
 
 
 void Animator::incAnimationTime()
 {
 	this->animationTime += 0; // deltatime
-	if (this->animationTime > currentAnim->GetLength())
+	if (this->animationTime > currentAnim->length)
 	{
-		this->animationTime = std::fmod(this->animationTime, currentAnim->GetLength());
+		this->animationTime = std::fmod(this->animationTime, currentAnim->length);
 	}
 
 }
@@ -344,16 +249,16 @@ Animator::~Animator()
 {
 }
 
-void Animator::Update()
-{
-	if (currentAnim == nullptr)
-	{
-		return;
-	}
-	incAnimationTime();
-	std::map<std::string, XMMATRIX> currentPose = GetCurrAnimPose();
-	applyPoseToJoints(currentPose, entity->GetRootJoint(), XMMATRIX());
-}
+//void Animator::Update()
+//{
+//	if (currentAnim == nullptr)
+//	{
+//		return;
+//	}
+//	incAnimationTime();
+//	std::map<std::string, XMMATRIX> currentPose = GetCurrAnimPose();
+//	applyPoseToJoints(currentPose, entity->GetRootJoint(), XMMATRIX());
+//}
 
 void Animator::DoAnimation(Animation animation)
 {
