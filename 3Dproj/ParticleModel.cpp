@@ -77,20 +77,34 @@ void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, Dir
 
 	DirectX::XMVECTOR rotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rotation1), DirectX::XMLoadFloat4(&rotation2), fp.second);
 
-	DirectX::XMMATRIX positionMat = DirectX::XMMATRIX(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+	DirectX::XMMATRIX positionMat = DirectX::XMMATRIX(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 
 	// calculate localTransform
 	//positionMat = glm::translate(positionMat, position);
 	DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationQuaternion(rotation);
-	DirectX::XMMATRIX localTransform = positionMat * rotationMat;
-	DirectX::XMMATRIX globalTransform = parentTransform * localTransform;
 
-	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * globalTransform * joint.getOffsetMatrix();
+	DirectX::XMMATRIX localTransform = positionMat * rotationMat;
+	//DirectX::XMMATRIX globalTransform = parentTransform * localTransform;
+	DirectX::XMMATRIX globalTransform =  localTransform;
+
+	//SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * globalTransform * joint.getOffsetMatrix();
+	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = globalTransform * joint.getOffsetMatrix();
+	OBBSkeleton->setTransform(joint.GetId(), SkeletonConstBufferConverter.Transformations.element[joint.GetId()]);
 	//update values for children bones
 	for (Joint& child : joint.GetChildJoints()) {
-		//getPose(animation, child, dt, output, globalTransform, globalInverseTransform);
 		getPose(child, anim, time, globalTransform);
+	}
+}
+
+void getTransforms(std::vector<DirectX::XMMATRIX>& v, Joint& joint, DirectX::XMMATRIX parent){
+
+	v.push_back(joint.getOffsetMatrix());
+
+	DirectX::XMMATRIX newParent = v[v.size() - 1];
+
+	for(int i = 0; i < joint.GetChildJoints().size(); i++){
+		getTransforms(v, joint.GetChildJoints()[i], newParent);
 	}
 }
 
@@ -105,7 +119,8 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
+	loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -159,6 +174,17 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		std::cout << "failed to create const buffer" << std::endl;
 	}
 	this->CSConstBuffer.time.element = 0;
+
+
+	std::vector<float> heightTest;
+	for(int i = 0; i < animation.keyFrames.size(); i++){
+		heightTest.push_back(2);
+	}
+	std::vector<DirectX::XMMATRIX> trans;
+	DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+	getTransforms(trans, rootJoint, p);
+
+	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
 
 ParticleModel::~ParticleModel()
@@ -171,6 +197,9 @@ ParticleModel::~ParticleModel()
 	billUAV->Release();
 	computeShaderConstantBuffer->Release();
 	SkeletonConstBuffer->Release();
+	if(OBBSkeleton != nullptr){
+		delete OBBSkeleton;
+	}
 }
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
@@ -227,6 +256,8 @@ void ParticleModel::draw(Graphics*& gfx)
 
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
+
+	OBBSkeleton->draw(gfx);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)

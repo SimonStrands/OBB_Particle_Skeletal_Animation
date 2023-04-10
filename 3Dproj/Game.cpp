@@ -44,30 +44,6 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	
 	lightNr = 0;
 
-	//std::vector<DirectX::XMMATRIX> transforms = {
-	//	DirectX::XMMATRIX(
-	//	    1,0,0,0,
-	//		0,1,0,0,
-	//		0,0,1,0,
-    //        1,0,0,1
-	//	),
-	//	DirectX::XMMATRIX(
-	//	    1,0,0,0,
-	//		0,1,0,0,
-	//		0,0,1,0,
-    //        2,2,0,1
-	//	),
-	//	DirectX::XMMATRIX(
-	//	    1,0,0,0,
-	//		0,1,0,0,
-	//		0,0,1,0,
-    //        -2,-2,1,1
-	//	)
-	//};
-	//std::vector<float> height = {1, 2, 3};
-	//
-	//
-	//OBBSkeleton = new OBBSkeletonDebug(transforms, height, gfx);
 }
 
 Game::~Game() 
@@ -95,9 +71,6 @@ Game::~Game()
 		delete obj[i];
 	}
 	delete particleModel;
-	if(OBBSkeleton != nullptr){
-		delete OBBSkeleton;
-	}
 }
 
 
@@ -229,7 +202,6 @@ void Game::DrawToBuffer()
 void Game::ForwardDraw()
 {
 	particleModel->draw(gfx);
-	//OBBSkeleton->draw(gfx);
 }
 
 void Game::DrawAllShadowObject()

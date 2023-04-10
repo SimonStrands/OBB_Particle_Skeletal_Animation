@@ -24,6 +24,7 @@ public:
 	OBBSkeletonDebug(std::vector<DirectX::XMMATRIX>& transform, std::vector<float>& height, Graphics*& gfx);
 	~OBBSkeletonDebug();
 	void setTransformations(std::vector<DirectX::XMMATRIX>& transform);
+	void setTransform(int id, const DirectX::XMMATRIX transform);
 	void draw(Graphics*& gfx);
 
 private:

@@ -62,6 +62,11 @@ void OBBSkeletonDebug::setTransformations(std::vector<DirectX::XMMATRIX>& transf
 	this->transform = transform;
 }
 
+void OBBSkeletonDebug::setTransform(int id, const DirectX::XMMATRIX transform)
+{
+	this->transform[id] = transform;
+}
+
 void OBBSkeletonDebug::draw(Graphics*& gfx)
 {
 	UINT offset = 0;
