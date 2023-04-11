@@ -29,31 +29,6 @@ public:
 
 class Joint;
 class AnimatedModel;
-class Animator {
-private:
-	AnimatedModel* entity;
-	Animation* currentAnim;
-	float animationTime;
-
-	//std::map<std::string, DirectX::XMMATRIX> GetCurrAnimPose();
-	void applyPoseToJoints(std::map<std::string, DirectX::XMMATRIX> currentPose, Joint joint, DirectX::XMMATRIX parentTransform);
-	//std::vector<KeyFrame> GetPreviousAndNextFrames();
-	float calculatProgression(float previousFrame, float nextFrame);
-	//std::map<std::string, DirectX::XMMATRIX> calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression);
-	void incAnimationTime();
-
-
-public:
-	Animator();
-	Animator(AnimatedModel* entity);
-	Animator(const Animator& obj);
-	~Animator();
-
-
-	//void Update();
-	void DoAnimation(Animation animation);
-
-};
 
 
 class Joint {
@@ -62,16 +37,16 @@ private:
 	std::vector<Joint> childJoints;
 	int id;
 	std::string name;
-	
 
-	DirectX::XMMATRIX inverseBindTransform;
-	DirectX::XMMATRIX animatedTransform;
+
 public:
 	Joint();
 	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform);
 	Joint(const Joint & obj);
 	Joint operator=(const Joint& obj);
 	DirectX::XMMATRIX localBindTransform;
+	DirectX::XMMATRIX inverseBindTransform;
+	DirectX::XMMATRIX animatedTransform;
 
 	int GetId() const;
 	std::string GetName() const;
@@ -81,7 +56,7 @@ public:
 
 	DirectX::XMMATRIX GetAnimatedTransform() const;
 	void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
-	DirectX::XMMATRIX GetInverseBindTransform() const;
+	//DirectX::XMMATRIX GetInverseBindTransform() const;
 	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
 	
 };
@@ -108,7 +83,7 @@ private:
 	//texture;
 	Joint rootJoint;
 	int jointCount;
-	Animator* animator;
+	//Animator* animator;
 public:
 	AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount);
 	
@@ -118,8 +93,8 @@ public:
 	//void DeleteProperties();
 
 
-	void DoAnimation(Animation animation);
-	void Update();
+	//void DoAnimation(Animation animation);
+	//void Update();
 
 	std::vector<DirectX::XMMATRIX> GetJointTransforms();
 	void AddJointsToArray(Joint headJoint, std::vector<DirectX::XMMATRIX> jointMatrices);
@@ -128,13 +103,10 @@ public:
 
 
 
-
-
-
-
 #endif
 
-
+//[] get animator to work
+//[] make joints loading for regular skeleton visible 
 
 //modified version and based on video link
 //https://www.youtube.com/watch?v=f3Cr8Yx3GGA

@@ -65,10 +65,10 @@ void Joint::SetAnimationTransform(XMMATRIX animationTransform)
     this->animatedTransform = animatedTransform;
 }
 
-XMMATRIX Joint::GetInverseBindTransform() const
-{
-    return this->inverseBindTransform;
-}
+//XMMATRIX Joint::GetInverseBindTransform() const
+//{
+//    return this->inverseBindTransform;
+//}
 
 void Joint::CalcInverseBindTransform(XMMATRIX parentBindTransform)
 {
@@ -102,15 +102,7 @@ Joint AnimatedModel::GetRootJoint() const
     return this->rootJoint;
 }
 
-void AnimatedModel::DoAnimation(Animation animation)
-{
-    animator->DoAnimation(animation);
-}
 
-void AnimatedModel::Update()
-{
-    //animator->Update();
-}
 
 std::vector<XMMATRIX> AnimatedModel::GetJointTransforms()
 {
@@ -136,132 +128,3 @@ Mesh::~Mesh()
 {
 }
 
-
-
-//std::map<std::string, XMMATRIX> Animator::GetCurrAnimPose()
-//{
-//	std::vector<KeyFrame> frames = GetPreviousAndNextFrames();
-//	float progression = calculatProgression(frames[0], frames[1]);
-//	return calculateCurrentPose(frames[0], frames[1], progression);
-//}
-
-void Animator::applyPoseToJoints(std::map<std::string, XMMATRIX> currentPose, Joint joint, XMMATRIX parentTransform)
-{
-	XMMATRIX currLocalTransform = currentPose.at(joint.GetName());
-	XMMATRIX currTransform = XMMatrixMultiply(parentTransform, currLocalTransform);
-
-	for (Joint childJoint : joint.GetChildJoints())
-	{
-		applyPoseToJoints(currentPose, childJoint, currTransform);
-
-	}
-	currTransform = XMMatrixMultiply(currTransform, joint.GetInverseBindTransform());
-	joint.SetAnimationTransform(currTransform);
-}
-
-//std::vector<KeyFrame> Animator::GetPreviousAndNextFrames()
-//{
-//	KeyFrame* prevFrame = nullptr;
-//	KeyFrame* nextFrame = nullptr;
-//	for (KeyFrame frame : currentAnim->keyFrames)
-//	{
-//		if (frame.GetTimeStamp() > animationTime)
-//		{
-//			nextFrame = &frame;
-//			break;
-//		}
-//		prevFrame = &frame;
-//	}
-//	if (prevFrame == nullptr)
-//	{
-//		prevFrame = nextFrame;
-//	}
-//	else if (nextFrame == nullptr)
-//	{
-//		nextFrame = prevFrame;
-//	}
-//	return std::vector<KeyFrame>(prevFrame, nextFrame);
-//}
-
-float Animator::calculatProgression(float previousFrame, float nextFrame)
-{
-	float timeDiff = nextFrame - previousFrame;
-	return (this->animationTime - previousFrame) / timeDiff;
-}
-
-//std::map<std::string, XMMATRIX> Animator::calculateCurrentPose(KeyFrame previousFrame, KeyFrame nextFrame, float progression)
-//{
-//	std::map<std::string, XMMATRIX> currentPose;// = hashmap
-//
-//	std::vector<std::string> keys;
-//	for (auto it = previousFrame.GetJointKeyFrames().begin(); it != previousFrame.GetJointKeyFrames().end(); it++)
-//	{
-//		keys.push_back(it->first);
-//	}
-//
-//
-//	for (std::string jointName : keys)
-//	{ 
-//		//use keyframes positin instead
-//		JointTransform previousTransform = previousFrame.GetJointKeyFrames().at(jointName);
-//		JointTransform nextTransform = nextFrame.GetJointKeyFrames().at(jointName);
-//		JointTransform currentTransform = currentTransform.Interpolate(previousTransform, nextTransform, progression);
-//		currentPose.emplace(jointName, currentTransform.GetLocalTransform());
-//	}
-//	return currentPose;
-//}
-
-
-void Animator::incAnimationTime()
-{
-	this->animationTime += 0; // deltatime
-	if (this->animationTime > currentAnim->length)
-	{
-		this->animationTime = std::fmod(this->animationTime, currentAnim->length);
-	}
-
-}
-
-Animator::Animator()
-{
-	this->entity = nullptr;
-	this->currentAnim = nullptr;
-	this->animationTime = 0.f;
-}
-
-Animator::Animator(AnimatedModel* entity)
-{
-	*this->entity = *entity;
-	this->currentAnim = nullptr;
-	this->animationTime = 0.f;
-}
-
-Animator::Animator(const Animator& obj)
-{
-	if (obj.entity != nullptr)
-		*this->entity = *obj.entity;
-	if (obj.currentAnim != nullptr)
-		*this->currentAnim = *obj.currentAnim;
-	this->animationTime = obj.animationTime;
-}
-
-Animator::~Animator()
-{
-}
-
-//void Animator::Update()
-//{
-//	if (currentAnim == nullptr)
-//	{
-//		return;
-//	}
-//	incAnimationTime();
-//	std::map<std::string, XMMATRIX> currentPose = GetCurrAnimPose();
-//	applyPoseToJoints(currentPose, entity->GetRootJoint(), XMMATRIX());
-//}
-
-void Animator::DoAnimation(Animation animation)
-{
-	this->animationTime = 0;
-	this->currentAnim = &animation;
-}

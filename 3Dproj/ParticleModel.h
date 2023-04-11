@@ -34,6 +34,10 @@ private:
 
 	
 	Animation animation;
+
+	std::pair<int, float> GetTimeFraction(std::vector<float>& times, float& dt);
+	void GetPose(Animation& animation, Joint& skeleton, float dt, std::vector<DirectX::XMMATRIX>& output, DirectX::XMMATRIX& parentTransform, DirectX::XMMATRIX& globalInverseTransform);
+
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);
@@ -49,6 +53,8 @@ private:
 	//vertex buffer with position, velocity and color
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* Vg_pConstantBuffer;
+
+	//
 
 	//2 textures for the particle one diffuse and one normal map
 	ID3D11ShaderResourceView* diffuseTexture;

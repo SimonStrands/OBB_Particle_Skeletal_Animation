@@ -107,6 +107,10 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
 	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
+	std::vector<DirectX::XMMATRIX> output;
+	GetPose(animation,rootJoint,dt,output,rootJoint.localBindTransform,rootJoint.inverseBindTransform);
+	
+
 	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
 
@@ -160,4 +164,73 @@ void ParticleModel::updateShaders(Graphics*& gfx)
 	memcpy(resource.pData, gfx->getVertexconstbuffer(), sizeof(Vcb));
 	gfx->get_IMctx()->Unmap(Vg_pConstantBuffer, 0);
 	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+}
+
+std::pair<int, float> ParticleModel::GetTimeFraction(std::vector<float>& times, float& dt)
+{
+	int segment = 0;
+	while (dt > times[segment])
+		segment++;
+	float start = times[segment - 1];
+	float end = times[segment];
+	float frac = (dt - start) / (end - start);
+	return { segment, frac };
+}
+
+using namespace DirectX;
+void ParticleModel::GetPose(Animation& animation, Joint& skeleton, float dt, std::vector<XMMATRIX>& output, XMMATRIX& parentTransform, XMMATRIX& globalInverseTransform)
+{
+	KeyFrame& btt = animation.keyFrames[skeleton.GetName()];
+	dt = fmod(dt, animation.length);
+	std::pair<int, float> fp;
+	//calculate interpolated position
+	fp = GetTimeFraction(btt.positionTimestamps, dt);
+
+	XMFLOAT3 position1 = btt.positions[fp.first - 1];
+	XMFLOAT3 position2 = btt.positions[fp.first];
+
+	XMVECTOR resultPos = XMVectorLerp(XMLoadFloat3(&position1), XMLoadFloat3(&position2), fp.second);
+	XMFLOAT3 position;
+	XMStoreFloat3(&position, resultPos);
+
+	//calculate interpolated rotation
+	fp = GetTimeFraction(btt.rotationTimestamps, dt);
+
+	XMFLOAT4 rotation1 = btt.rotations[fp.first - 1];
+	XMFLOAT4 rotation2 = btt.rotations[fp.first];
+
+	XMVECTOR rotation = XMQuaternionSlerp(XMLoadFloat4(&rotation1), XMLoadFloat4(&rotation2), fp.second);
+
+	//calculate interpolated scale
+	fp = GetTimeFraction(btt.scaleTimestamps, dt);
+	XMFLOAT3 scale1 = btt.scales[fp.first - 1];
+	XMFLOAT3 scale2 = btt.scales[fp.first];
+
+	XMVECTOR resultScale = XMVectorLerp(XMLoadFloat3(&scale1), XMLoadFloat3(&scale2), fp.second);
+	XMFLOAT3 scale;
+	XMStoreFloat3(&scale, resultScale);
+
+	XMMATRIX posIdentity = XMMatrixIdentity();
+	XMMATRIX scaleIdentity = XMMatrixIdentity();
+
+	// calculate localTransform
+	XMMATRIX transMat = XMMatrixTranslation(position.x, position.y, position.z);
+	transMat = XMMatrixMultiply(posIdentity, transMat);
+
+
+	//XMFLOAT4X4 rotationMat = glm::toMat4(rotation);
+	XMMATRIX rotMat = XMMatrixRotationQuaternion(rotation);
+
+	XMMATRIX scaleMat = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
+	scaleMat = XMMatrixMultiply(scaleIdentity, scaleMat);
+
+	XMMATRIX localTransform = transMat * rotMat * scaleMat;
+	XMMATRIX globalTransform = parentTransform * localTransform;
+
+	output[skeleton.GetId()] = globalInverseTransform * globalTransform * skeleton.localBindTransform;
+	//update values for children bones
+	for (Joint& child : skeleton.GetChildJoints()) {
+		GetPose(animation, child, dt, output, globalTransform, globalInverseTransform);
+	}
+	//std::cout << dt << " => " << position.x << ":" << position.y << ":" << position.z << ":" << std::endl;
 }

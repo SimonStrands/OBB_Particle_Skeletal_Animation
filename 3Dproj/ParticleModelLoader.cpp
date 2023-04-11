@@ -87,6 +87,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			Joint newRoot = Joint(totalnr, name, mat);
 
 			Nodes(totalnr, newRoot, walker);
+			newRoot.CalcInverseBindTransform(newRoot.localBindTransform);
 			rootJoint = newRoot;
 			
 	
