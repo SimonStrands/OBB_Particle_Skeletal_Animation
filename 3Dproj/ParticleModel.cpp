@@ -109,7 +109,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 
 	std::vector<DirectX::XMMATRIX> output;
 	GetPose(animation,rootJoint,dt,output,rootJoint.localBindTransform,rootJoint.inverseBindTransform);
-	
+	//here
 
 	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
