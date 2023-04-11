@@ -44,6 +44,21 @@ void Nodes(int & nrTotal, std::vector<DirectX::XMMATRIX> &arr, aiNode* walker)
 	
 }
 
+void testReadHiaechy(aiNode *pNode, const aiMatrix4x4& parentMatrix, std::vector<DirectX::XMMATRIX> &Transformations)
+{
+	aiMatrix4x4 newParentMatrix = parentMatrix * pNode->mTransformation;
+	aiMatrix4x4 m = newParentMatrix;
+				Transformations.push_back(DirectX::XMMATRIX(
+					m.a1, m.b1, m.c1, m.d1,
+					m.a2, m.b2, m.c2, m.d2,
+					m.a3, m.b3, m.c3, m.d3,
+					m.a4*0.01f, m.b4*0.01f, m.c4*0.01f, m.d4
+				));
+	for(int i = 0; i < pNode->mNumChildren; i++){
+		testReadHiaechy(pNode->mChildren[i], newParentMatrix, Transformations);
+	}
+}
+
 bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo, Joint& joint, aiNode* node){
 	if (boneInfo.find(node->mName.C_Str()) != boneInfo.end()) { // if node is actually a bone
 		joint.GetName() = node->mName.C_Str();

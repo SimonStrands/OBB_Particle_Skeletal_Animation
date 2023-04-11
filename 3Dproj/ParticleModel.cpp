@@ -83,13 +83,15 @@ void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, Dir
 	// calculate localTransform
 	//positionMat = glm::translate(positionMat, position);
 	DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationQuaternion(rotation);
+	//float x = 0;
+	//DirectX::XMMATRIX rotationMat = DirectX::XMMatrixRotationRollPitchYaw(x,x,0);
+	//x += 0.0001f;
 
 	DirectX::XMMATRIX localTransform = positionMat * rotationMat;
-	//DirectX::XMMATRIX globalTransform = parentTransform * localTransform;
-	DirectX::XMMATRIX globalTransform =  localTransform;
+	DirectX::XMMATRIX globalTransform = parentTransform * localTransform;
 
-	//SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * globalTransform * joint.getOffsetMatrix();
-	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = globalTransform * joint.getOffsetMatrix();
+	SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = GlobalInverseTransform * globalTransform * joint.getOffsetMatrix();
+	//SkeletonConstBufferConverter.Transformations.element[joint.GetId()] = globalTransform * joint.getOffsetMatrix();
 	OBBSkeleton->setTransform(joint.GetId(), SkeletonConstBufferConverter.Transformations.element[joint.GetId()]);
 	//update values for children bones
 	for (Joint& child : joint.GetChildJoints()) {
@@ -176,13 +178,31 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	this->CSConstBuffer.time.element = 0;
 
 
-	std::vector<float> heightTest;
-	for(int i = 0; i < animation.keyFrames.size(); i++){
-		heightTest.push_back(2);
-	}
 	std::vector<DirectX::XMMATRIX> trans;
 	DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 	getTransforms(trans, rootJoint, p);
+	
+	//Assimp::Importer AImporter;
+	//const aiScene* scene = AImporter.ReadFile("objects/testAnimation.fbx", aiProcess_JoinIdenticalVertices);
+	//
+	////exit if no scene/file was found
+	//if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
+	//	std::cout << "ERROR could find scene or file" << std::endl;
+	//	exit(-2);
+	//}
+	//
+	//testReadHiaechy(scene->mRootNode, 
+	//	aiMatrix4x4(
+	//			1,0,0,0,
+	//			0,1,0,0,
+	//			0,0,1,0,
+	//			0,0,0,1),
+	//	trans);
+
+	std::vector<float> heightTest;
+	for(int i = 0; i < trans.size(); i++){
+		heightTest.push_back(2);
+	}
 
 	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
@@ -205,7 +225,7 @@ ParticleModel::~ParticleModel()
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
 	time += dt;
-	getPose(rootJoint, animation, time);
+	//getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
