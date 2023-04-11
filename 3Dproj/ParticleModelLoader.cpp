@@ -59,16 +59,19 @@ void testReadHiaechy(aiNode *pNode, const aiMatrix4x4& parentMatrix, std::vector
 	}
 }
 
-bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo, Joint& joint, aiNode* node){
-	if (boneInfo.find(node->mName.C_Str()) != boneInfo.end()) { // if node is actually a bone
-		joint.GetName() = node->mName.C_Str();
-		joint.GetId() = boneInfo[joint.GetName()].first;
-		joint.getOffsetMatrix() = boneInfo[joint.GetName()].second;
+bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo, Bone& joint, aiNode* node){
 
+	if (boneInfo.find(node->mName.C_Str()) != boneInfo.end()) { // if node is actually a bone
+		joint.name = node->mName.C_Str();
+		joint.id = boneInfo[joint.name].first;
+		//joint.inverseBindPoseMatrix = boneInfo[joint.name].second;
+		//joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
+		joint.inverseBindPoseMatrix = DirectX::XMMatrixInverse(nullptr, boneInfo[joint.name].second);
+	
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
-			Joint child;
+			Bone child;
 			if(readSkeleton(boneInfo, child, node->mChildren[i])){
-				joint.addChild(child);
+				joint.childJoints.push_back(child);
 			}
 		}
 		return true;
@@ -78,15 +81,17 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 			if (readSkeleton(boneInfo, joint, node->mChildren[i])) {
 				return true;
 			}
-
+	
 		}
 	}
 	return false;
 }
 
+#include <iostream>
+
 void loadBoneDataToVertecies(
 	std::vector<VolumetricVertex>& vertecies, 
-	Joint& rootJoint, 
+	Bone& rootJoint, 
 	aiMesh* mesh,
 	aiNode* node,
 	int verteciesSize
@@ -157,7 +162,7 @@ bool loadAnimation(const aiScene* scene, Animation& animation){
 	else{
 		animation.tick = (float)anim->mTicksPerSecond;
 	}
-	animation.length = (float)(anim->mDuration * anim->mTicksPerSecond);
+	animation.length = (float)(anim->mDuration);
 	animation.keyFrames = {};
 
 	for (unsigned int i = 0; i < anim->mNumChannels; i++) {
@@ -177,12 +182,12 @@ bool loadAnimation(const aiScene* scene, Animation& animation){
 			track.scales.push_back(AiVector3ToXMFLOAT3(channel->mScalingKeys[j].mValue));
 	
 		}
-		animation.keyFrames[channel->mNodeName.C_Str()] = track;
+		animation.keyFrames.insert(std::pair<std::string, KeyFrame>(channel->mNodeName.C_Str(), track));
 	}
 	return true;
 }
 
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, DirectX::XMMATRIX &globalInverseTransform, Joint& rootJoint)
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, DirectX::XMMATRIX &globalInverseTransform, Bone& rootJoint)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
@@ -197,14 +202,11 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	//FOR Now just do the first one
 	aiMesh* mesh = scene->mMeshes[0];
 	uint16_t boneCount = 0;
-	uint16_t vao = 0;//?
-	
 	
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
-		//vertecies.push_back(VolumetricVertex(vertex.x, vertex.z, vertex.y, 0, 0, 1, 0.75f));
 	}
 	globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
 	globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);

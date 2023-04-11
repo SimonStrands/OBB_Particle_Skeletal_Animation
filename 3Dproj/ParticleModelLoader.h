@@ -18,5 +18,5 @@ void loadParticleModel(
 	const std::string& filePath,
 	Animation& animation,
 	DirectX::XMMATRIX &globalInverseTransform,
-	Joint& rootJoint
+	Bone& rootJoint
 );

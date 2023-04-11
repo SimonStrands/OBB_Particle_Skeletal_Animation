@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <map>
 
 struct KeyFrame{
 	std::vector<float> positionTimestamps;
@@ -20,7 +21,7 @@ class Animation {
 public:
 	float length;
 	float tick = 1.0f;
-	std::unordered_map<std::string, KeyFrame> keyFrames;
+	std::map<std::string, KeyFrame> keyFrames;
 };
 
 #endif // !ANIMATION_H

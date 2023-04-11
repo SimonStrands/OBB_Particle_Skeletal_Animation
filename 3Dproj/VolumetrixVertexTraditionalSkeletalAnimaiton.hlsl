@@ -27,7 +27,7 @@ static const int maxNumberOfBones = 50;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    float4x4 Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+    row_major matrix Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
     int nrOfBones;
 };
 

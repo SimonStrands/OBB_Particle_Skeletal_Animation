@@ -24,10 +24,6 @@ struct SkeletonConstantBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
 	}Transformations;
-	struct{
-		int element;
-	}nrOfBones;
-    //padding
 };
 
 class ParticleModel{
@@ -73,12 +69,12 @@ private:
 	ID3D11Buffer* computeShaderConstantBuffer;
 	ComputerShaderParticleModelConstBuffer CSConstBuffer;
 
-	void getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
+	void getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
 		1,0,0,0,
 		0,1,0,0,
 		0,0,1,0,
 		0,0,0,1
 	));
 	float time = 0;
-	Joint rootJoint;
+	Bone rootJoint;
 };
