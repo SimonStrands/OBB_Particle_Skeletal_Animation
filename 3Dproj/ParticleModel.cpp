@@ -3,6 +3,7 @@
 
 void getTransforms(std::vector<DirectX::XMMATRIX>& v, Joint joint, DirectX::XMMATRIX parent) {
 
+	//DirectX::XMMATRIX temp(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
 	v.push_back(joint.localBindTransform);
 
 	DirectX::XMMATRIX newParent = v[v.size() - 1];
@@ -73,7 +74,6 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	this->CSConstBuffer.time.element = 0;
 
 	std::vector<float> heightTest;
-	//animation
 	for (int i = 0; i < animation.keyFrames.size(); i++) {
 		heightTest.push_back(2);
 	}
@@ -81,7 +81,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	DirectX::XMMATRIX p(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	getTransforms(trans, rootJoint, p);
 
-	//OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
 
 ParticleModel::~ParticleModel()
@@ -137,6 +137,7 @@ void ParticleModel::draw(Graphics*& gfx)
 
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
+	OBBSkeleton->draw(gfx);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)

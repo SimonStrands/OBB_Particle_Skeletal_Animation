@@ -30,25 +30,21 @@ DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 	DirectX::XMMATRIX xmat = DirectX::XMLoadFloat4x4(&mat4);
 	return xmat;
 }
-void Nodes(int & nrTotal, Joint parent, aiNode* walker)
+void Nodes(int & nrTotal, Joint & parent, aiNode* walker)
 {
 	std::string name = walker->mName.C_Str();
 	DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(walker->mTransformation);
 	
-
 	for (int i = 0; i < walker->mNumChildren; i++)
 	{
 		nrTotal++;
-
-		aiNode* temp = walker->mChildren[i];
-
+		aiNode* temp = walker->mChildren[i]; //get info to create child node
 		std::string name = temp->mName.C_Str();
 		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(temp->mTransformation);
 		Joint childJoint = Joint(nrTotal, name, mat);
 
 		parent.addChild(childJoint);
 		Joint nextJoint = parent.GetChildJoints()[i]; //traverse
-
 		Nodes(nrTotal, nextJoint, temp);
 	}
 	

@@ -67,7 +67,7 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	std::vector<float> height = {1, 2, 3};
 
 
-	OBBSkeleton = new OBBSkeletonDebug(transforms, height, gfx);
+	//OBBSkeleton = new OBBSkeletonDebug(transforms, height, gfx);
 }
 
 Game::~Game() 
@@ -95,7 +95,7 @@ Game::~Game()
 		delete obj[i];
 	}
 	delete particleModel;
-	delete OBBSkeleton;
+	//delete OBBSkeleton;
 }
 
 
@@ -227,7 +227,7 @@ void Game::DrawToBuffer()
 void Game::ForwardDraw()
 {
 	particleModel->draw(gfx);
-	OBBSkeleton->draw(gfx);
+	//OBBSkeleton->draw(gfx);
 }
 
 void Game::DrawAllShadowObject()
