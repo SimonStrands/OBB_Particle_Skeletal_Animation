@@ -2,6 +2,8 @@
 #include <array>
 #include "Vec.h"
 
+#include "BuildDefines.h"
+
 //git
 struct vertex {
 	float pos[3];
@@ -32,11 +34,15 @@ struct vertex {
 	}
 };
 
-
 struct VolumetricVertex {
 	float pos[3];
 	float color[4];
 	float velocity[3] = {0};
+#ifdef TRADITIONALSKELETALANIMATION
+	int boneIDs[4] = {0};
+	float boneWeights[4] = {0};
+#endif 
+
 
 	VolumetricVertex() {
 		//yes should be like this

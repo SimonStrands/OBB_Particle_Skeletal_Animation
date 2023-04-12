@@ -25,7 +25,7 @@ Joint::Joint(const Joint& obj)
     name = obj.name;
     localBindTransform = obj.localBindTransform;
 
-    inverseBindTransform = obj.inverseBindTransform;
+    inverseBindPoseMatrix = obj.inverseBindPoseMatrix;
     animatedTransform = obj.animatedTransform;
 }
 
@@ -44,15 +44,15 @@ std::vector<Joint> Joint::GetChildJoints()
 {
     return this->childJoints;
 }
-int Joint::GetId() const
-{
-    return this->id;
-}
-
-std::string Joint::GetName() const
-{
-    return this->name;
-}
+//int Joint::GetId() const
+//{
+//    return this->id;
+//}
+//
+//std::string Joint::GetName() const
+//{
+//    return this->name;
+//}
 
 
 XMMATRIX Joint::GetAnimatedTransform() const
@@ -74,7 +74,7 @@ void Joint::CalcInverseBindTransform(XMMATRIX parentBindTransform)
 {
 	XMMATRIX bindTransform = XMMatrixMultiply(parentBindTransform, localBindTransform);
     
-    inverseBindTransform = XMMatrixInverse(nullptr, bindTransform);
+    inverseBindPoseMatrix = XMMatrixInverse(nullptr, bindTransform);
     for (Joint child : childJoints)
     {
         child.CalcInverseBindTransform(bindTransform);
@@ -82,49 +82,5 @@ void Joint::CalcInverseBindTransform(XMMATRIX parentBindTransform)
 
 }
 
-AnimatedModel::AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount)
-{
-    this->mesh = model;
-    //this->texture = texture;
-    this->rootJoint = rootJoint;
-    this->jointCount = jointCount;
-    //this->animator = new Animator(this);
-    rootJoint.CalcInverseBindTransform(XMMATRIX());
-}
 
-Mesh AnimatedModel::GetMesh() const
-{
-    return this->mesh;
-}
-
-Joint AnimatedModel::GetRootJoint() const
-{
-    return this->rootJoint;
-}
-
-
-
-std::vector<XMMATRIX> AnimatedModel::GetJointTransforms()
-{
-    std::vector<XMMATRIX> jointMatrices;
-    jointMatrices.resize(jointCount);
-    AddJointsToArray(rootJoint, jointMatrices);
-    return jointMatrices;
-}
-
-void AnimatedModel::AddJointsToArray(Joint headJoint, std::vector<XMMATRIX> jointMatrices)
-{
-    jointMatrices[headJoint.GetId()] = headJoint.GetAnimatedTransform();
-    for (Joint childJoint : headJoint.GetChildJoints()) {
-        AddJointsToArray(childJoint, jointMatrices);
-    }
-}
-
-Mesh::Mesh()
-{
-}
-
-Mesh::~Mesh()
-{
-}
 

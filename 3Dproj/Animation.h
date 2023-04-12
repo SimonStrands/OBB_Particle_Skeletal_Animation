@@ -2,7 +2,4 @@
 #define ANIMATION_H
 
 
-
-
-
 #endif // !ANIMATION_H

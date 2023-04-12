@@ -52,7 +52,9 @@ private:
 	std::vector<GameObject*> LightVisualizers;
 	std::vector<GameObject*> obj;
 	ParticleModel* particleModel;
+
 	//OBBSkeletonDebug* OBBSkeleton;
+
 
 	//var
 	int nrOfLight;//must still exist

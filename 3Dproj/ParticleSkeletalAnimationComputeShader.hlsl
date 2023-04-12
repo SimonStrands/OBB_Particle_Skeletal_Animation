@@ -19,6 +19,7 @@ RWBuffer<float> particleData;
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
+    
     static const float drag = 0.1f;
     static const float force = 0.9f;
     //pos 3
@@ -48,5 +49,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
     particleData[DTid.x * 10 + 7] = currentVelocity.x;
     particleData[DTid.x * 10 + 8] = currentVelocity.y;
     particleData[DTid.x * 10 + 9] = currentVelocity.z;
+    
 
 }

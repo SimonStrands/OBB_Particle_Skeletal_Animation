@@ -1,13 +1,13 @@
-//#pragma once
-//#include "Vec.h"
-//#include "vertex.h"
-//#include <string>
-//#include <DirectXMath.h>
-//#include <vector>
-//#include <unordered_map>
-//#include "Quaternion.h"
-////isn't used in 3D course
-//
+#pragma once
+#include "Vec.h"
+#include "vertex.h"
+#include <string>
+#include <DirectXMath.h>
+#include <vector>
+#include <unordered_map>
+#include "Quaternion.h"
+//isn't used in 3D course
+
 //struct BoneVertex {
 //	float pos[3];
 //	float uv[2];
@@ -81,7 +81,7 @@
 //	std::vector<vec3> Scales;
 //};
 //
-//struct Animation {
+//struct BoneAnimation {
 //	float duration = 0.0f;
 //	float currentTime = 0.0f;
 //	float tps = 1.0f;

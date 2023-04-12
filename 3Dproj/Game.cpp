@@ -68,6 +68,7 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 
 
 	//OBBSkeleton = new OBBSkeletonDebug(transforms, height, gfx);
+
 }
 
 Game::~Game() 
@@ -95,7 +96,9 @@ Game::~Game()
 		delete obj[i];
 	}
 	delete particleModel;
+
 	//delete OBBSkeleton;
+
 }
 
 
@@ -177,7 +180,7 @@ void Game::Update()
 		LightVisualizers[i]->setRot(vec3(0 , light[i]->getRotation().x, -light[i]->getRotation().y) + vec3(0,1.57f,0));
 	}
 	
-	particleModel->updateParticles(dt.dt(), gfx);
+	particleModel->updateParticles((float)dt.dt(), gfx);
 
 	gfx->Update((float)dt.dt(), camera->getPos());
 
@@ -227,7 +230,9 @@ void Game::DrawToBuffer()
 void Game::ForwardDraw()
 {
 	particleModel->draw(gfx);
+
 	//OBBSkeleton->draw(gfx);
+
 }
 
 void Game::DrawAllShadowObject()

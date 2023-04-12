@@ -16,14 +16,17 @@ struct OBBSkeletonOBBBuffer : CB{
 	}projection;
 };
 
-static const float OBBWidth = 1;
-static const float OBBDepth = 1;
+//static const float OBBWidth = 0.01f;
+//static const float OBBDepth = 0.01f;
+static const float OBBWidth = 1.f;
+static const float OBBDepth = 1.f;
 
 class OBBSkeletonDebug{
 public:
 	OBBSkeletonDebug(std::vector<DirectX::XMMATRIX>& transform, std::vector<float>& height, Graphics*& gfx);
 	~OBBSkeletonDebug();
 	void setTransformations(std::vector<DirectX::XMMATRIX>& transform);
+	void setTransform(int id, const DirectX::XMMATRIX transform);
 	void draw(Graphics*& gfx);
 
 private:

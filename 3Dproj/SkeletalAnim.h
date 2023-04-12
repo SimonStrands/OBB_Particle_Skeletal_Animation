@@ -1,13 +1,12 @@
-#ifndef SKELETALANIMH
-#define SKELETALANIMH
+#ifndef SKELETALANIM_H
+#define SKELETALANIM_H
 
-#include <cmath>
-#include <vector>
-#include <DirectXMath.h>
+
 #include <list>
 #include <string>
 #include <map>
 #include <unordered_map>
+#include <DirectXMath.h>
 
 struct KeyFrame {
 	std::vector<float> positionTimestamps;
@@ -27,16 +26,14 @@ public:
 };
 
 
-class Joint;
-class AnimatedModel;
+//class Joint;
+//class AnimatedModel;
 
 
 class Joint {
 
 private:
-	std::vector<Joint> childJoints;
-	int id;
-	std::string name;
+	
 
 
 public:
@@ -44,12 +41,16 @@ public:
 	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform);
 	Joint(const Joint & obj);
 	Joint operator=(const Joint& obj);
+
+	std::vector<Joint> childJoints;
+	int id;
+	std::string name;
 	DirectX::XMMATRIX localBindTransform;
-	DirectX::XMMATRIX inverseBindTransform;
+	DirectX::XMMATRIX inverseBindPoseMatrix;
 	DirectX::XMMATRIX animatedTransform;
 
-	int GetId() const;
-	std::string GetName() const;
+	//int GetId() const;
+	//std::string GetName() const;
 	void addChild(Joint child);
 	std::vector<Joint> GetChildJoints();
 	
@@ -61,52 +62,23 @@ public:
 	
 };
 
-//vertex
-class Mesh {
-private:
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT2 texCoords; //
-	DirectX::XMFLOAT3 normal; //
-	DirectX::XMINT3 jointIDs;
-	DirectX::XMFLOAT3 weights;
-public:
-	Mesh();
-	~Mesh();
-
-
-};
-
-class AnimatedModel {
-private:
-	
-	Mesh mesh;
-	//texture;
-	Joint rootJoint;
-	int jointCount;
-	//Animator* animator;
-public:
-	AnimatedModel(Mesh model, /*Texture texture,*/ Joint rootJoint, int jointCount);
-	
-	Mesh GetMesh() const;
-	//tEXTURE GetTexture();
-	Joint GetRootJoint() const;
-	//void DeleteProperties();
-
-
-	//void DoAnimation(Animation animation);
-	//void Update();
-
-	std::vector<DirectX::XMMATRIX> GetJointTransforms();
-	void AddJointsToArray(Joint headJoint, std::vector<DirectX::XMMATRIX> jointMatrices);
-
-};
-
+//struct Bone {
+//	std::vector<Bone> childJoints;
+//	int id;
+//	std::string name;
+//	DirectX::XMMATRIX inverseBindPoseMatrix;
+//	DirectX::XMMATRIX boneMatrix;
+//	
+//
+//};
 
 
 #endif
 
+
 //[] get animator to work
 //[] make joints loading for regular skeleton visible 
+
 
 //modified version and based on video link
 //https://www.youtube.com/watch?v=f3Cr8Yx3GGA

@@ -19,7 +19,16 @@ struct ComputerShaderParticleModelConstBuffer : CB{
 		float element[2];
 	}padding;
 };
-//class Animation;
+
+
+static const int maxNumberOfBones = 50;
+struct SkeletonConstantBuffer : CB{
+	struct{
+		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+	}Transformations;
+};
+
+
 class ParticleModel{
 public:
 	ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position);
@@ -31,12 +40,18 @@ private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
 	OBBSkeletonDebug* OBBSkeleton;
-
 	
-	Animation animation;
+	//Animation animation;
 
 	std::pair<int, float> GetTimeFraction(std::vector<float>& times, float& dt);
-	void GetPose(Animation& animation, Joint& skeleton, float dt, std::vector<DirectX::XMMATRIX>& output, DirectX::XMMATRIX& parentTransform, DirectX::XMMATRIX& globalInverseTransform);
+	void getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	));
+
+	void GetPose2(Animation& animation, Joint& skeleton, float dt, std::vector<DirectX::XMMATRIX>& output, DirectX::XMMATRIX& parentTransform, DirectX::XMMATRIX& globalInverseTransform);
 
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
@@ -54,7 +69,12 @@ private:
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* Vg_pConstantBuffer;
 
-	//
+
+	//For skeletal animation
+	SkeletonConstantBuffer SkeletonConstBufferConverter;
+	ID3D11Buffer* SkeletonConstBuffer;
+	Animation animation;
+	DirectX::XMMATRIX GlobalInverseTransform;
 
 	//2 textures for the particle one diffuse and one normal map
 	ID3D11ShaderResourceView* diffuseTexture;
@@ -65,8 +85,12 @@ private:
 	ID3D11UnorderedAccessView* billUAV;
 	ID3D11Buffer* computeShaderConstantBuffer;
 	ComputerShaderParticleModelConstBuffer CSConstBuffer;
-	
-	float time;
+
+	float time =0;
 	Joint rootJoint;
+
+
+	
+	
 
 };
