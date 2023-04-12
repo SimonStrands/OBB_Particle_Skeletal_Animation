@@ -17,7 +17,6 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMMATRIX newParentTransform;
 
 	float nTime = fmod(time, anim.length);
-	float procentTime = 0;
 	KeyFrame bonePlacement = anim.keyFrames.find(joint.name)->second;
 
 	std::pair<unsigned int, float> fp;
@@ -26,21 +25,16 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMFLOAT3 pos1 = bonePlacement.positions[fp.first - 1];
 	DirectX::XMFLOAT3 pos2 = bonePlacement.positions[fp.first];
 	DirectX::XMVECTOR position = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&pos1), DirectX::XMLoadFloat3(&pos2), fp.second);
+	DirectX::XMStoreFloat3(&pos1, position);
+	DirectX::XMMATRIX transpose = DirectX::XMMatrixTranslation(pos1.x, pos1.y, pos1.z);
 
 	fp = getTimeFraction(bonePlacement.rotationTimestamps, nTime);
 	DirectX::XMFLOAT4 rot1 = bonePlacement.rotations[fp.first - 1];
 	DirectX::XMFLOAT4 rot2 = bonePlacement.rotations[fp.first];
 	DirectX::XMVECTOR rotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rot1), DirectX::XMLoadFloat4(&rot2), fp.second);
-	DirectX::XMMATRIX transpose(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-	static float x = 0;
-	if(joint.id == 0){
-		//rotation = DirectX::XMQuaternionRotationRollPitchYaw(x,0,0);
-		//transpose = DirectX::XMMatrixTranslation(x,0,0);
-		//x += 0.001f;
-	}
+	
 
 	newParentTransform = transpose * DirectX::XMMatrixRotationQuaternion(rotation);
-	//newParentTransform = transpose * DirectX::XMMatrixRotationRollPitchYaw(0,x,0);
 
 	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = (parentTransform * newParentTransform) * joint.inverseBindPoseMatrix;
 
@@ -63,6 +57,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::vector<VolumetricVertex> vertecies;
 	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
