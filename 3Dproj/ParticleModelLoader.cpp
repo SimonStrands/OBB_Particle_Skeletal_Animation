@@ -219,12 +219,12 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	if (mesh->HasBones()) 
 	{
 		int totalnr = 0;
-		aiNode* walker = scene->mRootNode; //pointer to current node ->mChildren[0]->mTransformation
-		std::string name = walker->mName.C_Str();
-		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(walker->mTransformation);
+
+		std::string name = scene->mRootNode->mName.C_Str();
+		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
 		Joint newRoot = Joint(totalnr, name, mat);
 
-		Nodes(totalnr, newRoot, walker);
+		Nodes(totalnr, newRoot, scene->mRootNode);
 		newRoot.CalcInverseBindTransform(newRoot.localBindTransform);
 		rootJoint = newRoot;
 	}

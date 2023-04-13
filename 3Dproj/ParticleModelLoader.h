@@ -13,7 +13,7 @@ DirectX::XMFLOAT3 AiVector3ToXMFLOAT3(const aiVector3D& vec3);
 DirectX::XMFLOAT4 AiQuadToXMFLOAT4(const aiQuaternion& quad);
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
-void Nodes(int& nrTotal,Joint & parent, aiNode* walker);
+void Nodes(Joint & parent, aiNode* walker);
 
 void testReadHiaechy(aiNode *pNode, const aiMatrix4x4& parentMatrix, std::vector<DirectX::XMMATRIX> &Transformations);
 

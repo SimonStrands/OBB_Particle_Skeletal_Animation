@@ -26,10 +26,6 @@ public:
 };
 
 class Joint {
-
-private:
-	
-
 public:
 	Joint();
 	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform);
