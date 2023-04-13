@@ -24,9 +24,6 @@ std::pair<unsigned int, float> getTimeFraction(std::vector<float>& times, float&
 	return {segment, frac};
 }
 
-
-
-
 ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position):
 	positionMatris(
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -39,8 +36,6 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 
-	//loadParticleModel(vertecies, "objects/testAnimation.fbx",animation, rootJoint);
-	
 
 	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
@@ -136,8 +131,8 @@ ParticleModel::~ParticleModel()
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
 	time += dt;
-	getPose(rootJoint, animation, time, rootJoint.localBindTransform);
-	
+	//getPose(rootJoint, animation, time, rootJoint.localBindTransform);
+	GetPose2(rootJoint, animation, time, rootJoint.localBindTransform);
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	memcpy(resource.pData, &SkeletonConstBufferConverter, sizeof(SkeletonConstantBuffer));
@@ -229,7 +224,7 @@ std::pair<int, float> ParticleModel::GetTimeFraction(std::vector<float>& times, 
 }
 
 using namespace DirectX;
-void ParticleModel::GetPose2(Animation& animation, Joint& skeleton, float dt, std::vector<XMMATRIX>& output, XMMATRIX& parentTransform, XMMATRIX& globalInverseTransform)
+void ParticleModel::GetPose2(Joint& skeleton, Animation& animation,  float dt, XMMATRIX parentTransform)
 {
 	KeyFrame& btt = animation.keyFrames[skeleton.name];
 	dt = fmod(dt, animation.length);
@@ -267,21 +262,17 @@ void ParticleModel::GetPose2(Animation& animation, Joint& skeleton, float dt, st
 	// calculate localTransform
 	XMMATRIX transMat = XMMatrixTranslation(position.x, position.y, position.z);
 	transMat = XMMatrixMultiply(posIdentity, transMat);
-
-
-	//XMFLOAT4X4 rotationMat = glm::toMat4(rotation);
 	XMMATRIX rotMat = XMMatrixRotationQuaternion(rotation);
-
 	XMMATRIX scaleMat = DirectX::XMMatrixScaling(scale.x, scale.y, scale.z);
 	scaleMat = XMMatrixMultiply(scaleIdentity, scaleMat);
 
-	XMMATRIX localTransform = transMat * rotMat * scaleMat;
-	XMMATRIX globalTransform = parentTransform * localTransform;
+	XMMATRIX newParentTransform = transMat * rotMat * scaleMat;
 
-	output[skeleton.id] = globalInverseTransform * globalTransform * skeleton.localBindTransform;
+	this->SkeletonConstBufferConverter.Transformations.element[skeleton.id] = (parentTransform * newParentTransform) * skeleton.inverseBindPoseMatrix;
 	//update values for children bones
 	for (Joint& child : skeleton.GetChildJoints()) {
-		GetPose2(animation, child, dt, output, globalTransform, globalInverseTransform);
+		//GetPose2(animation, child, dt, output, globalTransform, globalInverseTransform);
+		GetPose2(child, animation,  dt, newParentTransform);
 	}
 	//std::cout << dt << " => " << position.x << ":" << position.y << ":" << position.z << ":" << std::endl;
 }

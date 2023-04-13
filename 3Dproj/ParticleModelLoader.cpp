@@ -172,7 +172,7 @@ bool loadAnimation(const aiScene* scene, Animation& animation)
 	else {
 		animation.tick = (float)anim->mTicksPerSecond;
 	}
-	animation.length = (float)(anim->mDuration * anim->mTicksPerSecond);
+	animation.length = (float)(anim->mDuration);
 	animation.keyFrames = {};
 
 	for (unsigned int i = 0; i < anim->mNumChannels; i++) {

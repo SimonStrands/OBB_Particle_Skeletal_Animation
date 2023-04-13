@@ -51,7 +51,12 @@ private:
 		0, 0, 0, 1
 	));
 
-	void GetPose2(Animation& animation, Joint& skeleton, float dt, std::vector<DirectX::XMMATRIX>& output, DirectX::XMMATRIX& parentTransform, DirectX::XMMATRIX& globalInverseTransform);
+	void GetPose2(Joint& skeleton, Animation& animation , float dt, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	));
 
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);

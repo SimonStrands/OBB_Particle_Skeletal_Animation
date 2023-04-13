@@ -26,7 +26,7 @@ Joint::Joint(const Joint& obj)
     localBindTransform = obj.localBindTransform;
 
     inverseBindPoseMatrix = obj.inverseBindPoseMatrix;
-    animatedTransform = obj.animatedTransform;
+    //animatedTransform = obj.animatedTransform;
 }
 
 Joint Joint::operator=(const Joint& obj)
@@ -55,15 +55,15 @@ std::vector<Joint> Joint::GetChildJoints()
 //}
 
 
-XMMATRIX Joint::GetAnimatedTransform() const
-{
-    return this->animatedTransform;
-}
-
-void Joint::SetAnimationTransform(XMMATRIX animationTransform)
-{
-    this->animatedTransform = animatedTransform;
-}
+//XMMATRIX Joint::GetAnimatedTransform() const
+//{
+//    return this->animatedTransform;
+//}
+//
+//void Joint::SetAnimationTransform(XMMATRIX animationTransform)
+//{
+//    this->animatedTransform = animatedTransform;
+//}
 
 //XMMATRIX Joint::GetInverseBindTransform() const
 //{

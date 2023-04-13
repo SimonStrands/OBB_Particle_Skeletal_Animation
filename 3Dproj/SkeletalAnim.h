@@ -25,16 +25,10 @@ public:
 	std::unordered_map<std::string, KeyFrame> keyFrames;
 };
 
-
-//class Joint;
-//class AnimatedModel;
-
-
 class Joint {
 
 private:
 	
-
 
 public:
 	Joint();
@@ -47,7 +41,7 @@ public:
 	std::string name;
 	DirectX::XMMATRIX localBindTransform;
 	DirectX::XMMATRIX inverseBindPoseMatrix;
-	DirectX::XMMATRIX animatedTransform;
+	//DirectX::XMMATRIX animatedTransform;
 
 	//int GetId() const;
 	//std::string GetName() const;
@@ -55,8 +49,8 @@ public:
 	std::vector<Joint> GetChildJoints();
 	
 
-	DirectX::XMMATRIX GetAnimatedTransform() const;
-	void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
+	//DirectX::XMMATRIX GetAnimatedTransform() const;
+	//void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
 	//DirectX::XMMATRIX GetInverseBindTransform() const;
 	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
 	
