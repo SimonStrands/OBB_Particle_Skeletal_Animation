@@ -86,11 +86,11 @@ private:
 	ID3D11Buffer* computeShaderConstantBuffer;
 	ComputerShaderParticleModelConstBuffer CSConstBuffer;
 
-	float time =0;
+
+	float time = 0.000001f;
 	Joint rootJoint;
 
 
-	
-	
 
+	
 };

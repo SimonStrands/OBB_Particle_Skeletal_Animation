@@ -38,13 +38,15 @@ VertexShaderOutput main(VertexShaderInput input)
     //don't know if it should be all 0
     float4x4 boneTransform =
     {
-        1.f, 0.f, 0.f, 0.f,
-        0.f, 1.f, 0.f, 0.f,
-        0.f, 0.f, 1.f, 0.f,
-        0.f, 0.f, 0.f, 1.f
-    };
 
-    if (input.boneWeights.x > 0) {
+        0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f
+	};
+    
+    if (input.boneWeights.x > 0)
+    {
         boneTransform += mul(Transformations[int(input.bondIDS.x)], input.boneWeights.x);
     }
     if (input.boneWeights.y > 0)
