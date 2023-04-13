@@ -247,7 +247,7 @@ void ParticleModel::GetPose2(Joint& skeleton, Animation& animation,  float dt, X
 	// calculate localTransform
 	XMMATRIX localTransform = transMat * rotMat * scaleMat;
 	XMMATRIX globalTransform = parentTransform * DirectX::XMMatrixTranspose(localTransform);
-	this->SkeletonConstBufferConverter.Transformations.element[skeleton.id] = (/*GlobalInverseTransform * */ globalTransform * skeleton.inverseBindPoseMatrix);
+	this->SkeletonConstBufferConverter.Transformations.element[skeleton.id] = ( globalTransform * skeleton.inverseBindPoseMatrix);
 	//update values for children bones
 	for (Joint& child : skeleton.GetChildJoints()) 
 	{

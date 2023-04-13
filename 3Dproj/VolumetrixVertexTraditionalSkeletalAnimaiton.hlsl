@@ -39,10 +39,10 @@ VertexShaderOutput main(VertexShaderInput input)
     float4x4 boneTransform =
     {
 
-        1.f, 0.f, 0.f, 0.f,
-		0.f, 1.f, 0.f, 0.f,
-		0.f, 0.f, 1.f, 0.f,
-		0.f, 0.f, 0.f, 1.f
+        0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f
 	};
     
     if (input.boneWeights.x > 0)

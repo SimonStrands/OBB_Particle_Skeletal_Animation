@@ -39,8 +39,8 @@ struct VolumetricVertex {
 	float color[4];
 	float velocity[3] = {0};
 #ifdef TRADITIONALSKELETALANIMATION
-	int boneIDs[4] = {0};
-	float boneWeights[4] = {0};
+	int boneIDs[4] = { -1, -1, -1, -1 };
+	float boneWeights[4] = {-1, -1, -1, -1 };
 #endif 
 
 
