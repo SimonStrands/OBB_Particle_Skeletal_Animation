@@ -27,7 +27,7 @@ static const int maxNumberOfBones = 50;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    row_major matrix Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+    matrix Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
     int nrOfBones;
 };
 
@@ -38,17 +38,27 @@ VertexShaderOutput main(VertexShaderInput input)
     //don't know if it should be all 0
     float4x4 boneTransform =
     {
-        1.f, 0.f, 0.f, 0.f,
-		0.f, 1.f, 0.f, 0.f,
-		0.f, 0.f, 1.f, 0.f,
-		0.f, 0.f, 0.f, 1.f
+        0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f
 	};
     
-    boneTransform += mul(Transformations[int(input.bondIDS.x)], input.boneWeights.x);
-    boneTransform += mul(Transformations[int(input.bondIDS.y)], input.boneWeights.y);
-    boneTransform += mul(Transformations[int(input.bondIDS.z)], input.boneWeights.z);
-    boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
-    
+    if (input.boneWeights.x > 0){
+        boneTransform += mul(Transformations[int(input.bondIDS.x)], input.boneWeights.x);
+    }
+    if (input.boneWeights.y > 0)
+    {
+        boneTransform += mul(Transformations[int(input.bondIDS.y)], input.boneWeights.y);
+    }
+    if (input.boneWeights.z > 0)
+    {
+        boneTransform += mul(Transformations[int(input.bondIDS.z)], input.boneWeights.z);
+    }
+    if (input.boneWeights.w > 0)
+    {
+        boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
+    }
     output.color = input.color;
     
     output.position = mul(float4(input.position, 1.0f), boneTransform);

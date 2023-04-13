@@ -25,18 +25,26 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMFLOAT3 pos1 = bonePlacement.positions[fp.first - 1];
 	DirectX::XMFLOAT3 pos2 = bonePlacement.positions[fp.first];
 	DirectX::XMVECTOR position = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&pos1), DirectX::XMLoadFloat3(&pos2), fp.second);
-	DirectX::XMStoreFloat3(&pos1, position);
-	DirectX::XMMATRIX transpose = DirectX::XMMatrixTranslation(pos1.x, pos1.y, pos1.z);
+	DirectX::XMMATRIX t = DirectX::XMMatrixTranslationFromVector(position);
 
 	fp = getTimeFraction(bonePlacement.rotationTimestamps, nTime);
 	DirectX::XMFLOAT4 rot1 = bonePlacement.rotations[fp.first - 1];
 	DirectX::XMFLOAT4 rot2 = bonePlacement.rotations[fp.first];
 	DirectX::XMVECTOR rotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rot1), DirectX::XMLoadFloat4(&rot2), fp.second);
+	DirectX::XMMATRIX r = DirectX::XMMatrixRotationQuaternion(rotation);
+
+	fp = getTimeFraction(bonePlacement.scaleTimestamps, nTime);
+	DirectX::XMFLOAT3 scale1 = bonePlacement.scales[fp.first - 1];
+	DirectX::XMFLOAT3 scale2 = bonePlacement.scales[fp.first];
+	DirectX::XMVECTOR scale = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&scale1), DirectX::XMLoadFloat3(&scale2), fp.second);
+	DirectX::XMMATRIX s = DirectX::XMMatrixScalingFromVector(scale);
 	
 
-	newParentTransform = transpose * DirectX::XMMatrixRotationQuaternion(rotation);
+	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
 
-	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = (parentTransform * newParentTransform) * joint.inverseBindPoseMatrix;
+	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
+
+	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = finalTransform;
 
 	for(int i = 0; i < joint.childJoints.size(); i++){
 		getPose(joint.childJoints[i], anim, time, newParentTransform);
@@ -55,9 +63,9 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
-	//loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
+	loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -143,7 +151,12 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt;
+	
+	if(getkey('P')){
+		time += dt * animation.tick;
+		std::cout << "time" << std::endl;
+	}
+	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
