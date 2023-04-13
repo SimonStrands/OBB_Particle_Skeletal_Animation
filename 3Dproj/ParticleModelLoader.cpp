@@ -223,13 +223,14 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		std::string name = scene->mRootNode->mName.C_Str();
 		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
 		Joint newRoot = Joint(totalnr, name, mat);
+		
+		globalInverseTransform = DirectX::XMMatrixInverse(nullptr, mat);
 
-		Nodes(totalnr, newRoot, scene->mRootNode);
+		/*Nodes(totalnr, newRoot, scene->mRootNode);
 		newRoot.CalcInverseBindTransform(newRoot.localBindTransform);
-		rootJoint = newRoot;
+		rootJoint = newRoot;*/
 	}
-	//globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
-	//globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);
+	
 
 	//load Bones
 	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, vertecies.size());
