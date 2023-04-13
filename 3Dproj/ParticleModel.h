@@ -74,7 +74,7 @@ private:
 	SkeletonConstantBuffer SkeletonConstBufferConverter;
 	ID3D11Buffer* SkeletonConstBuffer;
 	Animation animation;
-	DirectX::XMMATRIX GlobalInverseTransform;
+	//DirectX::XMMATRIX GlobalInverseTransform;
 
 	//2 textures for the particle one diffuse and one normal map
 	ID3D11ShaderResourceView* diffuseTexture;

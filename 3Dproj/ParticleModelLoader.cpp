@@ -196,7 +196,7 @@ bool loadAnimation(const aiScene* scene, Animation& animation)
 	}
 	return true;
 }
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, DirectX::XMMATRIX &globalInverseTransform, Joint& rootJoint)
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Joint& rootJoint)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
@@ -224,7 +224,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
 		Joint newRoot = Joint(totalnr, name, mat);
 		
-		globalInverseTransform = DirectX::XMMatrixInverse(nullptr, mat);
+		//globalInverseTransform = DirectX::XMMatrixInverse(nullptr, mat);
 
 		/*Nodes(totalnr, newRoot, scene->mRootNode);
 		newRoot.CalcInverseBindTransform(newRoot.localBindTransform);
