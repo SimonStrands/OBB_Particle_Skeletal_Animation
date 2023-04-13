@@ -31,6 +31,23 @@ cbuffer OBBSkeleton : register(b1)
     int nrOfBones;
 };
 
+bool f4eqf4(float4x4 a, float4x4 b)
+{
+    bool theReturn = true;
+    for (int x = 0; x < 4 && theReturn; x++)
+    {
+        for (int y = 0; y < 4 && theReturn; y++)
+        {
+            if (a[x][y] != b[x][y])
+            {
+                theReturn = false;
+            }
+
+        }
+    }
+    return theReturn;      
+};
+
 VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
@@ -59,6 +76,27 @@ VertexShaderOutput main(VertexShaderInput input)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
     }
+    
+    //DEBUG
+    static const float4x4 zeroVector =
+    {
+        0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f
+    };
+    static const float4x4 identity =
+    {
+        1.f, 0.f, 0.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
+		0.f, 0.f, 1.f, 0.f,
+		0.f, 0.f, 0.f, 1.f
+    };
+    if (f4eqf4(boneTransform, zeroVector))
+    {
+        boneTransform = identity;
+    }
+    
     output.color = input.color;
     
     output.position = mul(float4(input.position, 1.0f), boneTransform);

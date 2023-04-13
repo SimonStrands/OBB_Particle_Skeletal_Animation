@@ -14,7 +14,7 @@ std::pair<unsigned int, float> getTimeFraction(std::vector<float>& times, float&
 
 void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform){
 	
-	DirectX::XMMATRIX newParentTransform;
+	DirectX::XMMATRIX newParentTransform = DirectX::XMMatrixIdentity();
 
 	float nTime = fmod(time, anim.length);
 	KeyFrame bonePlacement = anim.keyFrames.find(joint.name)->second;
@@ -40,7 +40,7 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMMATRIX s = DirectX::XMMatrixScalingFromVector(scale);
 	
 
-	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
+	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(r * t);
 
 	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
 
@@ -63,9 +63,9 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	//loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
-	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
-	loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
+	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/ShowProb.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -156,7 +156,6 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 		time += dt * animation.tick;
 		std::cout << "time" << std::endl;
 	}
-	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;

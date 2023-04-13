@@ -81,9 +81,7 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 	if (boneInfo.find(node->mName.C_Str()) != boneInfo.end()) { // if node is actually a bone
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
-		//joint.inverseBindPoseMatrix = boneInfo[joint.name].second;
 		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
-		//joint.inverseBindPoseMatrix = DirectX::XMMatrixInverse(nullptr, boneInfo[joint.name].second);
 	
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Bone child;
