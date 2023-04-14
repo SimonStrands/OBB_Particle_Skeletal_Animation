@@ -152,20 +152,20 @@ void loadBoneDataToVertecies(
 		#endif 
 	}
 	//normalize weights to make all weights sum 1
-		for (int w = 0; w < vertecies.size(); w++) {
-			
-			float totalWeight = vertecies[w].boneWeights[0]
-				+ vertecies[w].boneWeights[1]
-				+ vertecies[w].boneWeights[2]
-				+ vertecies[w].boneWeights[3];
-
-			if (totalWeight > 0.0f) {
-				vertecies[w].boneWeights[0] = vertecies[w].boneWeights[0] / totalWeight;
-				vertecies[w].boneWeights[1] = vertecies[w].boneWeights[1] / totalWeight;
-				vertecies[w].boneWeights[2] = vertecies[w].boneWeights[2] / totalWeight;
-				vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
-			}
+	for (int w = 0; w < vertecies.size(); w++) {
+		
+		float totalWeight = vertecies[w].boneWeights[0]
+			+ vertecies[w].boneWeights[1]
+			+ vertecies[w].boneWeights[2]
+			+ vertecies[w].boneWeights[3];
+	
+		if (totalWeight > 0.0f) {
+			vertecies[w].boneWeights[0] = vertecies[w].boneWeights[0] / totalWeight;
+			vertecies[w].boneWeights[1] = vertecies[w].boneWeights[1] / totalWeight;
+			vertecies[w].boneWeights[2] = vertecies[w].boneWeights[2] / totalWeight;
+			vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
 		}
+	}
 	readSkeleton(boneInfo, rootJoint, node);
 }
 
@@ -279,10 +279,10 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	}
 	globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
 	globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);
-
+	
 	//load Bones
 	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, vertecies.size());
-
+	
 	//load Animation
 	loadAnimation(scene, animation);
 	addEmptyAnimationForEmptyJoints(rootJoint, animation);

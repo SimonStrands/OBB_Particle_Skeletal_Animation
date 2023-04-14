@@ -61,18 +61,19 @@ VertexShaderOutput main(VertexShaderInput input)
 		0.f, 0.f, 0.f, 0.f
 	};
     
-    if (input.boneWeights.x > 0){
+    if (input.bondIDS.x > -0.5f)
+    {
         boneTransform += mul(Transformations[int(input.bondIDS.x)], input.boneWeights.x);
     }
-    if (input.boneWeights.y > 0)
+    if (input.bondIDS.y > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.y)], input.boneWeights.y);
     }
-    if (input.boneWeights.z > 0)
+    if (input.bondIDS.z > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.z)], input.boneWeights.z);
     }
-    if (input.boneWeights.w > 0)
+    if (input.bondIDS.w > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
     }

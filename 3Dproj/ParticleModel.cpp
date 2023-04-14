@@ -63,7 +63,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	//loadParticleModel(vertecies, "objects/test3.fbx", animation, GlobalInverseTransform, rootJoint);
-	//loadParticleModel(vertecies, "objects/ShowProb.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/sillydance2.fbx", animation, GlobalInverseTransform, rootJoint);
 	loadParticleModel(vertecies, "objects/silly_dancing.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
@@ -151,12 +151,15 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
+	//time = 14.5f;
 	
 	if(getkey('P')){
-		//time += dt * animation.tick;
-		std::cout << "time" << std::endl;
+		time += dt * animation.tick;
+		//std::cout << "time" << std::endl;
 		getPose(rootJoint, animation, time);
-	}else{
+		
+	}
+	else{
 		for(int i = 0; i < 70; i++){
 			SkeletonConstBufferConverter.Transformations.element[i] = DirectX::XMMatrixIdentity();
 		}
