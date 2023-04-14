@@ -21,10 +21,11 @@ struct ComputerShaderParticleModelConstBuffer : CB{
 };
 
 
-static const int maxNumberOfBones = 50;
+static const int maxNumberOfBones = 70;
+
 struct SkeletonConstantBuffer : CB{
 	struct{
-		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
 	}Transformations;
 };
 
@@ -43,15 +44,15 @@ private:
 	
 	//Animation animation;
 
-	std::pair<int, float> GetTimeFraction(std::vector<float>& times, float& dt);
-	void getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
+	std::pair<int, float> getTimeFraction(std::vector<float>& times, float& dt);
+	void getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	));
 
-	void GetPose2(Joint& skeleton, Animation& animation , float dt, DirectX::XMMATRIX parentTransform);
+	void GetPose2(Bone& skeleton, Animation& animation , float dt, DirectX::XMMATRIX parentTransform);
 
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
@@ -88,7 +89,7 @@ private:
 
 
 	float time = 0.000001f;
-	Joint rootJoint;
+	Bone rootJoint;
 
 
 

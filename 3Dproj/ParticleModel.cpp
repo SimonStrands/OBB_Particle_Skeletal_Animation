@@ -2,18 +2,18 @@
 #include "Random.h"
 
 
-void getTransforms(std::vector<DirectX::XMMATRIX>& v, Joint joint, DirectX::XMMATRIX parent) {
+void getTransforms(std::vector<DirectX::XMMATRIX>& v, Bone joint, DirectX::XMMATRIX parent) {
 	//DirectX::XMMATRIX temp(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
-	v.push_back(joint.localBindTransform);
+	v.push_back(joint.boneMatrix);
 
 	DirectX::XMMATRIX newParent = v[v.size() - 1];
 
-	for (int i = 0; i < joint.GetChildJoints().size(); i++) {
-		getTransforms(v, joint.GetChildJoints()[i], newParent);
+	for (int i = 0; i < joint.childJoints.size(); i++) {
+		getTransforms(v, joint.childJoints[i], newParent);
 	}
 }
 
-std::pair<int, float> ParticleModel::GetTimeFraction(std::vector<float>& times, float& dt)
+std::pair<int, float> ParticleModel::getTimeFraction(std::vector<float>& times, float& dt)
 {
 	int segment = 0;
 	while (dt > times[segment])
@@ -24,6 +24,43 @@ std::pair<int, float> ParticleModel::GetTimeFraction(std::vector<float>& times, 
 	return { segment, frac };
 }
 
+void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform){
+	
+	DirectX::XMMATRIX newParentTransform = DirectX::XMMatrixIdentity();
+
+	float nTime = fmod(time, anim.length);
+	KeyFrame bonePlacement = anim.keyFrames.find(joint.name)->second;
+
+	std::pair<unsigned int, float> fp;
+
+	fp = getTimeFraction(bonePlacement.positionTimestamps, nTime);
+	DirectX::XMFLOAT3 pos1 = bonePlacement.positions[fp.first - 1];
+	DirectX::XMFLOAT3 pos2 = bonePlacement.positions[fp.first];
+	DirectX::XMVECTOR position = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&pos1), DirectX::XMLoadFloat3(&pos2), fp.second);
+	DirectX::XMMATRIX t = DirectX::XMMatrixTranslationFromVector(position);
+
+	fp = getTimeFraction(bonePlacement.rotationTimestamps, nTime);
+	DirectX::XMFLOAT4 rot1 = bonePlacement.rotations[fp.first - 1];
+	DirectX::XMFLOAT4 rot2 = bonePlacement.rotations[fp.first];
+	DirectX::XMVECTOR rotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rot1), DirectX::XMLoadFloat4(&rot2), fp.second);
+	DirectX::XMMATRIX r = DirectX::XMMatrixRotationQuaternion(rotation);
+
+	fp = getTimeFraction(bonePlacement.scaleTimestamps, nTime);
+	DirectX::XMFLOAT3 scale1 = bonePlacement.scales[fp.first - 1];
+	DirectX::XMFLOAT3 scale2 = bonePlacement.scales[fp.first];
+	DirectX::XMVECTOR scale = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&scale1), DirectX::XMLoadFloat3(&scale2), fp.second);
+	DirectX::XMMATRIX s = DirectX::XMMatrixScalingFromVector(scale);
+	
+	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
+
+	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
+
+	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = finalTransform;
+
+	for(int i = 0; i < joint.childJoints.size(); i++){
+		getPose(joint.childJoints[i], anim, time, newParentTransform);
+	}
+}
 
 
 ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position):
@@ -38,15 +75,15 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 
-	//loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
-	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
-	loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, rootJoint);
+	loadParticleModel(vertecies, filePath, animation, rootJoint);
 
 	this->nrOfVertecies = (UINT)vertecies.size();
+
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
 	this->PS = gfx->getPS()[4];
 	this->inputLayout = gfx->getInputLayout()[2];
+
 	loadCShader("ParticleSkeletalAnimationComputeShader.cso", gfx->getDevice(), cUpdate);
 	if (!CreateTexture("objects/Particle/SphereDiff.png", gfx->getDevice(), gfx->getTexture(), diffuseTexture)) {
 		std::cout << "cannot load particle texture" << std::endl;
@@ -55,6 +92,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		std::cout << "cannot load particle normal" << std::endl;
 	}
 	CreateVertexConstBuffer(gfx, this->Vg_pConstantBuffer);
+
 	//create UAV
 	D3D11_BUFFER_DESC buffDesc;
 	buffDesc.ByteWidth = sizeof(VolumetricVertex) * this->nrOfVertecies;
@@ -98,15 +136,17 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	this->CSConstBuffer.time.element = 0;
 
 
-	std::vector<float> heightTest;
-	for (int i = 0; i < animation.keyFrames.size(); i++) {
-		heightTest.push_back(2);
-	}
-	std::vector<DirectX::XMMATRIX> trans;
-	//DirectX::XMMATRIX p(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	getTransforms(trans, rootJoint, DirectX::XMMatrixIdentity());
 
-	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+	//std::vector<DirectX::XMMATRIX> trans;
+	//DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+	//
+	//std::vector<float> heightTest;
+	//for(int i = 0; i < trans.size(); i++){
+	//	heightTest.push_back(2);
+	//}
+	//
+	//OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+
 }
 
 ParticleModel::~ParticleModel()
@@ -126,13 +166,10 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	if(getkey('P')){
-		time += dt * animation.tick;
-		std::cout << "time" << std::endl;
-	}
-	//time = 14.5f;
-	//getPose(rootJoint, animation, time);
-	GetPose2(rootJoint, animation, time, DirectX::XMMatrixIdentity());
+
+	time += dt * animation.tick;
+	getPose(rootJoint, animation, time);
+	//GetPose2(rootJoint, animation, time, DirectX::XMMatrixIdentity());
 
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
@@ -188,7 +225,7 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 
-	OBBSkeleton->draw(gfx);
+	//OBBSkeleton->draw(gfx);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
@@ -214,20 +251,20 @@ void ParticleModel::updateShaders(Graphics*& gfx)
 }
 
 using namespace DirectX;
-void ParticleModel::GetPose2(Joint& skeleton, Animation& animation,  float dt, XMMATRIX parentTransform)
+void ParticleModel::GetPose2(Bone& skeleton, Animation& animation,  float dt, XMMATRIX parentTransform)
 {
 	KeyFrame& btt = animation.keyFrames[skeleton.name];
 	dt = fmod(dt, animation.length);
 	std::pair<unsigned int, float> fp;
 	//calculate interpolated position
-	fp = GetTimeFraction(btt.positionTimestamps, dt);
+	fp = getTimeFraction(btt.positionTimestamps, dt);
 	XMFLOAT3 position1 = btt.positions[fp.first - 1];
 	XMFLOAT3 position2 = btt.positions[fp.first];
 	XMVECTOR resultPos = XMVectorLerp(XMLoadFloat3(&position1), XMLoadFloat3(&position2), fp.second);
 	XMMATRIX transMat = XMMatrixTranslationFromVector(resultPos);
 
 	//calculate interpolated rotation
-	fp = GetTimeFraction(btt.rotationTimestamps, dt);
+	fp = getTimeFraction(btt.rotationTimestamps, dt);
 	XMFLOAT4 rotation1 = btt.rotations[fp.first - 1];
 	XMFLOAT4 rotation2 = btt.rotations[fp.first];
 	XMVECTOR rotation = XMQuaternionSlerp(XMLoadFloat4(&rotation1), XMLoadFloat4(&rotation2), fp.second);
@@ -235,7 +272,7 @@ void ParticleModel::GetPose2(Joint& skeleton, Animation& animation,  float dt, X
 	
 
 	//calculate interpolated scale
-	fp = GetTimeFraction(btt.scaleTimestamps, dt);
+	fp = getTimeFraction(btt.scaleTimestamps, dt);
 	XMFLOAT3 scale1 = btt.scales[fp.first - 1];
 	XMFLOAT3 scale2 = btt.scales[fp.first];
 	XMVECTOR resultScale = XMVectorLerp(XMLoadFloat3(&scale1), XMLoadFloat3(&scale2), fp.second);
@@ -250,48 +287,9 @@ void ParticleModel::GetPose2(Joint& skeleton, Animation& animation,  float dt, X
 	XMMATRIX globalTransform = parentTransform * DirectX::XMMatrixTranspose(localTransform);
 	this->SkeletonConstBufferConverter.Transformations.element[skeleton.id] = ( globalTransform * skeleton.inverseBindPoseMatrix);
 	//update values for children bones
-	for (Joint& child : skeleton.GetChildJoints()) 
+	for (Bone& child : skeleton.childJoints)
 	{
 		GetPose2(child, animation,  dt, globalTransform);
 	}
 	//std::cout << dt << " => " << position.x << ":" << position.y << ":" << position.z << ":" << std::endl;
-}
-
-void ParticleModel::getPose(Joint& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform) {
-
-	DirectX::XMMATRIX newParentTransform;
-
-	float nTime = fmod(time, anim.length);
-	KeyFrame bonePlacement = anim.keyFrames.find(joint.name)->second;
-
-	std::pair<unsigned int, float> fp;
-
-	fp = GetTimeFraction(bonePlacement.positionTimestamps, nTime);
-	DirectX::XMFLOAT3 pos1 = bonePlacement.positions[fp.first - 1];
-	DirectX::XMFLOAT3 pos2 = bonePlacement.positions[fp.first];
-	DirectX::XMVECTOR position = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&pos1), DirectX::XMLoadFloat3(&pos2), fp.second);
-	DirectX::XMMATRIX t = DirectX::XMMatrixTranslationFromVector(position);
-
-	fp = GetTimeFraction(bonePlacement.rotationTimestamps, nTime);
-	DirectX::XMFLOAT4 rot1 = bonePlacement.rotations[fp.first - 1];
-	DirectX::XMFLOAT4 rot2 = bonePlacement.rotations[fp.first];
-	DirectX::XMVECTOR rotation = DirectX::XMQuaternionSlerp(DirectX::XMLoadFloat4(&rot1), DirectX::XMLoadFloat4(&rot2), fp.second);
-	DirectX::XMMATRIX r = DirectX::XMMatrixRotationQuaternion(rotation);
-
-	fp = GetTimeFraction(bonePlacement.scaleTimestamps, nTime);
-	DirectX::XMFLOAT3 scale1 = bonePlacement.scales[fp.first - 1];
-	DirectX::XMFLOAT3 scale2 = bonePlacement.scales[fp.first];
-	DirectX::XMVECTOR scale = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&scale1), DirectX::XMLoadFloat3(&scale2), fp.second);
-	DirectX::XMMATRIX s = DirectX::XMMatrixScalingFromVector(scale);
-
-
-	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
-
-	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
-
-	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = finalTransform;
-
-	for (int i = 0; i < joint.childJoints.size(); i++) {
-		getPose(joint.childJoints[i], anim, time, newParentTransform);
-	}
 }

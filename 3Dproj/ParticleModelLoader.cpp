@@ -1,13 +1,6 @@
 #include "ParticleModelLoader.h"
 #include <iostream>
 
-DirectX::XMFLOAT3 AiVector3ToXMFLOAT3(const aiVector3D& vec3) {
-	return DirectX::XMFLOAT3(vec3.x, vec3.y, vec3.z);
-}
-DirectX::XMFLOAT4 AiQuadToXMFLOAT4(const aiQuaternion& quad) {
-	//return DirectX::XMFLOAT4(quad.x,quad.y,quad.z, quad.w);
-	return DirectX::XMFLOAT4(quad.x, quad.y, quad.z, quad.w);
-}
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
@@ -32,66 +25,26 @@ DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 	return xmat;
 }
 
-void Nodes(int & nrTotal, Joint & parent, aiNode* walker)
-{
-	std::string name = walker->mName.C_Str();
-	DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(walker->mTransformation);
-	
-	for (int i = 0; i < walker->mNumChildren; i++)
-	{
-		nrTotal++;
-		aiNode* temp = walker->mChildren[i]; //get info to create child node
-		std::string name = temp->mName.C_Str();
-		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(temp->mTransformation);
-		Joint childJoint = Joint(nrTotal, name, mat);
-
-		parent.addChild(childJoint);
-		Joint nextJoint = parent.GetChildJoints()[i]; //traverse
-		Nodes(nrTotal, nextJoint, temp);
-	}
-	
+DirectX::XMFLOAT3 AiVector3ToXMFLOAT3(const aiVector3D& vec3){
+	return DirectX::XMFLOAT3(vec3.x,vec3.y,vec3.z);
+}
+DirectX::XMFLOAT4 AiQuadToXMFLOAT4(const aiQuaternion& quad){
+	return DirectX::XMFLOAT4(quad.x, quad.y, quad.z, quad.w);
 }
 
+bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo, Bone& joint, aiNode* node){
 
-void testReadHiaechy(aiNode *pNode, const aiMatrix4x4& parentMatrix, std::vector<DirectX::XMMATRIX> &Transformations)
-{
-	aiMatrix4x4 newParentMatrix = parentMatrix * pNode->mTransformation;
-	aiMatrix4x4 m = newParentMatrix;
-				Transformations.push_back(DirectX::XMMATRIX(
-					m.a1, m.b1, m.c1, m.d1,
-					m.a2, m.b2, m.c2, m.d2,
-					m.a3, m.b3, m.c3, m.d3,
-					m.a4*0.01f, m.b4*0.01f, m.c4*0.01f, m.d4
-				));
-	for(int i = 0; i < pNode->mNumChildren; i++){
-		testReadHiaechy(pNode->mChildren[i], newParentMatrix, Transformations);
-	}
-}
-
-bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo, Joint& joint, aiNode* node){
 
 	if (boneInfo.find(node->mName.C_Str()) != boneInfo.end()) { // if node is actually a bone
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
-		//joint.inverseBindPoseMatrix = boneInfo[joint.name].second;
-		
-		if (joint.parent == nullptr) // is root
-		{
-			joint.worldMatrix = boneInfo[joint.name].second;
-		}
-		else
-			joint.worldMatrix = joint.parent->worldMatrix * boneInfo[joint.name].second;
 
-		//joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
-		//DirectX::XMMATRIX bindTransform = DirectX::XMMatrixMultiply(DirectX::XMMatrixIdentity(), boneInfo[joint.name].second);
-		//joint.inverseBindPoseMatrix = XMMatrixInverse(nullptr, bindTransform);
+		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
+	
 
-		joint.inverseBindPoseMatrix = DirectX::XMMatrixInverse(nullptr, joint.worldMatrix);
-		joint.localBindTransform = joint.inverseBindPoseMatrix * joint.worldMatrix;
-		//joint.inverseBindPoseMatrix = node->mTransformation;
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
-			Joint child;
-			child.parent = &joint;
+			Bone child;
+			
 			if(readSkeleton(boneInfo, child, node->mChildren[i])){
 				joint.childJoints.push_back(child);
 			}
@@ -114,7 +67,7 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 
 void loadBoneDataToVertecies(
 	std::vector<VolumetricVertex>& vertecies, 
-	Joint& rootJoint, 
+	Bone& rootJoint, 
 	aiMesh* mesh,
 	aiNode* node,
 	int verteciesSize
@@ -156,24 +109,23 @@ void loadBoneDataToVertecies(
 
 			}
 		}
-
+		#endif
 	}
 	//normalize weights to make all weights sum 1
-	for (int k = 0; k < vertecies.size(); k++) {
-
-		float totalWeight = vertecies[k].boneWeights[0]
-			+ vertecies[k].boneWeights[1]
-			+ vertecies[k].boneWeights[2]
-			+ vertecies[k].boneWeights[3];
-
+	for (int w = 0; w < vertecies.size(); w++) {
+		
+		float totalWeight = vertecies[w].boneWeights[0]
+			+ vertecies[w].boneWeights[1]
+			+ vertecies[w].boneWeights[2]
+			+ vertecies[w].boneWeights[3];
+	
 		if (totalWeight > 0.0f) {
-			vertecies[k].boneWeights[0] = vertecies[k].boneWeights[0] / totalWeight;
-			vertecies[k].boneWeights[1] = vertecies[k].boneWeights[1] / totalWeight;
-			vertecies[k].boneWeights[2] = vertecies[k].boneWeights[2] / totalWeight;
-			vertecies[k].boneWeights[3] = vertecies[k].boneWeights[3] / totalWeight;
+			vertecies[w].boneWeights[0] = vertecies[w].boneWeights[0] / totalWeight;
+			vertecies[w].boneWeights[1] = vertecies[w].boneWeights[1] / totalWeight;
+			vertecies[w].boneWeights[2] = vertecies[w].boneWeights[2] / totalWeight;
+			vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
 		}
 	}
-	#endif 
 	readSkeleton(boneInfo, rootJoint, node);
 
 	//rootJoint.CalcInverseBindTransform(DirectX::XMMatrixIdentity());
@@ -181,8 +133,58 @@ void loadBoneDataToVertecies(
 	
 }
 
-bool loadAnimation(const aiScene* scene, Animation& animation)
-{
+void addEmptyAnimationForEmptyJoints(Bone& bone, Animation& animation){
+
+	if(animation.keyFrames.find(bone.name) == animation.keyFrames.end()){
+		//if the bone doesn't exist in animation add it
+		//DO I need two???
+		KeyFrame track;
+		track.positions.push_back(DirectX::XMFLOAT3(0,0,0));
+		track.rotations.push_back(DirectX::XMFLOAT4(0,0,0,1));
+		track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+
+		track.positions.push_back(DirectX::XMFLOAT3(0,0,0));
+		track.rotations.push_back(DirectX::XMFLOAT4(0,0,0,1));
+		track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+		track.positionTimestamps.push_back(0);
+		track.rotationTimestamps.push_back(0);
+		track.scaleTimestamps.push_back(0);
+
+		track.positionTimestamps.push_back(animation.length);
+		track.rotationTimestamps.push_back(animation.length);
+		track.scaleTimestamps.push_back(animation.length);
+		animation.keyFrames.insert(std::pair<std::string, KeyFrame>(bone.name, track));
+	}
+	else{
+		//if the bone doesn't have a certain animation
+		KeyFrame& track = animation.keyFrames.find(bone.name)->second;
+		if(track.positions.size() <= 0){
+			track.positions.push_back(DirectX::XMFLOAT3(0, 0, 0));
+			track.positionTimestamps.push_back(0);
+			track.positions.push_back(DirectX::XMFLOAT3(0, 0, 0));
+			track.positionTimestamps.push_back(animation.length);
+		}
+		if(track.rotations.size() <= 0){
+			track.rotations.push_back(DirectX::XMFLOAT4(0, 0, 0, 1));
+			track.rotationTimestamps.push_back(0);
+			track.rotations.push_back(DirectX::XMFLOAT4(0, 0, 0, 1));
+			track.rotationTimestamps.push_back(animation.length);
+		}
+		if(track.scales.size() <= 0){
+			track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+			track.scaleTimestamps.push_back(0);
+			track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+			track.scaleTimestamps.push_back(animation.length);
+		}
+	}
+	for(int i = 0; i < bone.childJoints.size(); i++){
+		addEmptyAnimationForEmptyJoints(bone.childJoints[i], animation);
+	}
+
+}
+
+bool loadAnimation(const aiScene* scene, Animation& animation){
+
 	aiAnimation* anim = scene->mAnimations[0];
 
 	if (anim->mTicksPerSecond != 0.0f) {
@@ -215,7 +217,8 @@ bool loadAnimation(const aiScene* scene, Animation& animation)
 	}
 	return true;
 }
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Joint& rootJoint)
+
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
@@ -226,7 +229,6 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		exit(-2);
 	}
 
-	//FOR Now just do the first one
 	aiMesh* mesh = scene->mMeshes[0];
 	uint16_t boneCount = 0;
 	
@@ -235,27 +237,13 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		aiVector3D vertex = mesh->mVertices[v];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 	}
-	if (mesh->HasBones()) 
-	{
-		int totalnr = 0;
-
-		std::string name = scene->mRootNode->mName.C_Str();
-		DirectX::XMMATRIX mat = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
-		Joint newRoot = Joint(totalnr, name, mat);
-		
-		//globalInverseTransform = DirectX::XMMatrixInverse(nullptr, mat);
-
-		/*Nodes(totalnr, newRoot, scene->mRootNode);
-		newRoot.CalcInverseBindTransform(newRoot.localBindTransform);
-		rootJoint = newRoot;*/
-	}
-	
 
 	//load Bones
 	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, vertecies.size());
-
+	
 	//load Animation
 	loadAnimation(scene, animation);
+	addEmptyAnimationForEmptyJoints(rootJoint, animation);
 	
 }
 

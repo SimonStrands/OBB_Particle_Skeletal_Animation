@@ -23,12 +23,29 @@ cbuffer CBuf
     row_major matrix view;
     row_major matrix projection;
 };
-static const int maxNumberOfBones = 50;
+static const int maxNumberOfBones = 70;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    matrix Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+    matrix Transformations[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
     int nrOfBones;
+};
+
+bool f4eqf4(float4x4 a, float4x4 b)
+{
+    bool theReturn = true;
+    for (int x = 0; x < 4 && theReturn; x++)
+    {
+        for (int y = 0; y < 4 && theReturn; y++)
+        {
+            if (a[x][y] != b[x][y])
+            {
+                theReturn = false;
+            }
+
+        }
+    }
+    return theReturn;      
 };
 
 VertexShaderOutput main(VertexShaderInput input)
@@ -45,22 +62,44 @@ VertexShaderOutput main(VertexShaderInput input)
 		0.f, 0.f, 0.f, 0.f
 	};
     
-    if (input.boneWeights.x > 0)
+
+    if (input.bondIDS.x > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.x)], input.boneWeights.x);
     }
-    if (input.boneWeights.y > 0)
+    if (input.bondIDS.y > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.y)], input.boneWeights.y);
     }
-    if (input.boneWeights.z > 0)
+    if (input.bondIDS.z > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.z)], input.boneWeights.z);
     }
-    if (input.boneWeights.w > 0)
+    if (input.bondIDS.w > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
     }
+    
+    //DEBUG
+    static const float4x4 zeroVector =
+    {
+        0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f
+    };
+    static const float4x4 identity =
+    {
+        1.f, 0.f, 0.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
+		0.f, 0.f, 1.f, 0.f,
+		0.f, 0.f, 0.f, 1.f
+    };
+    if (f4eqf4(boneTransform, zeroVector))
+    {
+        boneTransform = identity;
+    }
+    
     output.color = input.color;
 
     output.position = mul(float4(input.position, 1.0f), boneTransform);
