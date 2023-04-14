@@ -39,8 +39,7 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMVECTOR scale = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&scale1), DirectX::XMLoadFloat3(&scale2), fp.second);
 	DirectX::XMMATRIX s = DirectX::XMMatrixScalingFromVector(scale);
 	
-
-	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(r * t);
+	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
 
 	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
 
@@ -63,8 +62,9 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
+	//loadParticleModel(vertecies, "objects/test3.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/ShowProb.fbx", animation, GlobalInverseTransform, rootJoint);
+	loadParticleModel(vertecies, "objects/silly_dancing.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
@@ -153,10 +153,15 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
 	
 	if(getkey('P')){
-		time += dt * animation.tick;
+		//time += dt * animation.tick;
 		std::cout << "time" << std::endl;
+		getPose(rootJoint, animation, time);
+	}else{
+		for(int i = 0; i < 70; i++){
+			SkeletonConstBufferConverter.Transformations.element[i] = DirectX::XMMatrixIdentity();
+		}
 	}
-	getPose(rootJoint, animation, time);
+	
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);

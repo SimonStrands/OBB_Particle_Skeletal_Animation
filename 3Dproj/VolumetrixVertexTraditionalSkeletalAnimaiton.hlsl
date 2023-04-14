@@ -23,11 +23,11 @@ cbuffer CBuf
     row_major matrix view;
     row_major matrix projection;
 };
-static const int maxNumberOfBones = 50;
+static const int maxNumberOfBones = 70;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    matrix Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+    matrix Transformations[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
     int nrOfBones;
 };
 

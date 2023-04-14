@@ -82,6 +82,7 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
 		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
+		//joint.inverseBindPoseMatrix = boneInfo[joint.name].second;
 	
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Bone child;
@@ -148,24 +149,74 @@ void loadBoneDataToVertecies(
 
 			}
 		}
-		//normalize weights to make all weights sum 1
-		for (int i = 0; i < vertecies.size(); i++) {
-			
-			float totalWeight = vertecies[i].boneWeights[0]
-				+ vertecies[i].boneWeights[1]
-				+ vertecies[i].boneWeights[2]
-				+ vertecies[i].boneWeights[3];
-
-			if (totalWeight > 0.0f) {
-				vertecies[i].boneWeights[0] = vertecies[i].boneWeights[0] / totalWeight;
-				vertecies[i].boneWeights[1] = vertecies[i].boneWeights[1] / totalWeight;
-				vertecies[i].boneWeights[2] = vertecies[i].boneWeights[2] / totalWeight;
-				vertecies[i].boneWeights[3] = vertecies[i].boneWeights[3] / totalWeight;
-			}
-		}
 		#endif 
 	}
+	//normalize weights to make all weights sum 1
+		for (int w = 0; w < vertecies.size(); w++) {
+			
+			float totalWeight = vertecies[w].boneWeights[0]
+				+ vertecies[w].boneWeights[1]
+				+ vertecies[w].boneWeights[2]
+				+ vertecies[w].boneWeights[3];
+
+			if (totalWeight > 0.0f) {
+				vertecies[w].boneWeights[0] = vertecies[w].boneWeights[0] / totalWeight;
+				vertecies[w].boneWeights[1] = vertecies[w].boneWeights[1] / totalWeight;
+				vertecies[w].boneWeights[2] = vertecies[w].boneWeights[2] / totalWeight;
+				vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
+			}
+		}
 	readSkeleton(boneInfo, rootJoint, node);
+}
+
+void addEmptyAnimationForEmptyJoints(Bone& bone, Animation& animation){
+
+	if(animation.keyFrames.find(bone.name) == animation.keyFrames.end()){
+		//if the bone doesn't exist in animation add it
+		//DO I need two???
+		KeyFrame track;
+		track.positions.push_back(DirectX::XMFLOAT3(0,0,0));
+		track.rotations.push_back(DirectX::XMFLOAT4(0,0,0,1));
+		track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+
+		track.positions.push_back(DirectX::XMFLOAT3(0,0,0));
+		track.rotations.push_back(DirectX::XMFLOAT4(0,0,0,1));
+		track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+		track.positionTimestamps.push_back(0);
+		track.rotationTimestamps.push_back(0);
+		track.scaleTimestamps.push_back(0);
+
+		track.positionTimestamps.push_back(animation.length);
+		track.rotationTimestamps.push_back(animation.length);
+		track.scaleTimestamps.push_back(animation.length);
+		animation.keyFrames.insert(std::pair<std::string, KeyFrame>(bone.name, track));
+	}
+	else{
+		//if the bone doesn't have a certain animation
+		KeyFrame& track = animation.keyFrames.find(bone.name)->second;
+		if(track.positions.size() <= 0){
+			track.positions.push_back(DirectX::XMFLOAT3(0, 0, 0));
+			track.positionTimestamps.push_back(0);
+			track.positions.push_back(DirectX::XMFLOAT3(0, 0, 0));
+			track.positionTimestamps.push_back(animation.length);
+		}
+		if(track.rotations.size() <= 0){
+			track.rotations.push_back(DirectX::XMFLOAT4(0, 0, 0, 1));
+			track.rotationTimestamps.push_back(0);
+			track.rotations.push_back(DirectX::XMFLOAT4(0, 0, 0, 1));
+			track.rotationTimestamps.push_back(animation.length);
+		}
+		if(track.scales.size() <= 0){
+			track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+			track.scaleTimestamps.push_back(0);
+			track.scales.push_back(DirectX::XMFLOAT3(1,1,1));
+			track.scaleTimestamps.push_back(animation.length);
+		}
+	}
+	for(int i = 0; i < bone.childJoints.size(); i++){
+		addEmptyAnimationForEmptyJoints(bone.childJoints[i], animation);
+	}
+
 }
 
 bool loadAnimation(const aiScene* scene, Animation& animation){
@@ -198,6 +249,9 @@ bool loadAnimation(const aiScene* scene, Animation& animation){
 	
 		}
 		animation.keyFrames.insert(std::pair<std::string, KeyFrame>(channel->mNodeName.C_Str(), track));
+		if(std::string(channel->mNodeName.C_Str()) == "mixamorig:Spine"){
+			std::cout << "stop" << std::endl;
+		}
 	}
 	return true;
 }
@@ -223,13 +277,14 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		aiVector3D vertex = mesh->mVertices[v];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 	}
-	//globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
-	//globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);
+	globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
+	globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);
 
 	//load Bones
 	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, vertecies.size());
 
 	//load Animation
 	loadAnimation(scene, animation);
+	addEmptyAnimationForEmptyJoints(rootJoint, animation);
 	
 }
