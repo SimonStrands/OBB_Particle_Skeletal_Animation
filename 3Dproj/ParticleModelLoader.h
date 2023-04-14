@@ -17,6 +17,5 @@ void loadParticleModel(
 	std::vector<VolumetricVertex>& vertecies, 
 	const std::string& filePath,
 	Animation& animation,
-	DirectX::XMMATRIX &globalInverseTransform,
 	Bone& rootJoint
 );

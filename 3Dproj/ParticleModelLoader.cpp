@@ -4,22 +4,6 @@
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
 	DirectX::XMFLOAT4X4 mat4;
-	//mat4._11 = mat.a1;
-	//mat4._12 = mat.a2;
-	//mat4._13 = mat.a3;
-	//mat4._14 = mat.a4;
-	//mat4._21 = mat.b1;
-	//mat4._22 = mat.b2;
-	//mat4._23 = mat.b3;
-	//mat4._24 = mat.b4;
-	//mat4._31 = mat.c1;
-	//mat4._32 = mat.c2;
-	//mat4._33 = mat.c3;
-	//mat4._34 = mat.c4;
-	//mat4._41 = mat.d1;
-	//mat4._42 = mat.d2;
-	//mat4._43 = mat.d3;
-	//mat4._44 = mat.d4;
 	mat4._11 = mat.a1;
 	mat4._12 = mat.b1;
 	mat4._13 = mat.c1;
@@ -43,37 +27,7 @@ DirectX::XMFLOAT3 AiVector3ToXMFLOAT3(const aiVector3D& vec3){
 	return DirectX::XMFLOAT3(vec3.x,vec3.y,vec3.z);
 }
 DirectX::XMFLOAT4 AiQuadToXMFLOAT4(const aiQuaternion& quad){
-	//return DirectX::XMFLOAT4(quad.w,quad.z,quad.y, quad.x);
-	//Don't care about this
 	return DirectX::XMFLOAT4(quad.x, quad.y, quad.z, quad.w);
-}
-
-void Nodes(int & nrTotal, std::vector<DirectX::XMMATRIX> &arr, aiNode* walker)
-{
-	arr.push_back(AiMatrixToXMMATRIX(walker->mTransformation));
-
-	for (unsigned int i = 0; i < walker->mNumChildren; i++)
-	{
-		aiNode* temp = walker->mChildren[i];
-		Nodes(nrTotal, arr, temp);
-	}
-	
-	
-}
-
-void testReadHiaechy(aiNode *pNode, const aiMatrix4x4& parentMatrix, std::vector<DirectX::XMMATRIX> &Transformations)
-{
-	aiMatrix4x4 newParentMatrix = parentMatrix * pNode->mTransformation;
-	aiMatrix4x4 m = newParentMatrix;
-				Transformations.push_back(DirectX::XMMATRIX(
-					m.a1, m.b1, m.c1, m.d1,
-					m.a2, m.b2, m.c2, m.d2,
-					m.a3, m.b3, m.c3, m.d3,
-					m.a4*0.01f, m.b4*0.01f, m.c4*0.01f, m.d4
-				));
-	for(int i = 0; i < pNode->mNumChildren; i++){
-		testReadHiaechy(pNode->mChildren[i], newParentMatrix, Transformations);
-	}
 }
 
 bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo, Bone& joint, aiNode* node){
@@ -82,7 +36,6 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
 		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
-		//joint.inverseBindPoseMatrix = boneInfo[joint.name].second;
 	
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Bone child;
@@ -249,14 +202,11 @@ bool loadAnimation(const aiScene* scene, Animation& animation){
 	
 		}
 		animation.keyFrames.insert(std::pair<std::string, KeyFrame>(channel->mNodeName.C_Str(), track));
-		if(std::string(channel->mNodeName.C_Str()) == "mixamorig:Spine"){
-			std::cout << "stop" << std::endl;
-		}
 	}
 	return true;
 }
 
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, DirectX::XMMATRIX &globalInverseTransform, Bone& rootJoint)
+void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
@@ -267,8 +217,6 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		exit(-2);
 	}
 
-
-	//FOR Now just do the first one
 	aiMesh* mesh = scene->mMeshes[0];
 	uint16_t boneCount = 0;
 	
@@ -277,8 +225,6 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		aiVector3D vertex = mesh->mVertices[v];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 	}
-	globalInverseTransform = AiMatrixToXMMATRIX(scene->mRootNode->mTransformation);
-	globalInverseTransform = DirectX::XMMatrixInverse(nullptr, globalInverseTransform);
 	
 	//load Bones
 	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, vertecies.size());

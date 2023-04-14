@@ -62,12 +62,14 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, filePath, animation, GlobalInverseTransform, rootJoint);
+	loadParticleModel(vertecies, filePath, animation, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
+
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
 	this->PS = gfx->getPS()[4];
 	this->inputLayout = gfx->getInputLayout()[2];
+
 	loadCShader("ParticleSkeletalAnimationComputeShader.cso", gfx->getDevice(), cUpdate);
 	if (!CreateTexture("objects/Particle/SphereDiff.png", gfx->getDevice(), gfx->getTexture(), diffuseTexture)) {
 		std::cout << "cannot load particle texture" << std::endl;
@@ -76,6 +78,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		std::cout << "cannot load particle normal" << std::endl;
 	}
 	CreateVertexConstBuffer(gfx, this->Vg_pConstantBuffer);
+
 	//create UAV
 	D3D11_BUFFER_DESC buffDesc;
 	buffDesc.ByteWidth = sizeof(VolumetricVertex) * this->nrOfVertecies;
@@ -119,16 +122,15 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	this->CSConstBuffer.time.element = 0;
 
 
-	std::vector<DirectX::XMMATRIX> trans;
-	DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-	//getTransforms(trans, rootJoint, p);
-
-	std::vector<float> heightTest;
-	for(int i = 0; i < trans.size(); i++){
-		heightTest.push_back(2);
-	}
-
-	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+	//std::vector<DirectX::XMMATRIX> trans;
+	//DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+	//
+	//std::vector<float> heightTest;
+	//for(int i = 0; i < trans.size(); i++){
+	//	heightTest.push_back(2);
+	//}
+	//
+	//OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
 
 ParticleModel::~ParticleModel()
@@ -201,7 +203,7 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 
-	OBBSkeleton->draw(gfx);
+	//OBBSkeleton->draw(gfx);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
