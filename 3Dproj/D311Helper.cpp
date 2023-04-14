@@ -26,9 +26,9 @@ bool CreateInsterface(UINT width, UINT height, HWND wnd, ID3D11Device*& device, 
     swapChainDesc.Flags = 0;
 
     UINT flags = 0;
-    #ifdef _DEBUG
-        flags = D3D11_CREATE_DEVICE_DEBUG;
-    #endif
+    ////#ifdef _DEBUG
+    //    flags = D3D11_CREATE_DEVICE_DEBUG;
+    ////#endif
     D3D_FEATURE_LEVEL featureLvl[] = { D3D_FEATURE_LEVEL_11_0 };
 
     HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags, featureLvl, 1, D3D11_SDK_VERSION, &swapChainDesc, &swapChain, &device, nullptr, &immediateContext);
