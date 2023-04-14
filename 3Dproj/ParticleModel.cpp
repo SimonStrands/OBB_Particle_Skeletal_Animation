@@ -179,11 +179,11 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	gfx->get_IMctx()->VSSetConstantBuffers(1, 1, &SkeletonConstBuffer);
 
-	this->CSConstBuffer.dt.element = dt;
-	this->CSConstBuffer.time.element += dt;
 	#ifndef TRADITIONALSKELETALANIMATION
 	//update computeshader const buffer
-	D3D11_MAPPED_SUBRESOURCE resource;
+	this->CSConstBuffer.dt.element = dt;
+	this->CSConstBuffer.time.element += dt;
+
 	gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	memcpy(resource.pData, &CSConstBuffer, sizeof(ComputerShaderParticleModelConstBuffer));
 	gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
