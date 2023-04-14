@@ -2,6 +2,9 @@
 #include <d3d11.h>
 #include "vertex.h"
 #include <string>
+
+#include "BuildDefines.h"
+
 //git
 bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 	ID3D11PixelShader**& pShader, ID3D11GeometryShader**& gShader,

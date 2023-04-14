@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
-#include "Bone.h"
+#include <string>
+#include "vertex.h"
 #include <vector>
 #include <fstream>
 //git

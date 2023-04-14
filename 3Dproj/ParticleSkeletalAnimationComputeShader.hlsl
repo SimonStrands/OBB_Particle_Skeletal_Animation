@@ -5,11 +5,11 @@ cbuffer Time
     float2 padding;
 };
 
-static const int maxNumberOfBones = 50;
+static const int maxNumberOfBones = 70;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    matrix Transformations[maxNumberOfBones]; //max number of bones are 50 (NOT FINAL!)
+    matrix Transformations[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
     float3 WidthHeightDepth[maxNumberOfBones]; //WIDTH and DEPTH are the same for all bones right now
     int nrOfBones;
 };
@@ -19,6 +19,7 @@ RWBuffer<float> particleData;
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
+    
     static const float drag = 0.1f;
     static const float force = 0.9f;
     //pos 3
@@ -48,5 +49,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
     particleData[DTid.x * 10 + 7] = currentVelocity.x;
     particleData[DTid.x * 10 + 8] = currentVelocity.y;
     particleData[DTid.x * 10 + 9] = currentVelocity.z;
+    
 
 }

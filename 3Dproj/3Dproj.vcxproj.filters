@@ -228,6 +228,12 @@
     <ClCompile Include="OBBSkeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkeletalAnim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D311Helper.h">
@@ -308,9 +314,6 @@
     <ClInclude Include="imguiManager.h">
       <Filter>Header Files\IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="Bone.h">
-      <Filter>Header Files\Graphic\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
@@ -372,6 +375,15 @@
       <Filter>Header Files\Graphic\Particle</Filter>
     </ClInclude>
     <ClInclude Include="OBBSkeleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkeletalAnim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BuildDefines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -461,6 +473,9 @@
     </FxCompile>
     <FxCompile Include="DebugDrawOBBVertex.hlsl">
       <Filter>Resource Files\Shaders\DebugDrawObb</Filter>
+    </FxCompile>
+    <FxCompile Include="VolumetrixVertexTraditionalSkeletalAnimaiton.hlsl">
+      <Filter>Resource Files\Shaders\Volumetric</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

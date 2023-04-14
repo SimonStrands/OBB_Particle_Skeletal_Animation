@@ -44,30 +44,6 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	
 	lightNr = 0;
 
-	std::vector<DirectX::XMMATRIX> transforms = {
-		DirectX::XMMATRIX(
-		    1,0,0,0,
-			0,1,0,0,
-			0,0,1,0,
-            1,0,0,1
-		),
-		DirectX::XMMATRIX(
-		    1,0,0,0,
-			0,1,0,0,
-			0,0,1,0,
-            2,2,0,1
-		),
-		DirectX::XMMATRIX(
-		    1,0,0,0,
-			0,1,0,0,
-			0,0,1,0,
-            -2,-2,1,1
-		)
-	};
-	std::vector<float> height = {1, 2, 3};
-
-
-	OBBSkeleton = new OBBSkeletonDebug(transforms, height, gfx);
 }
 
 Game::~Game() 
@@ -95,7 +71,6 @@ Game::~Game()
 		delete obj[i];
 	}
 	delete particleModel;
-	delete OBBSkeleton;
 }
 
 
@@ -177,7 +152,7 @@ void Game::Update()
 		LightVisualizers[i]->setRot(vec3(0 , light[i]->getRotation().x, -light[i]->getRotation().y) + vec3(0,1.57f,0));
 	}
 	
-	particleModel->updateParticles(dt.dt(), gfx);
+	particleModel->updateParticles((float)dt.dt(), gfx);
 
 	gfx->Update((float)dt.dt(), camera->getPos());
 
@@ -227,7 +202,6 @@ void Game::DrawToBuffer()
 void Game::ForwardDraw()
 {
 	particleModel->draw(gfx);
-	OBBSkeleton->draw(gfx);
 }
 
 void Game::DrawAllShadowObject()
@@ -270,5 +244,5 @@ void Game::setUpObject()
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 0.f, 10.f), vec3(0.f, 0.f, 0.f), vec3(2.f, 2.0f, 2.0f)));//main
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(2.f, 2.0f, 2.0f)));//second
 	
-	particleModel = new ParticleModel(gfx, "", vec3());
+	particleModel = new ParticleModel(gfx, "objects/sillydance2.fbx", vec3());
 }

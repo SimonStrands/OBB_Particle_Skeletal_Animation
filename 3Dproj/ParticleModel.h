@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include "CreateBuffer.h"
 #include "ParticleModelLoader.h"
+#include "OBBSkeleton.h"
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : CB{
@@ -18,6 +19,13 @@ struct ComputerShaderParticleModelConstBuffer : CB{
 	}padding;
 };
 
+static const int maxNumberOfBones = 70;
+struct SkeletonConstantBuffer : CB{
+	struct{
+		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
+	}Transformations;
+};
+
 class ParticleModel{
 public:
 	ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position);
@@ -28,6 +36,7 @@ public:
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
+	OBBSkeletonDebug* OBBSkeleton;
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);
@@ -44,6 +53,12 @@ private:
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* Vg_pConstantBuffer;
 
+	//For skeletal animation
+	SkeletonConstantBuffer SkeletonConstBufferConverter;
+	ID3D11Buffer* SkeletonConstBuffer;
+	Animation animation;
+	DirectX::XMMATRIX GlobalInverseTransform;
+
 	//2 textures for the particle one diffuse and one normal map
 	ID3D11ShaderResourceView* diffuseTexture;
 	ID3D11ShaderResourceView* normalMapTexture;
@@ -53,4 +68,15 @@ private:
 	ID3D11UnorderedAccessView* billUAV;
 	ID3D11Buffer* computeShaderConstantBuffer;
 	ComputerShaderParticleModelConstBuffer CSConstBuffer;
+
+	void getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
+	));
+
+	//should never be 0
+	float time = 0.000001f;
+	Bone rootJoint;
 };

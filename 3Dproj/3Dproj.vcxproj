@@ -146,6 +146,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)/SFML/include;$(SolutionDir)/External Libs/Assimp/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,6 +161,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="BillBoard.cpp" />
     <ClCompile Include="BillBoardManager.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -198,6 +200,7 @@
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="rotation.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="SkeletalAnim.cpp" />
     <ClCompile Include="TileAnimation.cpp" />
     <ClCompile Include="TrashCollector.cpp" />
     <ClCompile Include="Vec.cpp" />
@@ -205,9 +208,10 @@
     <ClCompile Include="WindowHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="BillBoard.h" />
     <ClInclude Include="BillBoardManager.h" />
-    <ClInclude Include="Bone.h" />
+    <ClInclude Include="BuildDefines.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Convertions.h" />
@@ -246,6 +250,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="rotation.h" />
     <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="SkeletalAnim.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TileAnimation.h" />
     <ClInclude Include="TrashCollector.h" />
@@ -460,6 +465,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="VolumetricVertex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="VolumetrixVertexTraditionalSkeletalAnimaiton.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
