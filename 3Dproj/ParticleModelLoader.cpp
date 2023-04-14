@@ -104,6 +104,7 @@ void loadBoneDataToVertecies(
 		}
 		#endif 
 	}
+	#ifdef TRADITIONALSKELETALANIMATION
 	//normalize weights to make all weights sum 1
 	for (int w = 0; w < vertecies.size(); w++) {
 		
@@ -119,6 +120,7 @@ void loadBoneDataToVertecies(
 			vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
 		}
 	}
+	#endif 
 	readSkeleton(boneInfo, rootJoint, node);
 }
 
