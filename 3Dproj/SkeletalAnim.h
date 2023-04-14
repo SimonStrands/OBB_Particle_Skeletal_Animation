@@ -25,45 +25,45 @@ public:
 	std::unordered_map<std::string, KeyFrame> keyFrames;
 };
 
-class Joint {
-public:
-	Joint();
-	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform, Joint* parent=nullptr);
-	Joint(const Joint & obj);
-	Joint operator=(const Joint& obj);
-
-	Joint* parent;
-	std::vector<Joint> childJoints;
-	int id;
-	std::string name;
-	DirectX::XMMATRIX localBindTransform;
-	DirectX::XMMATRIX inverseBindPoseMatrix;
-	DirectX::XMMATRIX worldMatrix;
-	//DirectX::XMMATRIX animatedTransform;
-
-	//int GetId() const;
-	//std::string GetName() const;
-	void addChild(Joint child);
-	std::vector<Joint> GetChildJoints();
-	
-
-	//DirectX::XMMATRIX GetAnimatedTransform() const;
-	//void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
-	//DirectX::XMMATRIX GetInverseBindTransform() const;
-	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
-private:
-	
-};
-
-//struct Bone {
-//	std::vector<Bone> childJoints;
+//class Joint {
+//public:
+//	Joint();
+//	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform, Joint* parent=nullptr);
+//	Joint(const Joint & obj);
+//	Joint operator=(const Joint& obj);
+//
+//	Joint* parent;
+//	std::vector<Joint> childJoints;
 //	int id;
 //	std::string name;
+//	DirectX::XMMATRIX localBindTransform;
 //	DirectX::XMMATRIX inverseBindPoseMatrix;
-//	DirectX::XMMATRIX boneMatrix;
+//	DirectX::XMMATRIX worldMatrix;
+//	//DirectX::XMMATRIX animatedTransform;
+//
+//	//int GetId() const;
+//	//std::string GetName() const;
+//	void addChild(Joint child);
+//	std::vector<Joint> GetChildJoints();
 //	
 //
+//	//DirectX::XMMATRIX GetAnimatedTransform() const;
+//	//void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
+//	//DirectX::XMMATRIX GetInverseBindTransform() const;
+//	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
+//private:
+//	
 //};
+
+struct Bone {
+	std::vector<Bone> childJoints;
+	int id;
+	std::string name;
+	DirectX::XMMATRIX inverseBindPoseMatrix;
+	DirectX::XMMATRIX boneMatrix;
+	
+
+};
 
 
 #endif
