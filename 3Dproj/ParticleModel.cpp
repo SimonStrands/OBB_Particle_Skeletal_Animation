@@ -62,10 +62,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	//loadParticleModel(vertecies, "objects/test3.fbx", animation, GlobalInverseTransform, rootJoint);
-	//loadParticleModel(vertecies, "objects/sillydance2.fbx", animation, GlobalInverseTransform, rootJoint);
-	loadParticleModel(vertecies, "objects/silly_dancing.fbx", animation, GlobalInverseTransform, rootJoint);
-	//loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, GlobalInverseTransform, rootJoint);
+	loadParticleModel(vertecies, filePath, animation, GlobalInverseTransform, rootJoint);
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
@@ -151,20 +148,8 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	//time = 14.5f;
-	
-	if(getkey('P')){
-		time += dt * animation.tick;
-		//std::cout << "time" << std::endl;
-		getPose(rootJoint, animation, time);
-		
-	}
-	else{
-		for(int i = 0; i < 70; i++){
-			SkeletonConstBufferConverter.Transformations.element[i] = DirectX::XMMatrixIdentity();
-		}
-	}
-	
+	time += dt * animation.tick;
+	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
