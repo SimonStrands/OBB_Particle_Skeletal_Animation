@@ -40,7 +40,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 	//loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
-	loadParticleModel(vertecies, "objects/sillydancing.fbx", animation, rootJoint);
+	loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, rootJoint);
 
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
