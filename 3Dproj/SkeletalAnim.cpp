@@ -7,14 +7,15 @@ Joint::Joint() //maybe make it impossible to make default joints? and only point
     this->id = -1;
     this->name = "default";
     this->localBindTransform = XMMATRIX();
+    this->parent = nullptr;
 }
 
-Joint::Joint(int index, std::string name, XMMATRIX bindLocalTransform)
+Joint::Joint(int index, std::string name, XMMATRIX bindLocalTransform,Joint* parent)
 {
     this->id = index;
     this->name = name;
     this->localBindTransform = bindLocalTransform;
-
+    this->parent = parent;
 }
 
 Joint::Joint(const Joint& obj)
@@ -72,9 +73,9 @@ std::vector<Joint> Joint::GetChildJoints()
 
 void Joint::CalcInverseBindTransform(XMMATRIX parentBindTransform)
 {
-	XMMATRIX bindTransform = XMMatrixMultiply(parentBindTransform, localBindTransform);
+	XMMATRIX bindTransform = XMMatrixMultiply(parentBindTransform, this->localBindTransform);
     
-    inverseBindPoseMatrix = XMMatrixInverse(nullptr, bindTransform);
+    this->inverseBindPoseMatrix = XMMatrixInverse(nullptr, bindTransform);
     for (Joint child : childJoints)
     {
         child.CalcInverseBindTransform(bindTransform);

@@ -28,15 +28,17 @@ public:
 class Joint {
 public:
 	Joint();
-	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform);
+	Joint(int index, std::string name, DirectX::XMMATRIX bindLocalTransform, Joint* parent=nullptr);
 	Joint(const Joint & obj);
 	Joint operator=(const Joint& obj);
 
+	Joint* parent;
 	std::vector<Joint> childJoints;
 	int id;
 	std::string name;
 	DirectX::XMMATRIX localBindTransform;
 	DirectX::XMMATRIX inverseBindPoseMatrix;
+	DirectX::XMMATRIX worldMatrix;
 	//DirectX::XMMATRIX animatedTransform;
 
 	//int GetId() const;
@@ -49,6 +51,7 @@ public:
 	//void SetAnimationTransform(DirectX::XMMATRIX animationTransform);
 	//DirectX::XMMATRIX GetInverseBindTransform() const;
 	void CalcInverseBindTransform(DirectX::XMMATRIX parentBindTransform);
+private:
 	
 };
 
@@ -66,7 +69,8 @@ public:
 #endif
 
 
-//[] get animator to work
+//[x] get animator to work
+//[x] get model to shows 
 //[] make joints loading for regular skeleton visible 
 
 

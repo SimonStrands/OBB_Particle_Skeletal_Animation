@@ -40,7 +40,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 	//loadParticleModel(vertecies, "objects/test2.fbx", animation, GlobalInverseTransform, rootJoint);
 	//loadParticleModel(vertecies, "objects/MovementAnimationTest.fbx", animation, GlobalInverseTransform, rootJoint);
-	loadParticleModel(vertecies, "objects/testAnimation.fbx", animation, rootJoint);
+	loadParticleModel(vertecies, "objects/sillydancing.fbx", animation, rootJoint);
 
 	this->nrOfVertecies = (UINT)vertecies.size();
 	this->VS = gfx->getVS()[4];
@@ -103,8 +103,8 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		heightTest.push_back(2);
 	}
 	std::vector<DirectX::XMMATRIX> trans;
-	DirectX::XMMATRIX p(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	getTransforms(trans, rootJoint, p);
+	//DirectX::XMMATRIX p(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	getTransforms(trans, rootJoint, DirectX::XMMatrixIdentity());
 
 	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
@@ -232,6 +232,7 @@ void ParticleModel::GetPose2(Joint& skeleton, Animation& animation,  float dt, X
 	XMFLOAT4 rotation2 = btt.rotations[fp.first];
 	XMVECTOR rotation = XMQuaternionSlerp(XMLoadFloat4(&rotation1), XMLoadFloat4(&rotation2), fp.second);
 	XMMATRIX rotMat = XMMatrixRotationQuaternion(rotation);
+	
 
 	//calculate interpolated scale
 	fp = GetTimeFraction(btt.scaleTimestamps, dt);

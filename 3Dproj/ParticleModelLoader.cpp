@@ -74,11 +74,24 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
 		//joint.inverseBindPoseMatrix = boneInfo[joint.name].second;
-		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
-		//joint.inverseBindPoseMatrix = DirectX::XMMatrixInverse(nullptr, boneInfo[joint.name].second);
-	
+		
+		if (joint.parent == nullptr) // is root
+		{
+			joint.worldMatrix = boneInfo[joint.name].second;
+		}
+		else
+			joint.worldMatrix = joint.parent->worldMatrix * boneInfo[joint.name].second;
+
+		//joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
+		//DirectX::XMMATRIX bindTransform = DirectX::XMMatrixMultiply(DirectX::XMMatrixIdentity(), boneInfo[joint.name].second);
+		//joint.inverseBindPoseMatrix = XMMatrixInverse(nullptr, bindTransform);
+
+		joint.inverseBindPoseMatrix = DirectX::XMMatrixInverse(nullptr, joint.worldMatrix);
+		joint.localBindTransform = joint.inverseBindPoseMatrix * joint.worldMatrix;
+		//joint.inverseBindPoseMatrix = node->mTransformation;
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Joint child;
+			child.parent = &joint;
 			if(readSkeleton(boneInfo, child, node->mChildren[i])){
 				joint.childJoints.push_back(child);
 			}
@@ -93,6 +106,7 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 	
 		}
 	}
+	
 	return false;
 }
 
@@ -142,24 +156,29 @@ void loadBoneDataToVertecies(
 
 			}
 		}
-		//normalize weights to make all weights sum 1
-		for (int i = 0; i < vertecies.size(); i++) {
-			
-			float totalWeight = vertecies[i].boneWeights[0]
-				+ vertecies[i].boneWeights[1]
-				+ vertecies[i].boneWeights[2]
-				+ vertecies[i].boneWeights[3];
 
-			if (totalWeight > 0.0f) {
-				vertecies[i].boneWeights[0] = vertecies[i].boneWeights[0] / totalWeight;
-				vertecies[i].boneWeights[1] = vertecies[i].boneWeights[1] / totalWeight;
-				vertecies[i].boneWeights[2] = vertecies[i].boneWeights[2] / totalWeight;
-				vertecies[i].boneWeights[3] = vertecies[i].boneWeights[3] / totalWeight;
-			}
-		}
-		#endif 
 	}
+	//normalize weights to make all weights sum 1
+	for (int k = 0; k < vertecies.size(); k++) {
+
+		float totalWeight = vertecies[k].boneWeights[0]
+			+ vertecies[k].boneWeights[1]
+			+ vertecies[k].boneWeights[2]
+			+ vertecies[k].boneWeights[3];
+
+		if (totalWeight > 0.0f) {
+			vertecies[k].boneWeights[0] = vertecies[k].boneWeights[0] / totalWeight;
+			vertecies[k].boneWeights[1] = vertecies[k].boneWeights[1] / totalWeight;
+			vertecies[k].boneWeights[2] = vertecies[k].boneWeights[2] / totalWeight;
+			vertecies[k].boneWeights[3] = vertecies[k].boneWeights[3] / totalWeight;
+		}
+	}
+	#endif 
 	readSkeleton(boneInfo, rootJoint, node);
+
+	//rootJoint.CalcInverseBindTransform(DirectX::XMMatrixIdentity());
+
+	
 }
 
 bool loadAnimation(const aiScene* scene, Animation& animation)
