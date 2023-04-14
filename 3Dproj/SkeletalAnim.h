@@ -4,7 +4,7 @@
 #include <list>
 #include <string>
 
-#include "Animator.h"
+#include "Animation.h"
 
 struct Bone {
 	std::vector<Bone> childJoints;

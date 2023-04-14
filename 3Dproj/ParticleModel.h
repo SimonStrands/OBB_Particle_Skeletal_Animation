@@ -75,6 +75,8 @@ private:
 		0,0,1,0,
 		0,0,0,1
 	));
+
+	//should never be 0
 	float time = 0.000001f;
 	Bone rootJoint;
 };

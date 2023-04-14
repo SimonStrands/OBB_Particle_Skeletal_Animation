@@ -17,6 +17,7 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMMATRIX newParentTransform = DirectX::XMMatrixIdentity();
 
 	float nTime = fmod(time, anim.length);
+	if(nTime == 0){nTime += 0.00000001f;}
 	KeyFrame bonePlacement = anim.keyFrames.find(joint.name)->second;
 
 	std::pair<unsigned int, float> fp;

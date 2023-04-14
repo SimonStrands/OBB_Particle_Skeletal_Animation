@@ -1,7 +1,7 @@
 #pragma once
 #include "CreateBuffer.h"
 #include "Graphics.h"
-#include "Bone.h"
+//#include "Bone.h"
 #include "Material.h"
 
 #include <assimp/Importer.hpp>

@@ -231,9 +231,6 @@
     <ClCompile Include="Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Animator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SkeletalAnim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -317,9 +314,6 @@
     <ClInclude Include="imguiManager.h">
       <Filter>Header Files\IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="Bone.h">
-      <Filter>Header Files\Graphic\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
@@ -384,9 +378,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Animation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Animator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SkeletalAnim.h">

@@ -78,7 +78,7 @@ VertexShaderOutput main(VertexShaderInput input)
         boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
     }
     
-    //DEBUG
+    //DEBUG //THIS SHOULD BE REMOVED IN FINAL PRODUCT
     static const float4x4 zeroVector =
     {
         0.f, 0.f, 0.f, 0.f,
@@ -97,6 +97,7 @@ VertexShaderOutput main(VertexShaderInput input)
     {
         boneTransform = identity;
     }
+    ///////////////////////////////////////////////////
     
     output.color = input.color;
     
