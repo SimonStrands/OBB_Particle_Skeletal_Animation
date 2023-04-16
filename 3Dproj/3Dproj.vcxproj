@@ -262,6 +262,7 @@
   <ItemGroup>
     <None Include="MVP.hlsli" />
     <None Include="README.md" />
+    <None Include="SkeletalData.hlsli" />
     <None Include="Transforms.hlsli">
       <FileType>Document</FileType>
     </None>

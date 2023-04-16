@@ -2,23 +2,23 @@
 #include <iostream>
 #include "CreateBuffer.h"
 
-OBBSkeletonDebug::OBBSkeletonDebug(std::vector<DirectX::XMMATRIX>& transform, std::vector<float>& height, Graphics*& gfx)
+OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& whd, Graphics*& gfx)
 {
-	if(transform.size() != height.size()){
+	if(nrOfBones != whd.size()){
 		std::cout << "not the same size" << std::endl;
 	}
-	this->transform = transform;
-	for(int i = 0; i < height.size(); i++){
+	//this->transform.resize(nrOfBones);
+	for(int i = 0; i < nrOfBones; i++){
 		size.push_back(DirectX::XMMATRIX(
 			OBBWidth, 0, 0, 0,
-			0, height[i], 0, 0,
+			0, whd[i], 0, 0,
 			0, 0, OBBDepth, 0,
 			0, 0, 0, 1
 		));
 	}
-	for(int i = 0; i < transform.size(); i++){
-		constBufferConverter.transform.element[i] = size[i] * transform[i];
-	}
+	//for(int i = 0; i < transform.size(); i++){
+	//	constBufferConverter.transform.element[i] = size[i] * transform[i];
+	//}
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
@@ -65,6 +65,27 @@ void OBBSkeletonDebug::setTransformations(std::vector<DirectX::XMMATRIX>& transf
 void OBBSkeletonDebug::setTransform(int id, const DirectX::XMMATRIX transform)
 {
 	this->transform[id] = transform;
+}
+
+std::vector<DirectX::XMMATRIX>& OBBSkeletonDebug::getTransforms()
+{
+	return this->transform;
+}
+
+void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer)
+{
+	DirectX::XMMATRIX BonePositionMatrix = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
+	//DirectX::XMMATRIX jointMatrix = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix)) *
+	//	skeltonConstBuffer.Transformations.element[rootjoint.id]
+	//	
+	//	;
+	//DirectX::XMMATRIX jointMatrix = skeltonConstBuffer.Transformations.element[rootjoint.id];
+
+	transform[rootjoint.id] = jointMatrix;
+
+	for(int i = 0; i < rootjoint.childJoints.size(); i++){
+		updateObbPosition(rootjoint.childJoints[i], skeltonConstBuffer);
+	}
 }
 
 void OBBSkeletonDebug::draw(Graphics*& gfx)

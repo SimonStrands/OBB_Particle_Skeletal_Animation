@@ -19,12 +19,6 @@ struct ComputerShaderParticleModelConstBuffer : CB{
 	}padding;
 };
 
-static const int maxNumberOfBones = 70;
-struct SkeletonConstantBuffer : CB{
-	struct{
-		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
-	}Transformations;
-};
 
 class ParticleModel{
 public:

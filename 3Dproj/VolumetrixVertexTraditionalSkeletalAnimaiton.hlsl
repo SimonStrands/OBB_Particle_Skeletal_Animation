@@ -1,3 +1,4 @@
+#include "SkeletalData.hlsli"
 struct VertexShaderInput
 {
     float3 position : POSITION;
@@ -23,11 +24,10 @@ cbuffer CBuf
     row_major matrix view;
     row_major matrix projection;
 };
-static const int maxNumberOfBones = 70;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    matrix Transformations[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
+    matrix Transformations[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
     int nrOfBones;
 };
 

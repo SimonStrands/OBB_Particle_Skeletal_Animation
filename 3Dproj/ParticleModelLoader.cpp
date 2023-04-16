@@ -220,7 +220,6 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	}
 
 	aiMesh* mesh = scene->mMeshes[0];
-	uint16_t boneCount = 0;
 	
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
@@ -235,4 +234,56 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	loadAnimation(scene, animation);
 	addEmptyAnimationForEmptyJoints(rootJoint, animation);
 	
+}
+
+//aiNode* findNode(std::string nodeName, aiNode* node){
+//
+//	for(int i = 0; i < node->mNumChildren; i++){
+//		node->mChildren[i]
+//	}
+//
+//	return nullptr;
+//}
+
+void getOrginalPositions(
+	Bone& Joint, 
+	std::vector<DirectX::XMMATRIX>& transform, 
+	aiNode* node,
+	const SkeletonConstantBuffer& skeletalConstBuffer)
+{
+	
+	//aiNode* jointNode = node->FindNode(Joint.name.c_str());
+	//if(jointNode != nullptr){
+	//	transform.push_back(AiMatrixToXMMATRIX(jointNode->mTransformation));
+	//}
+
+	transform.push_back(DirectX::XMMatrixTranspose(Joint.inverseBindPoseMatrix));
+
+	for(int i = 0; i < Joint.childJoints.size(); i++){
+		getOrginalPositions(
+			Joint.childJoints[i], 
+			transform, 
+			node,
+			skeletalConstBuffer);
+	}
+}
+
+void getHitBoxPosition(
+	const std::string& filePath, 
+	Bone& rootJoint, 
+	std::vector<DirectX::XMMATRIX>& transform,
+	const SkeletonConstantBuffer& skeletalConstBuffer)
+{
+	Assimp::Importer AImporter;
+	const aiScene* scene = AImporter.ReadFile(filePath, 0);
+	
+	//exit if no scene/file was found
+	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
+		std::cout << "ERROR could find scene or file" << std::endl;
+		exit(-2);
+	}
+	aiMesh* mesh = scene->mMeshes[0];
+	
+	getOrginalPositions(rootJoint, transform, scene->mRootNode, skeletalConstBuffer);
+
 }

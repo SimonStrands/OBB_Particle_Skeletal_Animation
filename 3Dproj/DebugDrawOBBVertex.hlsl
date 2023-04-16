@@ -1,6 +1,7 @@
+#include "SkeletalData.hlsli"
 cbuffer cbuf
 {
-    row_major matrix transform[50]; //model
+    row_major matrix transform[MAXNUMBEROFBONES]; //model
     row_major matrix view;
     row_major matrix projection;
 };

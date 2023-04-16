@@ -1,0 +1,1 @@
+static const int MAXNUMBEROFBONES = 70;
