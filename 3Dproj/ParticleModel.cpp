@@ -135,7 +135,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 	getPose(rootJoint, animation, time);
 
-	//#ifndef TRADITIONALSKELETALANIMATION
+	#ifndef TRADITIONALSKELETALANIMATION
 	//get bone orginal position
 	std::vector<float> heightTest;
 	int nrOfBones = getNrOfBones(rootJoint) + 1;
@@ -148,7 +148,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	getHitBoxPosition(filePath, rootJoint, OBBSkeleton->getTransforms(), SkeletonConstBufferConverter);
 	
 	
-	//#endif // DEBUG
+	#endif // DEBUG
 }
 
 ParticleModel::~ParticleModel()
@@ -168,7 +168,7 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick;
+	//time += dt * animation.tick;
 	time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
@@ -224,9 +224,9 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 
-	//#ifndef TRADITIONALSKELETALANIMATION
+	#ifndef TRADITIONALSKELETALANIMATION
 	OBBSkeleton->draw(gfx);
-    //#endif
+    #endif
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)

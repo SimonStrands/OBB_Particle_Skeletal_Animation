@@ -74,12 +74,9 @@ std::vector<DirectX::XMMATRIX>& OBBSkeletonDebug::getTransforms()
 
 void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer)
 {
-	DirectX::XMMATRIX BonePositionMatrix = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
-	//DirectX::XMMATRIX jointMatrix = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix)) *
-	//	skeltonConstBuffer.Transformations.element[rootjoint.id]
-	//	
-	//	;
-	//DirectX::XMMATRIX jointMatrix = skeltonConstBuffer.Transformations.element[rootjoint.id];
+	DirectX::XMMATRIX BoneOrginalPosition = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
+
+	DirectX::XMMATRIX jointMatrix = BoneOrginalPosition;
 
 	transform[rootjoint.id] = jointMatrix;
 
@@ -94,15 +91,19 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	static UINT strid = sizeof(point);
 	//set shaders
 	update(gfx);
+
+	
+	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
+
 	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gfx->get_IMctx()->IASetInputLayout(gfx->getInputLayout()[1]);
 	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &constantBuffer);
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->IASetIndexBuffer(indeciesBuffer, DXGI_FORMAT_R32_UINT, offset);
 	//draw
-	//gfx->get_IMctx()->Draw(verteciesPoints.size(), 0);
-	//gfx->get_IMctx()->DrawIndexed(indecies.size(), 0, 0);
 	gfx->get_IMctx()->DrawIndexedInstanced((UINT)indecies.size(), (UINT)size.size(), 0, 0, 0);
+
+	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
 
 }
 

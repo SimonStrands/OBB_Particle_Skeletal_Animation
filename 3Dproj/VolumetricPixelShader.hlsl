@@ -20,6 +20,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
     
     const float4 diffuseTexture = diffuseTex.Sample(testSampler, input.uv).xyzw;
     clip(diffuseTexture.w < 0.1f ? -1 : 1);
+    clip(input.color.w < 0.0001f ? -1 : 1);
     
     float3 nMapNormal;
     float3x3 TBN = float3x3(
