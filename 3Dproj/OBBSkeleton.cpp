@@ -76,7 +76,7 @@ void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstant
 {
 	DirectX::XMMATRIX BoneOrginalPosition = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
 
-	DirectX::XMMATRIX jointMatrix = BoneOrginalPosition;
+	DirectX::XMMATRIX jointMatrix = BoneOrginalPosition * DirectX::XMMatrixTranspose(skeltonConstBuffer.Transformations.element[rootjoint.id]);
 
 	transform[rootjoint.id] = jointMatrix;
 
