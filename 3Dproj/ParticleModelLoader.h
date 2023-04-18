@@ -26,7 +26,5 @@ void loadParticleModel(
 );
 
 void getHitBoxPosition(
-	const std::string& filepath,
 	Bone& rootJoint, 
-	std::vector<DirectX::XMMATRIX>& transform,
-	const SkeletonConstantBuffer& skeletalConstBuffer);
+	std::vector<DirectX::XMMATRIX>& transform);

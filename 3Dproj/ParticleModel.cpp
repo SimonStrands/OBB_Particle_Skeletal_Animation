@@ -145,7 +145,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 	OBBSkeleton = new OBBSkeletonDebug(nrOfBones, heightTest, gfx);
 
-	getHitBoxPosition(filePath, rootJoint, OBBSkeleton->getTransforms(), SkeletonConstBufferConverter);
+	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
 	
 	
 	#endif // DEBUG
