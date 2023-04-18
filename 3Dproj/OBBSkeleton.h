@@ -31,6 +31,7 @@ public:
 	std::vector<DirectX::XMMATRIX>& getTransforms();
 	void updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer);
 	void draw(Graphics*& gfx);
+	ID3D11Buffer* getSkeletalTransformConstBuffer();
 
 private:
 	

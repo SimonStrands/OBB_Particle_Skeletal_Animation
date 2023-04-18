@@ -92,7 +92,7 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	//set shaders
 	update(gfx);
 
-	
+	//remove depthstencil so OBB shows through everything
 	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
 
 	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -103,8 +103,14 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	//draw
 	gfx->get_IMctx()->DrawIndexedInstanced((UINT)indecies.size(), (UINT)size.size(), 0, 0, 0);
 
+	//add depth stencil again
 	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
 
+}
+
+ID3D11Buffer* OBBSkeletonDebug::getSkeletalTransformConstBuffer()
+{
+	return constantBuffer;
 }
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
