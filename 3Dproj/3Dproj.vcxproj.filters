@@ -397,6 +397,9 @@
     <None Include="MVP.hlsli">
       <Filter>Resource Files\Shaders\Buffers\Tesselation</Filter>
     </None>
+    <None Include="SkeletalData.hlsli">
+      <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexBillBoard.hlsl">

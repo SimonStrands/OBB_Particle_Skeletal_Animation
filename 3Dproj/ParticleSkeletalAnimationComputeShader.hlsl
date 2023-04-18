@@ -1,3 +1,4 @@
+#include "SkeletalData.hlsli"
 cbuffer Time
 {
     float dt;
@@ -5,12 +6,11 @@ cbuffer Time
     float2 padding;
 };
 
-static const int maxNumberOfBones = 70;
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    matrix Transformations[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
-    float3 WidthHeightDepth[maxNumberOfBones]; //WIDTH and DEPTH are the same for all bones right now
+    matrix Transformations[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
+    float3 WidthHeightDepth[MAXNUMBEROFBONES]; //WIDTH and DEPTH are the same for all bones right now
     int nrOfBones;
 };
 

@@ -42,6 +42,8 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	
 	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
 
+	joint.boneMatrix = newParentTransform;
+
 	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
 
 	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = finalTransform;
@@ -51,6 +53,15 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	}
 }
 
+int getNrOfBones(Bone joint){
+	int x = 0;
+	x += joint.childJoints.size();
+	for(int i = 0; i < joint.childJoints.size(); i++){
+		
+		x += getNrOfBones(joint.childJoints[i]);
+	}
+	return x;
+}
 
 ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position):
 	positionMatris(
@@ -122,16 +133,22 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	}
 	this->CSConstBuffer.time.element = 0;
 
+	getPose(rootJoint, animation, time);
 
-	//std::vector<DirectX::XMMATRIX> trans;
-	//DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-	//
-	//std::vector<float> heightTest;
-	//for(int i = 0; i < trans.size(); i++){
-	//	heightTest.push_back(2);
-	//}
-	//
-	//OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+	#ifndef TRADITIONALSKELETALANIMATION
+	//get bone orginal position
+	std::vector<float> heightTest;
+	int nrOfBones = getNrOfBones(rootJoint) + 1;
+	for(int i = 0; i < nrOfBones; i++){
+		heightTest.push_back(0.2);
+	}
+
+	OBBSkeleton = new OBBSkeletonDebug(nrOfBones, heightTest, gfx);
+
+	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
+	
+	
+	#endif // DEBUG
 }
 
 ParticleModel::~ParticleModel()
@@ -152,6 +169,7 @@ ParticleModel::~ParticleModel()
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
 	time += dt * animation.tick;
+	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -167,23 +185,25 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	this->CSConstBuffer.dt.element = dt;
 	this->CSConstBuffer.time.element += dt;
 
-	gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	memcpy(resource.pData, &CSConstBuffer, sizeof(ComputerShaderParticleModelConstBuffer));
-	gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
-	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	OBBSkeleton->updateObbPosition(rootJoint, SkeletonConstBufferConverter);
 
-	//dispathc shit
-	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
-
-	gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &computeShaderConstantBuffer);
-
-	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
-
-	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
-
-	//nulla unorderedaccesview
-	ID3D11UnorderedAccessView* nullUAV = nullptr;
-	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+	//gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	//memcpy(resource.pData, &CSConstBuffer, sizeof(ComputerShaderParticleModelConstBuffer));
+	//gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
+	//ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//
+	////dispathc shit
+	//gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
+	//
+	//gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &computeShaderConstantBuffer);
+	//
+	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
+	//
+	//gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
+	//
+	////nulla unorderedaccesview
+	//ID3D11UnorderedAccessView* nullUAV = nullptr;
+	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
 #endif
 }
 
@@ -204,7 +224,9 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 
-	//OBBSkeleton->draw(gfx);
+	#ifndef TRADITIONALSKELETALANIMATION
+	OBBSkeleton->draw(gfx);
+    #endif
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)

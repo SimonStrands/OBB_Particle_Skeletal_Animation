@@ -220,12 +220,11 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	}
 
 	aiMesh* mesh = scene->mMeshes[0];
-	uint16_t boneCount = 0;
 	
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
-		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
+		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.7f));
 	}
 	
 	//load Bones
@@ -235,4 +234,25 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	loadAnimation(scene, animation);
 	addEmptyAnimationForEmptyJoints(rootJoint, animation);
 	
+}
+
+void getOrginalPositions(
+	Bone& Joint, 
+	std::vector<DirectX::XMMATRIX>& transform)
+{
+	transform.push_back(DirectX::XMMatrixTranspose(Joint.inverseBindPoseMatrix));
+
+	for(int i = 0; i < Joint.childJoints.size(); i++){
+		getOrginalPositions(
+			Joint.childJoints[i], 
+			transform);
+	}
+}
+
+void getHitBoxPosition(
+	Bone& rootJoint, 
+	std::vector<DirectX::XMMATRIX>& transform)
+{	
+	getOrginalPositions(rootJoint, transform);
+
 }

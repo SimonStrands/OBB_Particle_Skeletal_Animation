@@ -7,6 +7,14 @@
 #include <assimp/postprocess.h>
 #include "SkeletalAnim.h"
 #include "Animation.h"
+#include "Graphics.h"
+
+static const int maxNumberOfBones = 70;
+struct SkeletonConstantBuffer : CB{
+	struct{
+		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
+	}Transformations;
+};
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
 
@@ -16,3 +24,7 @@ void loadParticleModel(
 	Animation& animation,
 	Bone& rootJoint
 );
+
+void getHitBoxPosition(
+	Bone& rootJoint, 
+	std::vector<DirectX::XMMATRIX>& transform);
