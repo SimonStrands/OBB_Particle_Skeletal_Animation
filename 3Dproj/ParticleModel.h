@@ -5,8 +5,8 @@
 #include "CreateBuffer.h"
 #include "ParticleModelLoader.h"
 #include "OBBSkeleton.h"
-//#include "DirectxMath.h"
-#include <cmath>
+//#include <cmath>
+#include <fstream>
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : CB{

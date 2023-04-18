@@ -29,6 +29,6 @@ void getHitBoxPosition(
 	Bone& rootJoint, 
 	std::vector<DirectX::XMMATRIX>& transform);
 
-float distance(DirectX::XMFLOAT3 A, DirectX::XMFLOAT3 B);
-
-void getJointsToVector(Bone& joint, std::vector<Bone>& jointVec);
+//float distance(DirectX::XMFLOAT3 A, DirectX::XMFLOAT3 B);
+//
+//void getJointsToVector(Bone& joint, std::vector<Bone>& jointVec);
