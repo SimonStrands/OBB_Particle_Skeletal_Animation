@@ -2,17 +2,18 @@
 #include <iostream>
 #include "CreateBuffer.h"
 
-OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& whd, Graphics*& gfx)
+OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
 {
-	if(nrOfBones != whd.size()){
+	if(nrOfBones != sizes.size()){
 		std::cout << "not the same size" << std::endl;
 	}
 	//this->transform.resize(nrOfBones);
+	//sizes: x =height, y= Width, z=Depth
 	for(int i = 0; i < nrOfBones; i++){
 		size.push_back(DirectX::XMMATRIX(
-			OBBWidth, 0, 0, 0,
-			0, whd[i], 0, 0,
-			0, 0, OBBDepth, 0,
+			sizes[i].y, 0, 0, 0,
+			0, sizes[i].x, 0, 0,
+			0, 0, sizes[i].z, 0,
 			0, 0, 0, 1
 		));
 	}
@@ -22,14 +23,14 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& w
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
-	verteciesPoints.push_back(point(vec3(0.5f, 0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, 0.5f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, -0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, -0.5f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 0.5f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, -0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, -0.5f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 0.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 0.f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 1.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 1.f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 0.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 0.f, -0.5f)));
 
 	indecies = {
         0,2,1,

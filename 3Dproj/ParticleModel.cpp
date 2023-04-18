@@ -137,19 +137,26 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 
 	#ifndef TRADITIONALSKELETALANIMATION
 	//get bone orginal position
-	std::vector<float> heightTest;
-	int nrOfBones = getNrOfBones(rootJoint) + 1;
-	for(int i = 0; i < nrOfBones; i++){
-		heightTest.push_back(0.2);
+	
+	std::vector<DirectX::XMFLOAT3> sizes; //x =height, y= Width, z=Depth
+	std::ifstream sizesFile;
+	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	
+	while (!sizesFile.eof())
+	{
+		float x, y, z;
+		sizesFile >> x;
+		sizesFile >> y;
+		sizesFile >> z;
+		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
 	}
-
-	OBBSkeleton = new OBBSkeletonDebug(nrOfBones, heightTest, gfx);
-
+	sizesFile.close();
+	OBBSkeleton = new OBBSkeletonDebug(sizes.size(), sizes, gfx);
 	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
-	
-	
+
 	#endif // DEBUG
 }
+
 
 ParticleModel::~ParticleModel()
 {
