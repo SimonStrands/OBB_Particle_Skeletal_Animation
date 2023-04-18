@@ -4,6 +4,7 @@
 
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& whd, Graphics*& gfx)
 {
+	lastFrameConstBufferConverter.nrOfBones.element = -1;
 	if(nrOfBones != whd.size()){
 		std::cout << "not the same size" << std::endl;
 	}
@@ -76,6 +77,10 @@ void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstant
 	DirectX::XMMATRIX jointMatrix = BoneOrginalPosition * DirectX::XMMatrixTranspose(skeltonConstBuffer.Transformations.element[rootjoint.id]);
 
 	transform[rootjoint.id] = jointMatrix;
+
+	if(lastFrameConstBufferConverter.nrOfBones.element == -1){
+		lastFrameConstBufferConverter.transform.element[rootjoint.id] = jointMatrix;
+	}
 
 	for(int i = 0; i < rootjoint.childJoints.size(); i++){
 		updateObbPosition(rootjoint.childJoints[i], skeltonConstBuffer);

@@ -49,5 +49,6 @@ private:
 	ID3D11Buffer* indeciesBuffer;
 	ID3D11Buffer* constantBuffer;
 	OBBSkeletonOBBBuffer constBufferConverter;
+	OBBSkeletonOBBBuffer lastFrameConstBufferConverter;
 	
 };
