@@ -15,12 +15,15 @@ struct OBBSkeletonOBBBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element;
 	}projection;
+	struct{
+		int element;
+	}nrOfBones;
 };
 
 //static const float OBBWidth = 0.01f;
 //static const float OBBDepth = 0.01f;
-static const float OBBWidth = 0.1f;
-static const float OBBDepth = 0.1f;
+static const float OBBWidth = 0.3f;
+static const float OBBDepth = 0.3f;
 
 class OBBSkeletonDebug{
 public:
@@ -31,7 +34,7 @@ public:
 	std::vector<DirectX::XMMATRIX>& getTransforms();
 	void updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer);
 	void draw(Graphics*& gfx);
-	ID3D11Buffer* getSkeletalTransformConstBuffer();
+	ID3D11Buffer*& getSkeletalTransformConstBuffer();
 
 private:
 	

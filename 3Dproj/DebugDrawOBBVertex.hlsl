@@ -4,6 +4,7 @@ cbuffer cbuf
     row_major matrix transform[MAXNUMBEROFBONES]; //model
     row_major matrix view;
     row_major matrix projection;
+    int nrOfBones;
 };
 
 struct VertexShaderInput

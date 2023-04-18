@@ -54,8 +54,8 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 }
 
 int getNrOfBones(Bone joint){
-	int x = 0;
-	x += joint.childJoints.size();
+	unsigned int x = 0;
+	x += (unsigned int)joint.childJoints.size();
 	for(int i = 0; i < joint.childJoints.size(); i++){
 		
 		x += getNrOfBones(joint.childJoints[i]);
@@ -124,14 +124,10 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		printf("doesn't work create Buffer");
 		return;
 	}
-	if(!CreateConstBuffer(gfx, this->computeShaderConstantBuffer, sizeof(ComputerShaderParticleModelConstBuffer), &CSConstBuffer)){
-		std::cout << "stop" << std::endl;
-	}
 	std::cout << sizeof(DirectX::XMMATRIX) << std::endl;
 	if(!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)){
 		std::cout << "failed to create const buffer" << std::endl;
 	}
-	this->CSConstBuffer.time.element = 0;
 
 	getPose(rootJoint, animation, time);
 
@@ -140,7 +136,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::vector<float> heightTest;
 	int nrOfBones = getNrOfBones(rootJoint) + 1;
 	for(int i = 0; i < nrOfBones; i++){
-		heightTest.push_back(0.2);
+		heightTest.push_back(0.3f);
 	}
 
 	OBBSkeleton = new OBBSkeletonDebug(nrOfBones, heightTest, gfx);
@@ -159,7 +155,6 @@ ParticleModel::~ParticleModel()
 	normalMapTexture->Release();
 	cUpdate->Release();
 	billUAV->Release();
-	computeShaderConstantBuffer->Release();
 	SkeletonConstBuffer->Release();
 	if(OBBSkeleton != nullptr){
 		delete OBBSkeleton;
@@ -168,7 +163,7 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick;
+	time += dt * animation.tick * 0.01;
 	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
@@ -181,30 +176,22 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	gfx->get_IMctx()->VSSetConstantBuffers(1, 1, &SkeletonConstBuffer);
 
 	#ifndef TRADITIONALSKELETALANIMATION
-	//update computeshader const buffer
-	this->CSConstBuffer.dt.element = dt;
-	this->CSConstBuffer.time.element += dt;
 
 	OBBSkeleton->updateObbPosition(rootJoint, SkeletonConstBufferConverter);
-
-	//gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	//memcpy(resource.pData, &CSConstBuffer, sizeof(ComputerShaderParticleModelConstBuffer));
-	//gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
-	//ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-	//
-	////dispathc shit
-	//gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
-	//
-	//gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &computeShaderConstantBuffer);
-	//
-	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
-	//
-	//gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
-	//
-	////nulla unorderedaccesview
-	//ID3D11UnorderedAccessView* nullUAV = nullptr;
-	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
-#endif
+	
+	//dispathc shit
+	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
+	
+	gfx->get_IMctx()->CSSetConstantBuffers(1, 1, &OBBSkeleton->getSkeletalTransformConstBuffer());
+	
+	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
+	
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
+	
+	//nulla unorderedaccesview
+	ID3D11UnorderedAccessView* nullUAV = nullptr;
+	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+    #endif
 }
 
 void ParticleModel::draw(Graphics*& gfx)

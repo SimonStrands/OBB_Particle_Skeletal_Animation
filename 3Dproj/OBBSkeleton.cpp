@@ -7,8 +7,8 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& w
 	if(nrOfBones != whd.size()){
 		std::cout << "not the same size" << std::endl;
 	}
-	//this->transform.resize(nrOfBones);
-	for(int i = 0; i < nrOfBones; i++){
+	constBufferConverter.nrOfBones.element = nrOfBones;
+	for(unsigned int i = 0; i < nrOfBones; i++){
 		size.push_back(DirectX::XMMATRIX(
 			OBBWidth, 0, 0, 0,
 			0, whd[i], 0, 0,
@@ -16,9 +16,6 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& w
 			0, 0, 0, 1
 		));
 	}
-	//for(int i = 0; i < transform.size(); i++){
-	//	constBufferConverter.transform.element[i] = size[i] * transform[i];
-	//}
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
@@ -91,10 +88,10 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	static UINT strid = sizeof(point);
 	//set shaders
 	update(gfx);
-
+	
 	//remove depthstencil so OBB shows through everything
-	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
-
+	//gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
+	
 	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gfx->get_IMctx()->IASetInputLayout(gfx->getInputLayout()[1]);
 	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &constantBuffer);
@@ -102,13 +99,13 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetIndexBuffer(indeciesBuffer, DXGI_FORMAT_R32_UINT, offset);
 	//draw
 	gfx->get_IMctx()->DrawIndexedInstanced((UINT)indecies.size(), (UINT)size.size(), 0, 0, 0);
-
+	
 	//add depth stencil again
-	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
+	//gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
 
 }
 
-ID3D11Buffer* OBBSkeletonDebug::getSkeletalTransformConstBuffer()
+ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 {
 	return constantBuffer;
 }
