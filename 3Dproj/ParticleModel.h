@@ -79,4 +79,5 @@ private:
 	//should never be 0
 	float time = 0.000001f;
 	Bone rootJoint;
+	void JointsToVector(Bone& joint, std::vector<DirectX::XMMATRIX>& matrixVec);
 };

@@ -36,9 +36,19 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
 		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
-	
+		
+		
+		DirectX::XMMATRIX localMatrix = boneInfo[joint.name].second;
+		if (joint.parent==nullptr)
+			joint.worldMatrix = localMatrix;
+		else
+			joint.worldMatrix = joint.parent->worldMatrix * localMatrix;
+
+		joint.worldMatrix = boneInfo[joint.name].second;
+
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Bone child;
+			child.parent = &joint;
 			if(readSkeleton(boneInfo, child, node->mChildren[i])){
 				joint.childJoints.push_back(child);
 			}

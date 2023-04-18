@@ -8,11 +8,12 @@
 
 struct Bone {
 	std::vector<Bone> childJoints;
+	Bone* parent = nullptr;
 	int id;
 	std::string name;
 	DirectX::XMMATRIX inverseBindPoseMatrix;
-	DirectX::XMMATRIX boneMatrix;
-	
+	DirectX::XMMATRIX worldMatrix;
+	//DirectX::XMMATRIX offsetMatrix;
 };
 #endif
 

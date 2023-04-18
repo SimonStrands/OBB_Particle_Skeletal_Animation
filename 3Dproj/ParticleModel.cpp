@@ -40,10 +40,12 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	DirectX::XMVECTOR scale = DirectX::XMVectorLerp(DirectX::XMLoadFloat3(&scale1), DirectX::XMLoadFloat3(&scale2), fp.second);
 	DirectX::XMMATRIX s = DirectX::XMMatrixScalingFromVector(scale);
 	
+	DirectX::XMMATRIX mat = s * r * t;
 	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
 
 	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
-
+	OBBSkeleton->setTransform(joint.id, mat);
+	
 	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = finalTransform;
 
 	for(int i = 0; i < joint.childJoints.size(); i++){
@@ -123,17 +125,29 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	this->CSConstBuffer.time.element = 0;
 
 
-	//std::vector<DirectX::XMMATRIX> trans;
-	//DirectX::XMMATRIX p(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
-	//
-	//std::vector<float> heightTest;
-	//for(int i = 0; i < trans.size(); i++){
-	//	heightTest.push_back(2);
-	//}
-	//
-	//OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
+	std::vector<DirectX::XMMATRIX> trans;
+	JointsToVector(rootJoint, trans);
+
+
+	
+	std::vector<float> heightTest;
+	for(int i = 0; i < trans.size(); i++){
+		heightTest.push_back(2.f);
+	}
+	
+	OBBSkeleton = new OBBSkeletonDebug(trans, heightTest, gfx);
 }
 
+void ParticleModel::JointsToVector(Bone & joint, std::vector<DirectX::XMMATRIX>& matrixVec)
+{
+	matrixVec.push_back(joint.worldMatrix);
+	
+	for (int i = 0; i < joint.childJoints.size(); i++)
+	{
+		JointsToVector(joint.childJoints[i], matrixVec);
+	}
+		
+}
 ParticleModel::~ParticleModel()
 {
 	vertexBuffer->Release();
@@ -204,7 +218,7 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 
-	//OBBSkeleton->draw(gfx);
+	OBBSkeleton->draw(gfx);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
