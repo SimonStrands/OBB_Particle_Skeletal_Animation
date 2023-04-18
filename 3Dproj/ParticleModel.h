@@ -5,6 +5,8 @@
 #include "CreateBuffer.h"
 #include "ParticleModelLoader.h"
 #include "OBBSkeleton.h"
+//#include "DirectxMath.h"
+#include <cmath>
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : CB{
@@ -73,4 +75,6 @@ private:
 	//should never be 0
 	float time = 0.000001f;
 	Bone rootJoint;
+
+	
 };
