@@ -17,11 +17,6 @@ struct OBBSkeletonOBBBuffer : CB{
 	}projection;
 };
 
-//static const float OBBWidth = 0.01f;
-//static const float OBBDepth = 0.01f;
-//static const float OBBWidth = 0.1f;
-//static const float OBBDepth = 0.1f;
-
 
 class OBBSkeletonDebug{
 public:

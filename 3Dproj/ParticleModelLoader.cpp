@@ -259,16 +259,3 @@ void getHitBoxPosition(
 	getOrginalPositions(rootJoint, transform);
 
 }
-//float distance(DirectX::XMFLOAT3 A, DirectX::XMFLOAT3 B)
-//{
-//	return sqrt(std::pow(A.x - B.x, 2) + std::pow(A.y - B.y, 2) + std::pow(A.z - B.z, 2));
-//}
-//
-//void getJointsToVector(Bone& joint, std::vector<Bone>& jointVec)
-//{
-//	jointVec.push_back(joint);
-//	for (int i = 0; i < joint.childJoints.size(); i++) {
-//
-//		getJointsToVector(joint.childJoints[i],jointVec);
-//	}
-//}

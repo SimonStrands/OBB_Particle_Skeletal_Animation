@@ -141,7 +141,6 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::vector<DirectX::XMFLOAT3> sizes; //x =height, y= Width, z=Depth
 	std::ifstream sizesFile;
 	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
-	//std::string theData;
 	
 	while (!sizesFile.eof())
 	{
@@ -149,7 +148,6 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		sizesFile >> x;
 		sizesFile >> y;
 		sizesFile >> z;
-		//std::cout << x << " " << y << " " << z << std::endl;
 		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
 	}
 	sizesFile.close();
