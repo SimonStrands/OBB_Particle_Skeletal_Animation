@@ -136,7 +136,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::vector<float> heightTest;
 	int nrOfBones = getNrOfBones(rootJoint) + 1;
 	for(int i = 0; i < nrOfBones; i++){
-		heightTest.push_back(0.3f);
+		heightTest.push_back(0.9f);
 	}
 
 	OBBSkeleton = new OBBSkeletonDebug(nrOfBones, heightTest, gfx);

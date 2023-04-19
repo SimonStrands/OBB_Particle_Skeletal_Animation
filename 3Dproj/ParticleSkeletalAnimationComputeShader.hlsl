@@ -122,17 +122,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
     {
         //CHECK IF POINTS IS INSIDE A BONE OR NOT
         matrix tempTransformation = Transformations[i];
-        float3 boxPosition = tempTransformation[3].xyz;
-        tempTransformation[3].xyz = float3(0, 0, 0);
-        float3 boxScale = float3(length(Transformations[i][0]), length(Transformations[i][1]), length(Transformations[i][2]));//orkar inte än
         
-        //dont know if this should be inversed
-        matrix rotationMatrix = inverse(extract_rotation_matrix(tempTransformation));
+        float3 nPos = mul(float4(currPos, 1.0f), inverse(tempTransformation));
         
-        const float4 lPos = float4(currPos - boxPosition, 1.0f);
-        float3 nPos = mul(lPos, rotationMatrix);
-        
-        if ((abs(nPos.x) < boxScale.x / 2) && (abs(nPos.y) < boxScale.y / 2) && (abs(nPos.z) < boxScale.z / 2))
+        // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
+        if ((abs(nPos.x) < 0.5) && (abs(nPos.y) < 0.5) && (abs(nPos.z) < 0.5))
         {
              //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
             currColor = float4(0, 1, 0, 1);
