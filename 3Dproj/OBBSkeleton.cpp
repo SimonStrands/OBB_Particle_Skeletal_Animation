@@ -120,11 +120,19 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 
 void OBBSkeletonDebug::inverseTransforms()
 {
-
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
 		constBufferConverter.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverter.transform.element[i]);
 	}
 }
+
+void OBBSkeletonDebug::inverseDeltaTransforms()
+{
+	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
+		constBufferConverter.deltaTransform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverter.deltaTransform.element[i]);
+		//constBufferConverter.deltaTransform.element[i] = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr,constBufferConverter.deltaTransform.element[i]));
+	}
+}
+
 
 void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 {
@@ -139,7 +147,8 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
-	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	//OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
 	this->constBufferConverterPrev = this->constBufferConverter;
 
 	//plan is to send all delta matrices into shader

@@ -145,13 +145,17 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
 	
 	float x, y, z;
-	while (!sizesFile.eof())
-	{
-		sizesFile >> x;
-		sizesFile >> y;
-		sizesFile >> z;
-		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
-	}
+	//while (!sizesFile.eof())
+	//{
+	//	sizesFile >> x;
+	//	sizesFile >> y;
+	//	sizesFile >> z;
+	//	sizes.push_back(DirectX::XMFLOAT3(x,y,z));
+	//}
+
+	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
+	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
+
 	sizesFile.close();
 	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
 	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
@@ -175,7 +179,7 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick * 0.2f;
+	time += dt * animation.tick * 0.1f;
 	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
