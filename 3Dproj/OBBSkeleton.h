@@ -29,14 +29,6 @@ struct OBBSkeletonOBBBuffer : CB{
 		return temp;
 	}
 
-	//DirectX::XMMATRIX* subtractMatArray(OBBSkeletonOBBBuffer first, OBBSkeletonOBBBuffer second)const
-	//{
-	//	DirectX::XMMATRIX temp[70];
-	//	for (int i = 0; i < this->nrOfBones.element; i++)
-	//		temp[i] = first.transform.element[i] - second.transform.element[i];
-	//	return temp;
-	//}
-	// 
 	//void operator=(const OBBSkeletonOBBBuffer& other)
 	//{
 	//	for (int i = 0; i < this->nrOfBones.element; i++)
