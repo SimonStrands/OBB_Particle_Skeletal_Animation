@@ -9,6 +9,9 @@ struct OBBSkeletonOBBBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element[70];
 	}transform;
+	struct {
+		DirectX::XMMATRIX element[70];
+	}deltaTransform;
 	struct{
 		DirectX::XMMATRIX element;
 	}view;
@@ -23,9 +26,17 @@ struct OBBSkeletonOBBBuffer : CB{
 		OBBSkeletonOBBBuffer temp;
 		for (int i = 0; i < this->nrOfBones.element; i++)
 			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
-
 		return temp;
 	}
+
+	//DirectX::XMMATRIX* subtractMatArray(OBBSkeletonOBBBuffer first, OBBSkeletonOBBBuffer second)const
+	//{
+	//	DirectX::XMMATRIX temp[70];
+	//	for (int i = 0; i < this->nrOfBones.element; i++)
+	//		temp[i] = first.transform.element[i] - second.transform.element[i];
+	//	return temp;
+	//}
+	// 
 	//void operator=(const OBBSkeletonOBBBuffer& other)
 	//{
 	//	for (int i = 0; i < this->nrOfBones.element; i++)
@@ -70,6 +81,6 @@ private:
 	OBBSkeletonOBBBuffer constBufferConverter;
 
 	OBBSkeletonOBBBuffer constBufferConverterPrev;
-	OBBSkeletonOBBBuffer constBufferConverterDelta;
+	//OBBSkeletonOBBBuffer constBufferConverterDelta;
 
 };

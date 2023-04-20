@@ -10,6 +10,7 @@
 cbuffer OBBSkeleton : register(b1)
 {
     row_major matrix Transformations[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
+    row_major matrix DeltaTransformations[MAXNUMBEROFBONES];
     row_major matrix view;
     row_major matrix projection;
     int nrOfBones;
