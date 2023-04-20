@@ -145,6 +145,7 @@ void OBBSkeletonDebug::update(Graphics*& gfx)
 	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
 	this->constBufferConverterPrev = this->constBufferConverter;
 
+
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
 		constBufferConverter.transform.element[i] = size[i] * transform[i];
