@@ -20,14 +20,10 @@ struct OBBSkeletonOBBBuffer : CB{
 	}nrOfBones;
 };
 
-//static const float OBBWidth = 0.01f;
-//static const float OBBDepth = 0.01f;
-static const float OBBWidth = 0.3f;
-static const float OBBDepth = 0.3f;
 
 class OBBSkeletonDebug{
 public:
-	OBBSkeletonDebug(unsigned int nrOfBones, std::vector<float>& whd, Graphics*& gfx);
+	OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);
 	~OBBSkeletonDebug();
 	void setTransformations(std::vector<DirectX::XMMATRIX>& transform);
 	void setTransform(int id, const DirectX::XMMATRIX transform);

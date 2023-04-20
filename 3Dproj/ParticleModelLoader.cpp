@@ -37,9 +37,11 @@ bool readSkeleton(std::unordered_map<std::string, std::pair<int, DirectX::XMMATR
 		joint.name = node->mName.C_Str();
 		joint.id = boneInfo[joint.name].first;
 		joint.inverseBindPoseMatrix = DirectX::XMMatrixTranspose(boneInfo[joint.name].second);
+		 
 	
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
 			Bone child;
+			//child.parent = &joint;
 			if(readSkeleton(boneInfo, child, node->mChildren[i])){
 				joint.childJoints.push_back(child);
 			}
@@ -242,10 +244,11 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 }
 
 void getOrginalPositions(
-	Bone& Joint, 
+	Bone& Joint,
 	std::vector<DirectX::XMMATRIX>& transform)
 {
 	transform.push_back(DirectX::XMMatrixTranspose(Joint.inverseBindPoseMatrix));
+
 
 	for(int i = 0; i < Joint.childJoints.size(); i++){
 		getOrginalPositions(
