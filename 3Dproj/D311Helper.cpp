@@ -25,7 +25,7 @@ bool CreateInsterface(UINT width, UINT height, HWND wnd, ID3D11Device*& device, 
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     swapChainDesc.Flags = 0;
 
-    UINT flags = 0;
+    UINT flags = D3D11_CREATE_DEVICE_DISABLE_GPU_TIMEOUT;
     ////#ifdef _DEBUG
     //    flags = D3D11_CREATE_DEVICE_DEBUG;
     ////#endif

@@ -4,6 +4,7 @@
 
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
 {
+	lastFrameConstBufferConverter.nrOfBones.element = -1;
 	if(nrOfBones != sizes.size()){
 		std::cout << "not the same size" << std::endl;
 	}
@@ -19,14 +20,23 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
-	verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, 0.f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, 0.f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 1.f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 1.f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 0.f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 0.f, -0.5f)));
+	//verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
+	//verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
+	//verteciesPoints.push_back(point(vec3(0.5f, 0.f, 0.5f)));
+	//verteciesPoints.push_back(point(vec3(0.5f, 0.f, -0.5f)));
+	//verteciesPoints.push_back(point(vec3(-0.5f, 1.f, 0.5f)));
+	//verteciesPoints.push_back(point(vec3(-0.5f, 1.f, -0.5f)));
+	//verteciesPoints.push_back(point(vec3(-0.5f, 0.f, 0.5f)));
+	//verteciesPoints.push_back(point(vec3(-0.5f, 0.f, -0.5f)));
+
+	verteciesPoints.push_back(point(vec3(0.5f, 0.5f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 0.5f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, -0.5f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, -0.5f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 0.5f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 0.5f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, -0.5f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, -0.5f, -0.5f)));
 
 	indecies = {
         0,2,1,
@@ -91,7 +101,11 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	UINT offset = 0;
 	static UINT strid = sizeof(point);
 	//set shaders
-	update(gfx);
+	gfx->get_IMctx()->VSSetShader(gfx->getVS()[2], nullptr, 0);
+	gfx->get_IMctx()->PSSetShader(gfx->getPS()[3], nullptr, 0);
+	gfx->get_IMctx()->GSSetShader(nullptr, nullptr, 0);
+	gfx->get_IMctx()->HSSetShader(nullptr, nullptr, 0);
+	gfx->get_IMctx()->DSSetShader(nullptr, nullptr, 0);
 	
 	//remove depthstencil so OBB shows through everything
 	//gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
@@ -114,25 +128,32 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 	return constantBuffer;
 }
 
+void OBBSkeletonDebug::inverseTransforms()
+{
+	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
+		constBufferConverter.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverter.transform.element[i]);
+	}
+}
+
+void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
+{
+	inverseTransforms();
+
+	D3D11_MAPPED_SUBRESOURCE resource;
+    gfx->get_IMctx()->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+    memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
+    gfx->get_IMctx()->Unmap(constantBuffer, 0);
+    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+}
+
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
-	//set shaders
-	gfx->get_IMctx()->VSSetShader(gfx->getVS()[2], nullptr, 0);
-	gfx->get_IMctx()->PSSetShader(gfx->getPS()[3], nullptr, 0);
-	gfx->get_IMctx()->GSSetShader(nullptr, nullptr, 0);
-	gfx->get_IMctx()->HSSetShader(nullptr, nullptr, 0);
-	gfx->get_IMctx()->DSSetShader(nullptr, nullptr, 0);
-
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
 		constBufferConverter.transform.element[i] = size[i] * transform[i];
 	}
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
-	
-	D3D11_MAPPED_SUBRESOURCE resource;
-    gfx->get_IMctx()->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-    memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
-    gfx->get_IMctx()->Unmap(constantBuffer, 0);
-    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	inverseAndUpload(gfx);
 }

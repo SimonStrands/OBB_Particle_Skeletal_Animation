@@ -53,7 +53,6 @@ private:
 	SkeletonConstantBuffer SkeletonConstBufferConverter;
 	ID3D11Buffer* SkeletonConstBuffer;
 	Animation animation;
-	DirectX::XMMATRIX GlobalInverseTransform;
 
 	//2 textures for the particle one diffuse and one normal map
 	ID3D11ShaderResourceView* diffuseTexture;
@@ -71,6 +70,7 @@ private:
 		0,0,1,0,
 		0,0,0,1
 	));
+	std::pair<unsigned int, float> getTimeFraction(const std::vector<float>& times, float& dt);
 
 	//should never be 0
 	float time = 0.000001f;

@@ -18,6 +18,7 @@ cbuffer OBBSkeleton : register(b1)
 RWBuffer<float> particleData;
 
 //https://gist.github.com/mattatz/86fff4b32d198d0928d0fa4ff32cf6fa
+/*
 float4x4 extract_rotation_matrix(float4x4 m)
 {
     float sx = length(float3(m[0][0], m[0][1], m[0][2]));
@@ -97,7 +98,7 @@ float4x4 inverse(float4x4 m)
 
     return ret;
 }
-
+*/
 
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
@@ -118,19 +119,20 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
     ///////////////REAL CODE/////////////////////////
     currColor = float4(0, 0, 1, 1);
-    for (int i = 0; i < nrOfBones; i++)
+    float3 nPos;
+
+    for (min12int i = 0; i < nrOfBones; i++)
     {
         //CHECK IF POINTS IS INSIDE A BONE OR NOT
-        matrix tempTransformation = Transformations[i];
-        
-        float3 nPos = mul(float4(currPos, 1.0f), inverse(tempTransformation));
+        nPos = mul(float4(currPos, 1.0f), Transformations[i]).xyz;
         
         // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
         if ((abs(nPos.x) < 0.5) && (abs(nPos.y) < 0.5) && (abs(nPos.z) < 0.5))
         {
              //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-            currColor = float4(0, 1, 0, 1);
-        }        
+             currColor = float4(0, 1, 0, 1);
+             break;
+        }
     }
     
     /////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 #include "ParticleModel.h"
 #include "Random.h"
 
-std::pair<unsigned int, float> getTimeFraction(std::vector<float>& times, float& dt) {
+std::pair<unsigned int, float> ParticleModel::getTimeFraction(const std::vector<float>& times, float& dt) {
 	unsigned int segment = 0;
 	while (dt > times[segment]){
 		segment++;
@@ -75,6 +75,16 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	loadParticleModel(vertecies, filePath, animation, rootJoint);
+	
+	//make it a multiple of 16 or can cause crashes
+	if(vertecies.size() < 1){
+		std::cout << "didn't get any vertecies" << std::endl;
+		exit(-2);
+	}
+	while(vertecies.size() % 16 != 0){
+		vertecies.push_back(vertecies[0]);
+	}
+
 	this->nrOfVertecies = (UINT)vertecies.size();
 
 	this->VS = gfx->getVS()[4];
@@ -144,10 +154,11 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		sizesFile >> x;
 		sizesFile >> y;
 		sizesFile >> z;
-		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
+		//sizes.push_back(DirectX::XMFLOAT3(x,y,z));
+		sizes.push_back(DirectX::XMFLOAT3(0.9f,0.3f,0.3f));
 	}
 	sizesFile.close();
-	OBBSkeleton = new OBBSkeletonDebug(sizes.size(), sizes, gfx);
+	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
 	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
 
 	#endif // DEBUG
@@ -169,8 +180,8 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick * 0.1f;
-	//time = 14.5f;
+	//time += dt * animation.tick * 0.2f;
+	time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -180,10 +191,11 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	
 	gfx->get_IMctx()->VSSetConstantBuffers(1, 1, &SkeletonConstBuffer);
-
+	
 	#ifndef TRADITIONALSKELETALANIMATION
-
+	
 	OBBSkeleton->updateObbPosition(rootJoint, SkeletonConstBufferConverter);
+	OBBSkeleton->update(gfx);
 	
 	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
@@ -192,11 +204,13 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 	
-	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16, 1, 1);//calc how many groups we need beacuse right now I do not know
 	
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+
+	OBBSkeleton->inverseAndUpload(gfx);
     #endif
 }
 
