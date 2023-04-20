@@ -135,16 +135,12 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
     memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
     gfx->get_IMctx()->Unmap(constantBuffer, 0);
     ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-
-
 }
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
 	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
 	this->constBufferConverterPrev = this->constBufferConverter;
-
 
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
