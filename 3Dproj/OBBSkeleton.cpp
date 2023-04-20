@@ -23,6 +23,8 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
+	this->constBufferConverterPrev = this->constBufferConverter;
+
 	verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
 	verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
 	verteciesPoints.push_back(point(vec3(0.5f, 0.f, 0.5f)));
@@ -75,6 +77,7 @@ std::vector<DirectX::XMMATRIX>& OBBSkeletonDebug::getTransforms()
 
 void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer)
 {
+
 	DirectX::XMMATRIX BoneOrginalPosition = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
 
 	DirectX::XMMATRIX jointMatrix = BoneOrginalPosition * DirectX::XMMatrixTranspose(skeltonConstBuffer.Transformations.element[rootjoint.id]);
@@ -107,6 +110,7 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	//add depth stencil again
 	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
 
+
 }
 
 ID3D11Buffer* OBBSkeletonDebug::getSkeletalTransformConstBuffer()
@@ -116,6 +120,9 @@ ID3D11Buffer* OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
+	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	this->constBufferConverterPrev = this->constBufferConverter;
+
 	//set shaders
 	gfx->get_IMctx()->VSSetShader(gfx->getVS()[2], nullptr, 0);
 	gfx->get_IMctx()->PSSetShader(gfx->getPS()[3], nullptr, 0);
@@ -135,4 +142,7 @@ void OBBSkeletonDebug::update(Graphics*& gfx)
     memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
     gfx->get_IMctx()->Unmap(constantBuffer, 0);
     ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+
+
 }

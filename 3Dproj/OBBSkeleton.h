@@ -17,20 +17,26 @@ struct OBBSkeletonOBBBuffer : CB{
 	}projection;
 
 	int nrOfBones = 52;
-	OBBSkeletonOBBBuffer operator-(OBBSkeletonOBBBuffer& other)
+	OBBSkeletonOBBBuffer operator-(const OBBSkeletonOBBBuffer& other)const
 	{
 		OBBSkeletonOBBBuffer temp;
 		for (int i = 0; i < nrOfBones; i++)
 		{
-			for (int r = 0; r < 4; r++)
-			{
-				for (int m = 0; m < 4; m++)
-				{
-					temp.transform.element[i].r[r].m128_f32[m] = this->transform.element[i].r[r].m128_f32[m] - other.transform.element[0].r[r].m128_f32[m];
-				}
-			}
+			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
 		}
 		return temp;
+	}
+	void operator=(const OBBSkeletonOBBBuffer& other)
+	{
+		OBBSkeletonOBBBuffer temp;
+		for (int i = 0; i < nrOfBones; i++)
+		{
+			this->transform.element[i] = other.transform.element[i];
+		}
+		this->view.element = other.view.element; 
+		this->projection.element = other.projection.element;
+		
+		this->nrOfBones = other.nrOfBones;
 	}
 };
 
@@ -59,5 +65,6 @@ private:
 	ID3D11Buffer* indeciesBuffer;
 	ID3D11Buffer* constantBuffer;
 	OBBSkeletonOBBBuffer constBufferConverter;
-	
+	OBBSkeletonOBBBuffer constBufferConverterPrevFrame;
+	OBBSkeletonOBBBuffer constBufferConverterDelta;
 };
