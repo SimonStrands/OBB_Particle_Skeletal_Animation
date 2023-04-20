@@ -139,9 +139,14 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
-	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
 	this->constBufferConverterPrev = this->constBufferConverter;
 
+	//plan is to send all delta matrices into shader
+	//only delta transform matrix is needed so the delta buffer can be omitted 
+	//save deltaElements and send them into some kind of buffer, either modify OBBSkeletonOBBBuffer or and dedicated buffer
+	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverter.deltaTransform.element);
+	
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
 		constBufferConverter.transform.element[i] = size[i] * transform[i];
