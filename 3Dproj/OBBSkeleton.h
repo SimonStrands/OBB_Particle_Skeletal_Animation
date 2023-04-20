@@ -15,6 +15,23 @@ struct OBBSkeletonOBBBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element;
 	}projection;
+
+	int nrOfBones = 52;
+	OBBSkeletonOBBBuffer operator-(OBBSkeletonOBBBuffer& other)
+	{
+		OBBSkeletonOBBBuffer temp;
+		for (int i = 0; i < nrOfBones; i++)
+		{
+			for (int r = 0; r < 4; r++)
+			{
+				for (int m = 0; m < 4; m++)
+				{
+					temp.transform.element[i].r[r].m128_f32[m] = this->transform.element[i].r[r].m128_f32[m] - other.transform.element[0].r[r].m128_f32[m];
+				}
+			}
+		}
+		return temp;
+	}
 };
 
 
