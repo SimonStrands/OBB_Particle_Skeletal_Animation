@@ -21,18 +21,15 @@ struct OBBSkeletonOBBBuffer : CB{
 	{
 		OBBSkeletonOBBBuffer temp;
 		for (int i = 0; i < nrOfBones; i++)
-		{
 			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
-		}
 		return temp;
 	}
 	void operator=(const OBBSkeletonOBBBuffer& other)
 	{
 		OBBSkeletonOBBBuffer temp;
 		for (int i = 0; i < nrOfBones; i++)
-		{
 			this->transform.element[i] = other.transform.element[i];
-		}
+		
 		this->view.element = other.view.element; 
 		this->projection.element = other.projection.element;
 		
