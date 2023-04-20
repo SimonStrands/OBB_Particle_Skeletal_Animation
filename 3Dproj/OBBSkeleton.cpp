@@ -135,15 +135,13 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
     memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
     gfx->get_IMctx()->Unmap(constantBuffer, 0);
     ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-
-
 }
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
 	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
 	this->constBufferConverterPrev = this->constBufferConverter;
+
 	//plan is to send all delta matrices into shader
 	//only delta transform matrix is needed so the delta buffer can be omitted 
 	//save deltaElements and send them into some kind of buffer, either modify OBBSkeletonOBBBuffer or and dedicated buffer

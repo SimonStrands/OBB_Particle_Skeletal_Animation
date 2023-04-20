@@ -1,5 +1,4 @@
 #include "ParticleModel.h"
-#include "Random.h"
 
 std::pair<unsigned int, float> ParticleModel::getTimeFraction(const std::vector<float>& times, float& dt) {
 	unsigned int segment = 0;
@@ -42,11 +41,7 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 	
 	newParentTransform = parentTransform * DirectX::XMMatrixTranspose(s * r * t);
 
-	joint.boneMatrix = newParentTransform;
-
-	DirectX::XMMATRIX finalTransform = newParentTransform * joint.inverseBindPoseMatrix;
-
-	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = finalTransform;
+	this->SkeletonConstBufferConverter.Transformations.element[joint.id] = newParentTransform * joint.inverseBindPoseMatrix;
 
 	for(int i = 0; i < joint.childJoints.size(); i++){
 		getPose(joint.childJoints[i], anim, time, newParentTransform);
@@ -105,7 +100,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	D3D11_BUFFER_DESC buffDesc;
 	buffDesc.ByteWidth = sizeof(VolumetricVertex) * this->nrOfVertecies;
 	buffDesc.Usage = D3D11_USAGE_DEFAULT;
-	buffDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS;//how does this bind with vertex Buffer?
+	buffDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_UNORDERED_ACCESS;
 	buffDesc.CPUAccessFlags = 0;
 	buffDesc.StructureByteStride = 0;
 	buffDesc.MiscFlags = 0;
@@ -130,16 +125,17 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	UavDesc.Buffer.NumElements = nrOfVertecies * 10;
 #endif // DEBUG
 	UavDesc.Buffer.Flags = 0;
+
 	if (FAILED(gfx->getDevice()->CreateUnorderedAccessView(vertexBuffer, &UavDesc, &billUAV))) {
 		printf("doesn't work create Buffer");
 		return;
 	}
-	std::cout << sizeof(DirectX::XMMATRIX) << std::endl;
+
+	getPose(rootJoint, animation, time);
+
 	if(!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)){
 		std::cout << "failed to create const buffer" << std::endl;
 	}
-
-	getPose(rootJoint, animation, time);
 
 	#ifndef TRADITIONALSKELETALANIMATION
 	//get bone orginal position
