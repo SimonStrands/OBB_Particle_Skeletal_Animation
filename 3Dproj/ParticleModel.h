@@ -62,7 +62,6 @@ private:
 	ID3D11ComputeShader* cUpdate;
 	ID3D11UnorderedAccessView* billUAV;
 	ID3D11Buffer* computeShaderConstantBuffer;
-	//ComputerShaderParticleModelConstBuffer CSConstBuffer;
 
 	void getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
 		1,0,0,0,

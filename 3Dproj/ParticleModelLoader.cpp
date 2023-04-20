@@ -1,6 +1,5 @@
 #include "ParticleModelLoader.h"
 #include <iostream>
-#include "Random.h"
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
