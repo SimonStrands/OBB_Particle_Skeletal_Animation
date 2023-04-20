@@ -20,23 +20,14 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
-	//verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
-	//verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
-	//verteciesPoints.push_back(point(vec3(0.5f, 0.f, 0.5f)));
-	//verteciesPoints.push_back(point(vec3(0.5f, 0.f, -0.5f)));
-	//verteciesPoints.push_back(point(vec3(-0.5f, 1.f, 0.5f)));
-	//verteciesPoints.push_back(point(vec3(-0.5f, 1.f, -0.5f)));
-	//verteciesPoints.push_back(point(vec3(-0.5f, 0.f, 0.5f)));
-	//verteciesPoints.push_back(point(vec3(-0.5f, 0.f, -0.5f)));
-
-	verteciesPoints.push_back(point(vec3(0.5f, 0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, 0.5f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, -0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(0.5f, -0.5f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, 0.5f, -0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, -0.5f, 0.5f)));
-	verteciesPoints.push_back(point(vec3(-0.5f, -0.5f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 0.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(0.5f, 0.f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 1.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 1.f, -0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 0.f, 0.5f)));
+	verteciesPoints.push_back(point(vec3(-0.5f, 0.f, -0.5f)));
 
 	indecies = {
         0,2,1,

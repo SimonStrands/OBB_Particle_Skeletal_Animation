@@ -148,14 +148,13 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::ifstream sizesFile;
 	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
 	
+	float x, y, z;
 	while (!sizesFile.eof())
 	{
-		float x, y, z;
 		sizesFile >> x;
 		sizesFile >> y;
 		sizesFile >> z;
-		//sizes.push_back(DirectX::XMFLOAT3(x,y,z));
-		sizes.push_back(DirectX::XMFLOAT3(0.9f,0.3f,0.3f));
+		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
 	}
 	sizesFile.close();
 	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
@@ -180,8 +179,8 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	//time += dt * animation.tick * 0.2f;
-	time = 14.5f;
+	time += dt * animation.tick * 0.2f;
+	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
