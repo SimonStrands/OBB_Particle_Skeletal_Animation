@@ -4,7 +4,6 @@
 
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
 {
-	lastFrameConstBufferConverter.nrOfBones.element = -1;
 	if(nrOfBones != sizes.size()){
 		std::cout << "not the same size" << std::endl;
 	}
@@ -19,6 +18,8 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 	}
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
+
+	this->constBufferConverterPrev = this->constBufferConverter;
 
 	verteciesPoints.push_back(point(vec3(0.5f, 1.f, 0.5f)));
 	verteciesPoints.push_back(point(vec3(0.5f, 1.f, -0.5f)));
@@ -72,15 +73,12 @@ std::vector<DirectX::XMMATRIX>& OBBSkeletonDebug::getTransforms()
 
 void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer)
 {
+
 	DirectX::XMMATRIX BoneOrginalPosition = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
 
 	DirectX::XMMATRIX jointMatrix = BoneOrginalPosition * DirectX::XMMatrixTranspose(skeltonConstBuffer.Transformations.element[rootjoint.id]);
 
 	transform[rootjoint.id] = jointMatrix;
-
-	if(lastFrameConstBufferConverter.nrOfBones.element == -1){
-		lastFrameConstBufferConverter.transform.element[rootjoint.id] = jointMatrix;
-	}
 
 	for(int i = 0; i < rootjoint.childJoints.size(); i++){
 		updateObbPosition(rootjoint.childJoints[i], skeltonConstBuffer);
@@ -112,6 +110,7 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	//add depth stencil again
 	//gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
 
+
 }
 
 ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
@@ -121,6 +120,7 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 
 void OBBSkeletonDebug::inverseTransforms()
 {
+
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
 		constBufferConverter.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverter.transform.element[i]);
 	}
@@ -135,10 +135,17 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
     memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
     gfx->get_IMctx()->Unmap(constantBuffer, 0);
     ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+
+
 }
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
+	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	this->constBufferConverterPrev = this->constBufferConverter;
+
+
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
 		constBufferConverter.transform.element[i] = size[i] * transform[i];

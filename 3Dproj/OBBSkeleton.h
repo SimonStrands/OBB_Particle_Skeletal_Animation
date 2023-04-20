@@ -15,9 +15,29 @@ struct OBBSkeletonOBBBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element;
 	}projection;
-	struct{
+	struct {
 		int element;
 	}nrOfBones;
+	OBBSkeletonOBBBuffer operator-(const OBBSkeletonOBBBuffer& other)const
+	{
+		OBBSkeletonOBBBuffer temp;
+		for (int i = 0; i < this->nrOfBones.element; i++)
+			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
+
+		return temp;
+	}
+	//void operator=(const OBBSkeletonOBBBuffer& other)
+	//{
+	//	for (int i = 0; i < this->nrOfBones.element; i++)
+	//		this->transform.element[i] = other.transform.element[i];
+	//	
+	//	this->view.element = other.view.element; 
+	//	this->projection.element = other.projection.element;
+	//	
+	//	this->nrOfBones.element = other.nrOfBones.element;
+	//}
+
+
 };
 
 
@@ -48,6 +68,8 @@ private:
 	ID3D11Buffer* indeciesBuffer;
 	ID3D11Buffer* constantBuffer;
 	OBBSkeletonOBBBuffer constBufferConverter;
-	OBBSkeletonOBBBuffer lastFrameConstBufferConverter;
-	
+
+	OBBSkeletonOBBBuffer constBufferConverterPrev;
+	OBBSkeletonOBBBuffer constBufferConverterDelta;
+
 };
