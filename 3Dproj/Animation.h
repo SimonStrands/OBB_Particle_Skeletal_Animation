@@ -19,7 +19,7 @@ struct KeyFrame{
 
 class Animation {
 public:
-	float length;
+	float length = 0;
 	float tick = 1.0f;
 	std::map<std::string, KeyFrame> keyFrames;
 };

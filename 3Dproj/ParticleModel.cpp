@@ -1,7 +1,7 @@
 #include "ParticleModel.h"
 #include "Random.h"
 
-std::pair<unsigned int, float> getTimeFraction(std::vector<float>& times, float& dt) {
+std::pair<unsigned int, float> ParticleModel::getTimeFraction(const std::vector<float>& times, float& dt) {
 	unsigned int segment = 0;
 	while (dt > times[segment]){
 		segment++;
@@ -54,8 +54,8 @@ void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, Dire
 }
 
 int getNrOfBones(Bone joint){
-	int x = 0;
-	x += joint.childJoints.size();
+	unsigned int x = 0;
+	x += (unsigned int)joint.childJoints.size();
 	for(int i = 0; i < joint.childJoints.size(); i++){
 		
 		x += getNrOfBones(joint.childJoints[i]);
@@ -75,6 +75,16 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	loadParticleModel(vertecies, filePath, animation, rootJoint);
+	
+	//make it a multiple of 16 or can cause crashes
+	if(vertecies.size() < 1){
+		std::cout << "didn't get any vertecies" << std::endl;
+		exit(-2);
+	}
+	while(vertecies.size() % 16 != 0){
+		vertecies.push_back(vertecies[0]);
+	}
+
 	this->nrOfVertecies = (UINT)vertecies.size();
 
 	this->VS = gfx->getVS()[4];
@@ -124,14 +134,10 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		printf("doesn't work create Buffer");
 		return;
 	}
-	if(!CreateConstBuffer(gfx, this->computeShaderConstantBuffer, sizeof(ComputerShaderParticleModelConstBuffer), &CSConstBuffer)){
-		std::cout << "stop" << std::endl;
-	}
 	std::cout << sizeof(DirectX::XMMATRIX) << std::endl;
 	if(!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)){
 		std::cout << "failed to create const buffer" << std::endl;
 	}
-	this->CSConstBuffer.time.element = 0;
 
 	getPose(rootJoint, animation, time);
 
@@ -142,21 +148,20 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	std::ifstream sizesFile;
 	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
 	
+	float x, y, z;
 	while (!sizesFile.eof())
 	{
-		float x, y, z;
 		sizesFile >> x;
 		sizesFile >> y;
 		sizesFile >> z;
 		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
 	}
 	sizesFile.close();
-	OBBSkeleton = new OBBSkeletonDebug(sizes.size(), sizes, gfx);
+	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
 	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
 
 	#endif // DEBUG
 }
-
 
 ParticleModel::~ParticleModel()
 {
@@ -166,7 +171,6 @@ ParticleModel::~ParticleModel()
 	normalMapTexture->Release();
 	cUpdate->Release();
 	billUAV->Release();
-	computeShaderConstantBuffer->Release();
 	SkeletonConstBuffer->Release();
 	if(OBBSkeleton != nullptr){
 		delete OBBSkeleton;
@@ -175,7 +179,7 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick;
+	time += dt * animation.tick * 0.2f;
 	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	
@@ -186,32 +190,27 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	
 	gfx->get_IMctx()->VSSetConstantBuffers(1, 1, &SkeletonConstBuffer);
-
+	
 	#ifndef TRADITIONALSKELETALANIMATION
-	//update computeshader const buffer
-	this->CSConstBuffer.dt.element = dt;
-	this->CSConstBuffer.time.element += dt;
-
+	
 	OBBSkeleton->updateObbPosition(rootJoint, SkeletonConstBufferConverter);
+	OBBSkeleton->update(gfx);
+	
+	//dispathc shit
+	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
+	
+	gfx->get_IMctx()->CSSetConstantBuffers(1, 1, &OBBSkeleton->getSkeletalTransformConstBuffer());
+	
+	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
+	
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16, 1, 1);//calc how many groups we need beacuse right now I do not know
+	
+	//nulla unorderedaccesview
+	ID3D11UnorderedAccessView* nullUAV = nullptr;
+	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
 
-	//gfx->get_IMctx()->Map(computeShaderConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	//memcpy(resource.pData, &CSConstBuffer, sizeof(ComputerShaderParticleModelConstBuffer));
-	//gfx->get_IMctx()->Unmap(computeShaderConstantBuffer, 0);
-	//ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-	//
-	////dispathc shit
-	//gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
-	//
-	//gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &computeShaderConstantBuffer);
-	//
-	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
-	//
-	//gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16 + 1, 1, 1);//calc how many groups we need beacuse right now I do not know
-	//
-	////nulla unorderedaccesview
-	//ID3D11UnorderedAccessView* nullUAV = nullptr;
-	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
-#endif
+	OBBSkeleton->inverseAndUpload(gfx);
+    #endif
 }
 
 void ParticleModel::draw(Graphics*& gfx)

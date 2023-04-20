@@ -110,9 +110,9 @@ void Game::run()
 		updateShaders();
 		
 		defRend->BindFirstPass();
-
+		
 		this->DrawToBuffer();
-
+		
 		defRend->BindSecondPass(shadowMap->GetshadowResV());
 
 		gfx->setTransparant(true);
@@ -151,8 +151,12 @@ void Game::Update()
 		LightVisualizers[i]->setPos(light[i]->getPos());
 		LightVisualizers[i]->setRot(vec3(0 , light[i]->getRotation().x, -light[i]->getRotation().y) + vec3(0,1.57f,0));
 	}
+	static bool onceUpdate = false;
+	if(onceUpdate){
+		particleModel->updateParticles((float)dt.dt(), gfx);
+	}
+	onceUpdate = true;
 	
-	particleModel->updateParticles((float)dt.dt(), gfx);
 
 	gfx->Update((float)dt.dt(), camera->getPos());
 

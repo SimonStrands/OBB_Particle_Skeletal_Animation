@@ -7,9 +7,8 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 	if(nrOfBones != sizes.size()){
 		std::cout << "not the same size" << std::endl;
 	}
-	//this->transform.resize(nrOfBones);
-	//sizes: x =height, y= Width, z=Depth
-	for(int i = 0; i < nrOfBones; i++){
+	constBufferConverter.nrOfBones.element = nrOfBones;
+	for(unsigned int i = 0; i < nrOfBones; i++){
 		size.push_back(DirectX::XMMATRIX(
 			sizes[i].y, 0, 0, 0,
 			0, sizes[i].x, 0, 0,
@@ -17,9 +16,6 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 			0, 0, 0, 1
 		));
 	}
-	//for(int i = 0; i < transform.size(); i++){
-	//	constBufferConverter.transform.element[i] = size[i] * transform[i];
-	//}
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
 
@@ -94,11 +90,15 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	UINT offset = 0;
 	static UINT strid = sizeof(point);
 	//set shaders
-	update(gfx);
-
+	gfx->get_IMctx()->VSSetShader(gfx->getVS()[2], nullptr, 0);
+	gfx->get_IMctx()->PSSetShader(gfx->getPS()[3], nullptr, 0);
+	gfx->get_IMctx()->GSSetShader(nullptr, nullptr, 0);
+	gfx->get_IMctx()->HSSetShader(nullptr, nullptr, 0);
+	gfx->get_IMctx()->DSSetShader(nullptr, nullptr, 0);
+	
 	//remove depthstencil so OBB shows through everything
-	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
-
+	//gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), nullptr);
+	
 	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gfx->get_IMctx()->IASetInputLayout(gfx->getInputLayout()[1]);
 	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &constantBuffer);
@@ -106,37 +106,30 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetIndexBuffer(indeciesBuffer, DXGI_FORMAT_R32_UINT, offset);
 	//draw
 	gfx->get_IMctx()->DrawIndexedInstanced((UINT)indecies.size(), (UINT)size.size(), 0, 0, 0);
-
+	
 	//add depth stencil again
-	gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
+	//gfx->get_IMctx()->OMSetRenderTargets(1, &gfx->getRenderTarget(), gfx->getDepthStencil());
 
 
 }
 
-ID3D11Buffer* OBBSkeletonDebug::getSkeletalTransformConstBuffer()
+ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 {
 	return constantBuffer;
 }
 
-void OBBSkeletonDebug::update(Graphics*& gfx)
+void OBBSkeletonDebug::inverseTransforms()
 {
-	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
-	this->constBufferConverterPrev = this->constBufferConverter;
 
-	//set shaders
-	gfx->get_IMctx()->VSSetShader(gfx->getVS()[2], nullptr, 0);
-	gfx->get_IMctx()->PSSetShader(gfx->getPS()[3], nullptr, 0);
-	gfx->get_IMctx()->GSSetShader(nullptr, nullptr, 0);
-	gfx->get_IMctx()->HSSetShader(nullptr, nullptr, 0);
-	gfx->get_IMctx()->DSSetShader(nullptr, nullptr, 0);
-
-	//update constantBuffer
-	for(int i = 0; i < transform.size(); i++){
-		constBufferConverter.transform.element[i] = size[i] * transform[i];
+	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
+		constBufferConverter.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverter.transform.element[i]);
 	}
-	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
-	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
-	
+}
+
+void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
+{
+	inverseTransforms();
+
 	D3D11_MAPPED_SUBRESOURCE resource;
     gfx->get_IMctx()->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
     memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
@@ -145,4 +138,19 @@ void OBBSkeletonDebug::update(Graphics*& gfx)
 
 
 
+}
+
+void OBBSkeletonDebug::update(Graphics*& gfx)
+{
+	this->constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	this->constBufferConverterPrev = this->constBufferConverter;
+
+	//update constantBuffer
+	for(int i = 0; i < transform.size(); i++){
+		constBufferConverter.transform.element[i] = size[i] * transform[i];
+	}
+	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
+	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
+
+	inverseAndUpload(gfx);
 }

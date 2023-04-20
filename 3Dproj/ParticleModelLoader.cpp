@@ -1,5 +1,6 @@
 #include "ParticleModelLoader.h"
 #include <iostream>
+#include "Random.h"
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat)
 {
@@ -230,7 +231,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	}
 	
 	//load Bones
-	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, vertecies.size());
+	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size());
 	
 	//load Animation
 	loadAnimation(scene, animation);
