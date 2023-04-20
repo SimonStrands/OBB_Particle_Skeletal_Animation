@@ -15,6 +15,9 @@ struct OBBSkeletonOBBBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element;
 	}projection;
+	struct{
+		int element;
+	}nrOfBones;
 };
 
 
@@ -26,15 +29,18 @@ public:
 	void setTransform(int id, const DirectX::XMMATRIX transform);
 	std::vector<DirectX::XMMATRIX>& getTransforms();
 	void updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer);
+	void update(Graphics*& gfx);
 	void draw(Graphics*& gfx);
-	ID3D11Buffer* getSkeletalTransformConstBuffer();
+	ID3D11Buffer*& getSkeletalTransformConstBuffer();
+	void inverseAndUpload(Graphics*& gfx);
 
 private:
 	
 	std::vector<DirectX::XMMATRIX> transform;//rotation position
 	std::vector<DirectX::XMMATRIX> size;//the size of the OBB
 	int nrOfBones;
-	void update(Graphics*& gfx);
+	void inverseTransforms();
+	
 private:
 	std::vector<point> verteciesPoints;
 	std::vector<DWORD> indecies;
@@ -42,5 +48,6 @@ private:
 	ID3D11Buffer* indeciesBuffer;
 	ID3D11Buffer* constantBuffer;
 	OBBSkeletonOBBBuffer constBufferConverter;
+	OBBSkeletonOBBBuffer lastFrameConstBufferConverter;
 	
 };

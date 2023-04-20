@@ -11,8 +11,8 @@
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : CB{
 	struct{
-		float element;
-	}dt;
+		DirectX::XMMATRIX element;
+	}Transformations;
 	struct{
 		float element;
 	}time;
@@ -53,7 +53,6 @@ private:
 	SkeletonConstantBuffer SkeletonConstBufferConverter;
 	ID3D11Buffer* SkeletonConstBuffer;
 	Animation animation;
-	DirectX::XMMATRIX GlobalInverseTransform;
 
 	//2 textures for the particle one diffuse and one normal map
 	ID3D11ShaderResourceView* diffuseTexture;
@@ -63,7 +62,7 @@ private:
 	ID3D11ComputeShader* cUpdate;
 	ID3D11UnorderedAccessView* billUAV;
 	ID3D11Buffer* computeShaderConstantBuffer;
-	ComputerShaderParticleModelConstBuffer CSConstBuffer;
+	//ComputerShaderParticleModelConstBuffer CSConstBuffer;
 
 	void getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform = DirectX::XMMATRIX(
 		1,0,0,0,
@@ -71,6 +70,7 @@ private:
 		0,0,1,0,
 		0,0,0,1
 	));
+	std::pair<unsigned int, float> getTimeFraction(const std::vector<float>& times, float& dt);
 
 	//should never be 0
 	float time = 0.000001f;
