@@ -1,10 +1,9 @@
 #include "SkeletalData.hlsli"
-//cbuffer Time
-//{
-//    float dt;
-//    float time;
-//    float2 padding;
-//};
+cbuffer Time
+{
+    float dt;
+    float2 padding;
+};
 
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
@@ -60,11 +59,68 @@ float4x4 extract_rotation_matrix(float4x4 m)
     return m;
 }
 */
+#define RANDOM_IA 16807
+#define RANDOM_IM 2147483647
+#define RANDOM_AM (1.0f/float(RANDOM_IM))
+#define RANDOM_IQ 127773u
+#define RANDOM_IR 2836
+#define RANDOM_MASK 123459876
 
+struct NumberGenerator {
+    int seed; // Used to generate values.
+
+    // Returns the current random float.
+    float GetCurrentFloat() {
+        Cycle();
+        return RANDOM_AM * seed;
+    }
+
+    // Returns the current random int.
+    int GetCurrentInt() {
+        Cycle();
+        return seed;
+    }
+
+    // Generates the next number in the sequence.
+    void Cycle() {
+        seed ^= RANDOM_MASK;
+        int k = seed / RANDOM_IQ;
+        seed = RANDOM_IA * (seed - k * RANDOM_IQ) - RANDOM_IR * k;
+
+        if (seed < 0)
+            seed += RANDOM_IM;
+
+        seed ^= RANDOM_MASK;
+    }
+
+    // Cycles the generator based on the input count. Useful for generating a thread unique seed.
+    // PERFORMANCE - O(N)
+    void Cycle(const uint _count) {
+        for (uint i = 0; i < _count; ++i)
+            Cycle();
+    }
+
+    // Returns a random float within the input range.
+    float GetRandomFloat(const float low, const float high) {
+        float v = GetCurrentFloat();
+        return low * (1.0f - v) + high * v;
+    }
+
+    // Sets the seed
+    void SetSeed(const uint value) {
+        seed = int(value);
+        Cycle();
+    }
+};
+const float3 downVec = float3(0, -1, 0);
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    
+    NumberGenerator test;
+    test.SetSeed(34);
+    //test.seed = 6;
+
+    //float new RandomNumber = randmobubmber * Tid.x
     static const float drag = 0.1f;
     static const float force = 0.9f;
     
@@ -81,11 +137,27 @@ void main( uint3 DTid : SV_DispatchThreadID )
     //currColor = float4(0, 0, 1, 1);
     float4 nPos;
 
+    currPos = float3(currPos + float3(0, -0.001, 0));
+    currColor = float4(0, 0.3, 0.7, 1);
+    if (currPos.y <= 0)
+    {
+        
+        float a = test.GetRandomFloat(0,nrOfBones);
+        //currPos = 
+        float x = Transformations[a][0][3];
+        float y = Transformations[a][1][3];
+        float z = Transformations[a][2][3];
+        currPos = float3(x, y, z);
+        //currPos.y = 6;
+    }
+
+
     for (min12int i = 0; i < nrOfBones; i++)
     {
         //CHECK IF POINTS IS INSIDE A BONE OR NOT
         nPos = mul(float4(currPos, 1.0f), Transformations[i]);
-        
+
+
         // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
         if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
@@ -93,9 +165,10 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
             currPos = float3(currPos + mul(nPos, DeltaTransformations[i]).xyz);
             currColor = float4(0, 1, 0, 1);
-
+            test.seed = nPos.z;
             break;
         }
+   
     }
     
     /////////////////////////////////////////////////

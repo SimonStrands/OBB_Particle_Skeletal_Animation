@@ -105,7 +105,11 @@ void loadBoneDataToVertecies(
 
 			}
 		}
-		#endif 
+		#endif
+		#ifndef TRADITIONALSKELETALANIMATION
+
+		#endif
+
 	}
 	#ifdef TRADITIONALSKELETALANIMATION
 	//normalize weights to make all weights sum 1
