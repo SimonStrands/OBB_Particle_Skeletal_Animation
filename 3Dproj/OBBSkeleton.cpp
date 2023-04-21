@@ -148,14 +148,6 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
-	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
-	this->constBufferConverterPrev = this->constBufferConverter;
-
-	//plan is to send all delta matrices into shader
-	//only delta transform matrix is needed so the delta buffer can be omitted 
-	//save deltaElements and send them into some kind of buffer, either modify OBBSkeletonOBBBuffer or and dedicated buffer
-	//since the constBufferConverterPrev now is sent to shader, we use it's delta slot
-	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverterPrev.deltaTransform.element);
 
 	
 	//update constantBuffer
@@ -164,6 +156,15 @@ void OBBSkeletonDebug::update(Graphics*& gfx)
 	}
 	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
+
+	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
+	this->constBufferConverterPrev = this->constBufferConverter;
+
+	//plan is to send all delta matrices into shader
+	//only delta transform matrix is needed so the delta buffer can be omitted 
+	//save deltaElements and send them into some kind of buffer, either modify OBBSkeletonOBBBuffer or and dedicated buffer
+	//since the constBufferConverterPrev now is sent to shader, we use it's delta slot
+	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverterPrev.deltaTransform.element);
 
 	inverseAndUpload(gfx);
 }

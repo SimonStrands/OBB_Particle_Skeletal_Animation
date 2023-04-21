@@ -89,13 +89,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
         // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
         if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
-
-             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-             currColor = float4(0, 1, 0, 1);
-             
- 
             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-            currPos = float3(currPos + mul(mul(nPos, DeltaTransformations[i]), 0.99f).xyz);
+            currColor = float4(0, 1, 0, 1);
+  
+            //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
+            currPos = float3(currPos + mul(nPos, mul(DeltaTransformations[i], 0.9855f)).xyz);
             break;
         }
     }
