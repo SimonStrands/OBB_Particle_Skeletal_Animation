@@ -145,16 +145,13 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
 	
 	float x, y, z;
-	//while (!sizesFile.eof())
-	//{
-	//	sizesFile >> x;
-	//	sizesFile >> y;
-	//	sizesFile >> z;
-	//	sizes.push_back(DirectX::XMFLOAT3(x,y,z));
-	//}
-
-	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
-	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
+	while (!sizesFile.eof())
+	{
+		sizesFile >> x;
+		sizesFile >> y;
+		sizesFile >> z;
+		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
+	}
 
 	sizesFile.close();
 	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
@@ -180,11 +177,8 @@ ParticleModel::~ParticleModel()
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
 
-	time += dt * animation.tick * 0.1f;
-	if(!getkey('P')){
-		getPose(rootJoint, animation, time);
-
-
+	time += dt * animation.tick;
+	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
@@ -216,7 +210,6 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 
 	OBBSkeleton->inverseAndUpload(gfx);
     #endif
-	}
 }
 
 void ParticleModel::draw(Graphics*& gfx)

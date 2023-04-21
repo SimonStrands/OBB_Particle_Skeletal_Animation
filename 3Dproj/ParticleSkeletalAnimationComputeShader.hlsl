@@ -78,7 +78,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float3 currentVelocity = float3(particleData[DTid.x * 10 + 7], particleData[DTid.x * 10 + 8], particleData[DTid.x * 10 + 9]);
     
     ///////////////REAL CODE/////////////////////////
-    currColor = float4(0, 0, 1, 1);
+    //currColor = float4(0, 0, 1, 1);
     float4 nPos;
 
     for (min12int i = 0; i < nrOfBones; i++)
