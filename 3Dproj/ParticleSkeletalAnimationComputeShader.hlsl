@@ -92,7 +92,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
             currPos = float3(currPos + mul(nPos, DeltaTransformations[i]).xyz);
             currColor = float4(0, 1, 0, 1);
-            break;
         }
     }
     
