@@ -229,6 +229,9 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		aiVector3D vertex = mesh->mVertices[v];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.7f));
 	}
+	//for(unsigned int v = 0; v < mesh->mNumVertices; v++){
+	//	vertecies.push_back(VolumetricVertex(0, 0, v * 0.2f, 0, 0, 1, 0.7f));
+	//}
 	
 	//load Bones
 	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size());

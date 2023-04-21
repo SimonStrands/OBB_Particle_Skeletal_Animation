@@ -152,6 +152,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		sizesFile >> z;
 		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
 	}
+
 	sizesFile.close();
 	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
 	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
@@ -175,8 +176,8 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick * 0.2f;
-	//time = 14.5f;
+
+	time += dt * animation.tick;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -199,8 +200,10 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 	
-	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16, 1, 1);//calc how many groups we need beacuse right now I do not know
-	
+	//if(getkey('P')){
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies / 16, 1, 1);//calc how many groups we need beacuse right now I do not know
+	//}
+
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);

@@ -76,23 +76,23 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float3 currPos = float3(particleData[DTid.x * 10 + 0], particleData[DTid.x * 10 + 1], particleData[DTid.x * 10 + 2]);
     float4 currColor = float4(particleData[DTid.x * 10 + 3], particleData[DTid.x * 10 + 4], particleData[DTid.x * 10 + 5], particleData[DTid.x * 10 + 6]);
     float3 currentVelocity = float3(particleData[DTid.x * 10 + 7], particleData[DTid.x * 10 + 8], particleData[DTid.x * 10 + 9]);
-
-
+    
     ///////////////REAL CODE/////////////////////////
-    currColor = float4(0, 0, 1, 1);
-    float3 nPos;
+    //currColor = float4(0, 0, 1, 1);
+    float4 nPos;
 
     for (min12int i = 0; i < nrOfBones; i++)
     {
         //CHECK IF POINTS IS INSIDE A BONE OR NOT
-        nPos = mul(float4(currPos, 1.0f), Transformations[i]).xyz;
+        nPos = mul(float4(currPos, 1.0f), Transformations[i]);
         
         // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
-        if ((abs(nPos.x) < 0.5) && (nPos.y < 1 && nPos.y > 0) && (abs(nPos.z) < 0.5))
+        if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
-             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-             currColor = float4(0, 1, 0, 1);
-             break;
+            //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
+            currPos = float3(currPos + mul(nPos, DeltaTransformations[i]).xyz);
+            currColor = float4(0, 1, 0, 1);
+            break;
         }
     }
     

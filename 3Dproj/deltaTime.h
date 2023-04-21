@@ -10,5 +10,6 @@ public:
 	DeltaTime();
 	void restartClock();
 	double dt()const;
+	void setDeltaTime(double dt);
 
 };
