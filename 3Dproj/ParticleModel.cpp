@@ -197,11 +197,12 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	#ifndef TRADITIONALSKELETALANIMATION
 	
 	OBBSkeleton->updateObbPosition(rootJoint, SkeletonConstBufferConverter);
-	OBBSkeleton->update(gfx);
+	OBBSkeleton->update(gfx, dt);
 	
 	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
 	
+	gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &OBBSkeleton->getSkeletalTimeConstBuffer());
 	gfx->get_IMctx()->CSSetConstantBuffers(1, 1, &OBBSkeleton->getSkeletalTransformConstBuffer());
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);

@@ -1,8 +1,9 @@
 #include "SkeletalData.hlsli"
-cbuffer Time
+
+cbuffer Time : register(b0)
 {
     float dt;
-    float2 padding;
+    float3 padding;
 };
 
 //need to check padding and other
@@ -18,61 +19,15 @@ cbuffer OBBSkeleton : register(b1)
 RWBuffer<float> particleData;
 
 //https://gist.github.com/mattatz/86fff4b32d198d0928d0fa4ff32cf6fa
-/*
-float4x4 extract_rotation_matrix(float4x4 m)
-{
-    float sx = length(float3(m[0][0], m[0][1], m[0][2]));
-    float sy = length(float3(m[1][0], m[1][1], m[1][2]));
-    float sz = length(float3(m[2][0], m[2][1], m[2][2]));
 
-    // if determine is negative, we need to invert one scale
-    float det = determinant(m);
-    if (det < 0)
-    {
-        sx = -sx;
-    }
-
-    float invSX = 1.0 / sx;
-    float invSY = 1.0 / sy;
-    float invSZ = 1.0 / sz;
-
-    m[0][0] *= invSX;
-    m[0][1] *= invSX;
-    m[0][2] *= invSX;
-    m[0][3] = 0;
-
-    m[1][0] *= invSY;
-    m[1][1] *= invSY;
-    m[1][2] *= invSY;
-    m[1][3] = 0;
-
-    m[2][0] *= invSZ;
-    m[2][1] *= invSZ;
-    m[2][2] *= invSZ;
-    m[2][3] = 0;
-
-    m[3][0] = 0;
-    m[3][1] = 0;
-    m[3][2] = 0;
-    m[3][3] = 1;
-
-    return m;
-}
-*/
-#define RANDOM_IA 16807
-#define RANDOM_IM 2147483647
-#define RANDOM_AM (1.0f/float(RANDOM_IM))
-#define RANDOM_IQ 127773u
-#define RANDOM_IR 2836
-#define RANDOM_MASK 123459876
 
 const float3 downVec = float3(0, -1, 0);
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
-{
+{   
     //float new RandomNumber = randmobubmber * Tid.x
-    static const float drag = 0.1f;
-    static const float force = 0.9f;
+    static const float drag = 0.9f;
+    static const float force = 1.00001f;
     
     //pos 3
     //color 4
@@ -87,21 +42,24 @@ void main( uint3 DTid : SV_DispatchThreadID )
     //currColor = float4(0, 0, 1, 1);
     float4 nPos;
 
-    currPos = float3(currPos + float3(0, -0.001, 0));
-    currColor = float4(0, 0.3, 0.7, 1);
-    if (currPos.y <= 0)
-    {
-        
-        float a = test.GetRandomFloat(0,nrOfBones);
-        //currPos = 
-        float x = Transformations[a][0][3];
-        float y = Transformations[a][1][3];
-        float z = Transformations[a][2][3];
-        currPos = float3(x, y, z);
-        //currPos.y = 6;
-    }
+    //currPos = float3(currPos + float3(0, -0.001, 0));
+    //currColor = float4(0, 0.3, 0.7, 1);
+    //if (currPos.y <= 0)
+    //{
+    //    
+    //    float a = test.GetRandomFloat(0,nrOfBones);
+    //    //currPos = 
+    //    float x = Transformations[a][0][3];
+    //    float y = Transformations[a][1][3];
+    //    float z = Transformations[a][2][3];
+    //    currPos = float3(x, y, z);
+    //    //currPos.y = 6;
+    //}
 
 
+    int nrOfBonesEffected = 0;
+    float3 velocities[3];
+    
     for (min12int i = 0; i < nrOfBones; i++)
     {
         //CHECK IF POINTS IS INSIDE A BONE OR NOT
@@ -113,12 +71,42 @@ void main( uint3 DTid : SV_DispatchThreadID )
         {
             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
 
-            currPos = float3(currPos + mul(nPos, DeltaTransformations[i]).xyz);
+            velocities[nrOfBonesEffected] = mul(nPos, DeltaTransformations[i]).xyz;
+            nrOfBonesEffected++;
+            if (nrOfBonesEffected > 2)
+            {
+                break;
+            }
             currColor = float4(0, 1, 0, 1);
 
         }
    
     }
+    if (nrOfBonesEffected > 0)
+    { 
+        currentVelocity = float3(0, 0, 0);
+        for (int i = 0; i < nrOfBonesEffected; i++)
+        {
+            currentVelocity += velocities[i] * force;
+        }
+        currentVelocity *= (1 / nrOfBonesEffected);
+    }
+    else
+    {
+        if (currColor.y == 1)
+        {
+            currColor = float4(1, 0, 0, 1);
+        }
+        if (currColor.x == 1)
+        {
+            currentVelocity += float3(0, -9.81, 0) * dt * dt;
+        }
+    }
+
+    currentVelocity *= (1 - (drag * dt));
+    
+    currPos += currentVelocity;
+    
     
     /////////////////////////////////////////////////
 
