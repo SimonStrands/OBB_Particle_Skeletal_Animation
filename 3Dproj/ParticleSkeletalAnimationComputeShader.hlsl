@@ -135,14 +135,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
     else
     {
         currentVelocity *= (1 - (drag * dt));
-        //if (currColor.y == 1)
-        //{
-            currColor = float4(1, 0, 0, 1);
-        //}
-        //if (currColor.x == 1)
-        //{
-            currentVelocity += float3(0, -9.81, 0) * dt * dt;
-        //}
+   
+        currColor = float4(1, 0, 0, 1);
+ 
+        currentVelocity += float3(0, -9.81, 0) * dt * dt;
+        
     }
     
     currPos += currentVelocity;
