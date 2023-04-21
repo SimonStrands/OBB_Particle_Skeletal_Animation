@@ -19,3 +19,8 @@ double DeltaTime::dt()const
 {
 	return this->pDt;
 }
+
+void DeltaTime::setDeltaTime(double dt)
+{
+	pDt = dt;
+}

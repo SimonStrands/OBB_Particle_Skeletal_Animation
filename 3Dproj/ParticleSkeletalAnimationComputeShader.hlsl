@@ -90,7 +90,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
         if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-            currPos = float3(currPos + mul(mul(nPos, DeltaTransformations[i]), 0.99f).xyz);
+            currPos = float3(currPos + mul(nPos, DeltaTransformations[i]).xyz);
+            currColor = float4(0, 1, 0, 1);
+            break;
         }
     }
     

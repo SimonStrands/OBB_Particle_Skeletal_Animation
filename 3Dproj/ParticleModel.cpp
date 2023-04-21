@@ -154,7 +154,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//}
 
 	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
-	sizes.push_back(DirectX::XMFLOAT3(1.8,0.3,0.3));
+	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
 
 	sizesFile.close();
 	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
@@ -179,10 +179,11 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	//if(getkey('P')){
-		time += dt * animation.tick * 0.1f;
-	//}
-	getPose(rootJoint, animation, time);
+
+	time += dt * animation.tick * 0.1f;
+	if(!getkey('P')){
+		getPose(rootJoint, animation, time);
+
 
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -215,6 +216,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 
 	OBBSkeleton->inverseAndUpload(gfx);
     #endif
+	}
 }
 
 void ParticleModel::draw(Graphics*& gfx)
