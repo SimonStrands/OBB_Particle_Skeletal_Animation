@@ -63,6 +63,7 @@ private:
 	std::vector<DirectX::XMMATRIX> size;//the size of the OBB
 	int nrOfBones;
 	void inverseTransforms();
+	void inverseDeltaTransforms();
 	
 private:
 	std::vector<point> verteciesPoints;
