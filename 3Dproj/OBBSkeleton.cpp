@@ -1,6 +1,7 @@
 #include "OBBSkeleton.h"
 #include <iostream>
 #include "CreateBuffer.h"
+#include "Random.h"
 
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
 {
@@ -158,6 +159,8 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
 	constBufferConverterTime.dt.element = dt;
+	int randNr = RandomNumber(0, int(transform.size()));
+	constBufferConverterTime.random.element = randNr;
 	D3D11_MAPPED_SUBRESOURCE resource;
     gfx->get_IMctx()->Map(constantBufferTime, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
     memcpy(resource.pData, &constBufferConverterTime, sizeof(OBBSkeletonOBBBufferTime));

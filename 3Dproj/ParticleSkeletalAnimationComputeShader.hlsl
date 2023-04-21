@@ -3,7 +3,8 @@
 cbuffer Time : register(b0)
 {
     float dt;
-    float3 padding;
+    float2 padding;
+    int random;
 };
 
 //need to check padding and other
@@ -25,9 +26,9 @@ const float3 downVec = float3(0, -1, 0);
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {   
-    //float new RandomNumber = randmobubmber * Tid.x
+    //int newRandomNumber = random * DTid.x;
     static const float drag = 0.9f;
-    static const float force = 1.00001f;
+    static const float force = 1.f;
     
     //pos 3
     //color 4
@@ -44,17 +45,17 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
     //currPos = float3(currPos + float3(0, -0.001, 0));
     //currColor = float4(0, 0.3, 0.7, 1);
-    //if (currPos.y <= 0)
-    //{
+    if (currPos.y <= 0)
+    {
     //    
     //    float a = test.GetRandomFloat(0,nrOfBones);
     //    //currPos = 
-    //    float x = Transformations[a][0][3];
-    //    float y = Transformations[a][1][3];
-    //    float z = Transformations[a][2][3];
-    //    currPos = float3(x, y, z);
-    //    //currPos.y = 6;
-    //}
+        float x = Transformations[random][0][3];
+        float y = Transformations[random][1][3];
+        float z = Transformations[random][2][3];
+        currPos = float3(x, y, z);
+        currPos.x = 6;
+    }
 
 
     int nrOfBonesEffected = 0;
@@ -64,7 +65,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
     {
         //CHECK IF POINTS IS INSIDE A BONE OR NOT
         nPos = mul(float4(currPos, 1.0f), Transformations[i]);
-
 
         // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
         if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
@@ -91,17 +91,17 @@ void main( uint3 DTid : SV_DispatchThreadID )
         }
         currentVelocity *= (1 / nrOfBonesEffected);
     }
-    else
-    {
-        if (currColor.y == 1)
-        {
-            currColor = float4(1, 0, 0, 1);
-        }
-        if (currColor.x == 1)
-        {
-            currentVelocity += float3(0, -9.81, 0) * dt * dt;
-        }
-    }
+    //else
+    //{
+    //    if (currColor.y == 1)
+    //    {
+    //        currColor = float4(1, 0, 0, 1);
+    //    }
+    //    if (currColor.x == 1)
+    //    {
+            currentVelocity += float3(0, -4.0/*-9.81*/, 0) * dt * dt;
+    //    }
+    //}
 
     currentVelocity *= (1 - (drag * dt));
     
