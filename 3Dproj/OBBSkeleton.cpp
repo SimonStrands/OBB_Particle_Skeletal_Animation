@@ -4,6 +4,7 @@
 
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
 {
+	constBufferConverterTime.dt.element = 0;
 	if(nrOfBones != sizes.size()){
 		std::cout << "not the same size" << std::endl;
 	}
@@ -46,6 +47,7 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
     };
 	CreateVertexBuffer(gfx->getDevice(), verteciesPoints, vertexBuffer, false);
 	CreateVertexBuffer(gfx->getDevice(), indecies, indeciesBuffer, true);
+	CreateConstBuffer(gfx, constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
 	CreateConstBuffer(gfx, constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverter);
 }
 
@@ -54,6 +56,8 @@ OBBSkeletonDebug::~OBBSkeletonDebug()
 	vertexBuffer->Release();
 	indeciesBuffer->Release();
 	constantBuffer->Release();
+	constantBufferTime->Release();
+	
 }
 
 void OBBSkeletonDebug::setTransformations(std::vector<DirectX::XMMATRIX>& transform)
@@ -118,6 +122,11 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 	return constantBuffer;
 }
 
+ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTimeConstBuffer()
+{
+	return constantBufferTime;
+}
+
 void OBBSkeletonDebug::inverseTransforms()
 {
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
@@ -145,8 +154,15 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
     ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 }
 
-void OBBSkeletonDebug::update(Graphics*& gfx)
+void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
+	constBufferConverterTime.dt.element = dt;
+	D3D11_MAPPED_SUBRESOURCE resource;
+    gfx->get_IMctx()->Map(constantBufferTime, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+    memcpy(resource.pData, &constBufferConverterTime, sizeof(OBBSkeletonOBBBufferTime));
+    gfx->get_IMctx()->Unmap(constantBufferTime, 0);
+    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
 	this->constBufferConverterPrev = this->constBufferConverter;
 	
 	//update constantBuffer

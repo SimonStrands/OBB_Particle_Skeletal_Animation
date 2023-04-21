@@ -5,6 +5,15 @@
 #include "point.h"
 #include "ParticleModelLoader.h"
 
+struct OBBSkeletonOBBBufferTime : CB {
+	struct{
+		float element;
+	}dt;
+	struct{
+		float pad[3];
+	}padding;
+};
+
 struct OBBSkeletonOBBBuffer : CB{
 	struct{
 		DirectX::XMMATRIX element[70];
@@ -28,19 +37,6 @@ struct OBBSkeletonOBBBuffer : CB{
 			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
 		return temp;
 	}
-
-	//void operator=(const OBBSkeletonOBBBuffer& other)
-	//{
-	//	for (int i = 0; i < this->nrOfBones.element; i++)
-	//		this->transform.element[i] = other.transform.element[i];
-	//	
-	//	this->view.element = other.view.element; 
-	//	this->projection.element = other.projection.element;
-	//	
-	//	this->nrOfBones.element = other.nrOfBones.element;
-	//}
-
-
 };
 
 
@@ -52,9 +48,10 @@ public:
 	void setTransform(int id, const DirectX::XMMATRIX transform);
 	std::vector<DirectX::XMMATRIX>& getTransforms();
 	void updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer);
-	void update(Graphics*& gfx);
+	void update(Graphics*& gfx, float dt);
 	void draw(Graphics*& gfx);
 	ID3D11Buffer*& getSkeletalTransformConstBuffer();
+	ID3D11Buffer*& getSkeletalTimeConstBuffer();
 	void inverseAndUpload(Graphics*& gfx);
 
 private:
@@ -71,9 +68,10 @@ private:
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indeciesBuffer;
 	ID3D11Buffer* constantBuffer;
-	OBBSkeletonOBBBuffer constBufferConverter;
+	ID3D11Buffer* constantBufferTime;
 
+	OBBSkeletonOBBBufferTime constBufferConverterTime;
+	OBBSkeletonOBBBuffer constBufferConverter;
 	OBBSkeletonOBBBuffer constBufferConverterPrev;
-	//OBBSkeletonOBBBuffer constBufferConverterDelta;
 
 };
