@@ -1,6 +1,7 @@
 #include "OBBSkeleton.h"
 #include <iostream>
 #include "CreateBuffer.h"
+#include "Random.h"
 
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
 {
@@ -129,6 +130,7 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTimeConstBuffer()
 
 void OBBSkeletonDebug::inverseTransforms()
 {
+
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
 		constBufferConverterPrev.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverterPrev.transform.element[i]);
 	}
@@ -157,6 +159,8 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
 	constBufferConverterTime.dt.element = dt;
+	int randNr = RandomNumber(0, int(transform.size()));
+	constBufferConverterTime.random.element = randNr;
 	D3D11_MAPPED_SUBRESOURCE resource;
     gfx->get_IMctx()->Map(constantBufferTime, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
     memcpy(resource.pData, &constBufferConverterTime, sizeof(OBBSkeletonOBBBufferTime));
@@ -174,9 +178,14 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 
 	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
 
+
+
 	//plan is to send all delta matrices into shader
 	//only delta transform matrix is needed so the delta buffer can be omitted 
 	//save deltaElements and send them into some kind of buffer, either modify OBBSkeletonOBBBuffer or and dedicated buffer
+
+	//since the constBufferConverterPrev now is sent to shader, we use it's delta slot
+
 	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverterPrev.deltaTransform.element);
 
 	inverseAndUpload(gfx);
