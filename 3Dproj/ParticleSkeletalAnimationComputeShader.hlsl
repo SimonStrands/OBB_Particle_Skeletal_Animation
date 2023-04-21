@@ -78,7 +78,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float3 currentVelocity = float3(particleData[DTid.x * 10 + 7], particleData[DTid.x * 10 + 8], particleData[DTid.x * 10 + 9]);
     
     ///////////////REAL CODE/////////////////////////
-    currColor = float4(0, 0, 1, 1);
+    //currColor = float4(0, 0, 1, 1);
     float4 nPos;
 
     for (min12int i = 0; i < nrOfBones; i++)
@@ -90,10 +90,10 @@ void main( uint3 DTid : SV_DispatchThreadID )
         if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
+
+            currPos = float3(currPos + mul(nPos, DeltaTransformations[i]).xyz);
             currColor = float4(0, 1, 0, 1);
-  
-            //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-            currPos = float3(currPos + mul(nPos, mul(DeltaTransformations[i], 0.9855f)).xyz);
+
             break;
         }
     }
