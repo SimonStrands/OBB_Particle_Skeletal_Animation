@@ -76,8 +76,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float3 currPos = float3(particleData[DTid.x * 10 + 0], particleData[DTid.x * 10 + 1], particleData[DTid.x * 10 + 2]);
     float4 currColor = float4(particleData[DTid.x * 10 + 3], particleData[DTid.x * 10 + 4], particleData[DTid.x * 10 + 5], particleData[DTid.x * 10 + 6]);
     float3 currentVelocity = float3(particleData[DTid.x * 10 + 7], particleData[DTid.x * 10 + 8], particleData[DTid.x * 10 + 9]);
-
-
+    
     ///////////////REAL CODE/////////////////////////
     currColor = float4(0, 0, 1, 1);
     float4 nPos;
@@ -88,11 +87,10 @@ void main( uint3 DTid : SV_DispatchThreadID )
         nPos = mul(float4(currPos, 1.0f), Transformations[i]);
         
         // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
-        if ((abs(nPos.x) < 0.5) && (nPos.y < 1 && nPos.y > 0) && (abs(nPos.z) < 0.5))
+        if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
             //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-            currPos = currPos + mul(nPos, DeltaTransformations[i]).xyz;
-
+            currPos = float3(currPos + mul(mul(nPos, DeltaTransformations[i]), 0.99f).xyz);
         }
     }
     

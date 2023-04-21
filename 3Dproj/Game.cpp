@@ -25,7 +25,7 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	
 	gfx->takeIM(&this->UIManager);
 	mus = new Mouse(gfx->getWH());
-	camera = new Camera(gfx, mus, vec3(0,0,0), vec3(1,0,0));
+	camera = new Camera(gfx, mus, vec3(-10,0,0), vec3(1,0,0));
 	camera->setData();
 	
 	setUpObject();

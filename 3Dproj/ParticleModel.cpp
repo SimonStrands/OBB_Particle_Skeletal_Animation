@@ -154,7 +154,7 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//}
 
 	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
-	sizes.push_back(DirectX::XMFLOAT3(0.8,0.3,0.3));
+	sizes.push_back(DirectX::XMFLOAT3(1.8,0.3,0.3));
 
 	sizesFile.close();
 	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
@@ -179,9 +179,11 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick * 0.1f;
-	//time = 14.5f;
+	//if(getkey('P')){
+		time += dt * animation.tick * 0.1f;
+	//}
 	getPose(rootJoint, animation, time);
+
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
 	gfx->get_IMctx()->Map(SkeletonConstBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
@@ -203,8 +205,10 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 	
-	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies/16, 1, 1);//calc how many groups we need beacuse right now I do not know
-	
+	//if(getkey('P')){
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies / 16, 1, 1);//calc how many groups we need beacuse right now I do not know
+	//}
+
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
