@@ -175,7 +175,7 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
-	time += dt * animation.tick * 0.2f;
+	time += dt * animation.tick * 0.1f;
 	//time = 14.5f;
 	getPose(rootJoint, animation, time);
 	

@@ -121,8 +121,8 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTransformConstBuffer()
 void OBBSkeletonDebug::inverseTransforms()
 {
 
-	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
-		constBufferConverter.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverter.transform.element[i]);
+	for(unsigned int i = 0; i < this->constBufferConverterPrev.nrOfBones.element; i++){
+		this->constBufferConverterPrev.transform.element[i] = DirectX::XMMatrixInverse(nullptr, this->constBufferConverterPrev.transform.element[i]);
 	}
 }
 
@@ -132,20 +132,21 @@ void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
 
 	D3D11_MAPPED_SUBRESOURCE resource;
     gfx->get_IMctx()->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-    memcpy(resource.pData, &constBufferConverter, sizeof(OBBSkeletonOBBBuffer));
+    memcpy(resource.pData, &this->constBufferConverterPrev, sizeof(OBBSkeletonOBBBuffer));
     gfx->get_IMctx()->Unmap(constantBuffer, 0);
     ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 }
 
 void OBBSkeletonDebug::update(Graphics*& gfx)
 {
-	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverterPrev - this->constBufferConverter;
+	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
 	this->constBufferConverterPrev = this->constBufferConverter;
 
 	//plan is to send all delta matrices into shader
 	//only delta transform matrix is needed so the delta buffer can be omitted 
 	//save deltaElements and send them into some kind of buffer, either modify OBBSkeletonOBBBuffer or and dedicated buffer
-	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverter.deltaTransform.element);
+	//since the constBufferConverterPrev now is sent to shader, we use it's delta slot
+	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), this->constBufferConverterPrev.deltaTransform.element);
 	
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
