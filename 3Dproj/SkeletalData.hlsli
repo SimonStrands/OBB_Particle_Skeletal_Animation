@@ -1,1 +1,1 @@
-static const int MAXNUMBEROFBONES = 70;
+static const int MAXNUMBEROFBONES = 55;

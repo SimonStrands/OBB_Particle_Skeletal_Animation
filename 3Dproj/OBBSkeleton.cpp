@@ -18,8 +18,8 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 			0, 0, 0, 1
 		));
 	}
-	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
-	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
+	constBufferConverterDebugDraw.projection.element = gfx->getVertexconstbuffer()->projection.element;
+	constBufferConverterDebugDraw.view.element = gfx->getVertexconstbuffer()->view.element;
 
 	this->constBufferConverterPrev = this->constBufferConverter;
 
@@ -46,10 +46,12 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 		3,2,7,
 		6,7,2
     };
+
 	CreateVertexBuffer(gfx->getDevice(), verteciesPoints, vertexBuffer, false);
 	CreateVertexBuffer(gfx->getDevice(), indecies, indeciesBuffer, true);
+	CreateConstBuffer(gfx, constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverterPrev);
 	CreateConstBuffer(gfx, constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
-	CreateConstBuffer(gfx, constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverter);
+	CreateConstBuffer(gfx, constantBufferDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw), &constBufferConverterDebugDraw);
 }
 
 OBBSkeletonDebug::~OBBSkeletonDebug()
@@ -106,7 +108,7 @@ void OBBSkeletonDebug::draw(Graphics*& gfx)
 	
 	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gfx->get_IMctx()->IASetInputLayout(gfx->getInputLayout()[1]);
-	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &constantBuffer);
+	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &constantBufferDebugDraw);
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
 	gfx->get_IMctx()->IASetIndexBuffer(indeciesBuffer, DXGI_FORMAT_R32_UINT, offset);
 	//draw
@@ -130,55 +132,40 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTimeConstBuffer()
 
 void OBBSkeletonDebug::inverseTransforms()
 {
-
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
-		constBufferConverterPrev.transform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverterPrev.transform.element[i]);
+		constBufferConverterPrev.InverseTransform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverterPrev.transform.element[i]);
 	}
 }
 
 void OBBSkeletonDebug::inverseDeltaTransforms()
 {
+	//this is not needed
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
 		constBufferConverterPrev.deltaTransform.element[i] = DirectX::XMMatrixInverse(nullptr, constBufferConverterPrev.deltaTransform.element[i]);
-		//constBufferConverter.deltaTransform.element[i] = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr,constBufferConverter.deltaTransform.element[i]));
 	}
 }
 
-
-void OBBSkeletonDebug::inverseAndUpload(Graphics*& gfx)
-{
-	inverseTransforms();
-
-	D3D11_MAPPED_SUBRESOURCE resource;
-    gfx->get_IMctx()->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-    memcpy(resource.pData, &constBufferConverterPrev, sizeof(OBBSkeletonOBBBuffer));
-    gfx->get_IMctx()->Unmap(constantBuffer, 0);
-    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-}
 
 void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
 	constBufferConverterTime.dt.element = dt;
 	int randNr = RandomNumber(0, int(transform.size()));
 	constBufferConverterTime.random.element = randNr;
-	D3D11_MAPPED_SUBRESOURCE resource;
-    gfx->get_IMctx()->Map(constantBufferTime, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-    memcpy(resource.pData, &constBufferConverterTime, sizeof(OBBSkeletonOBBBufferTime));
-    gfx->get_IMctx()->Unmap(constantBufferTime, 0);
-    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
 	this->constBufferConverterPrev = this->constBufferConverter;
 	
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
 		constBufferConverter.transform.element[i] = size[i] * transform[i];
+		constBufferConverterDebugDraw.transform.element[i] = size[i] * transform[i];
 	}
-	constBufferConverter.projection.element = gfx->getVertexconstbuffer()->projection.element;
-	constBufferConverter.view.element = gfx->getVertexconstbuffer()->view.element;
+
+	constBufferConverterDebugDraw.projection.element = gfx->getVertexconstbuffer()->projection.element;
+	constBufferConverterDebugDraw.view.element = gfx->getVertexconstbuffer()->view.element;
+
+	inverseTransforms();
 
 	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
-
-
 
 	//plan is to send all delta matrices into shader
 	//only delta transform matrix is needed so the delta buffer can be omitted 
@@ -188,5 +175,19 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 
 	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverterPrev.deltaTransform.element);
 
-	inverseAndUpload(gfx);
+	D3D11_MAPPED_SUBRESOURCE resource;
+    gfx->get_IMctx()->Map(constantBufferTime, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+    memcpy(resource.pData, &constBufferConverterTime, sizeof(OBBSkeletonOBBBufferTime));
+    gfx->get_IMctx()->Unmap(constantBufferTime, 0);
+    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	gfx->get_IMctx()->Map(constantBufferDebugDraw, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+    memcpy(resource.pData, &constBufferConverterDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw));
+    gfx->get_IMctx()->Unmap(constantBufferDebugDraw, 0);
+    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+    gfx->get_IMctx()->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+    memcpy(resource.pData, &constBufferConverterPrev, sizeof(OBBSkeletonOBBBuffer));
+    gfx->get_IMctx()->Unmap(constantBuffer, 0);
+    ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 }
