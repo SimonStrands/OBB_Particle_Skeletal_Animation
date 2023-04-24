@@ -38,20 +38,25 @@ void main( uint3 DTid : SV_DispatchThreadID )
  
     //currColor = float4(0, 0, 1, 1);
     
-    if (currPos.y <= 0)
+    if (currPos.y <= 0 && currColor.z == 1.f)
     {
         float4x4 temp = Transformations[random];
-
-        
+        float sx = 1.f;// length(float3(temp[0][0], temp[0][1], temp[0][2]));
+        float sy = 1.f;// length(float3(temp[1][0], temp[1][1], temp[1][2]));
+        float sz = 1.f;// length(float3(temp[2][0], temp[2][1], temp[2][2]));
         float x = temp[3][0];
         float y = temp[3][1];
-        float z = temp[3][2];
-
+        float z = temp[3][2];   
+        //float x = temp[0][3];
+        //float y = temp[1][3];
+        //float z = temp[2][3];
+                                
         //randomize a offset position 
         ////
-        currPos = float3(x+ offset.x, y+ offset.y, z+ offset.z);
-        currColor.x = 0;
-        currColor.z = 0;
+        currPos = float3(x + (offset.x * sx), y + (offset.y* sy), z + (offset.z* sz));
+        //currColor.x = 0.6;
+        currColor.y = 1.f;
+        currColor.z = 0.6;
         currColor.w = 1.0;
         //currPos.y += 6;
         //currentVelocity = float3(0,0,0);
@@ -62,7 +67,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     int nrOfBonesEffected = 0;
     float3 velocities[3];
     
-    //CHECKING IF POINT IS INSIDE AN OBB
+    ////CHECKING IF POINT IS INSIDE AN OBB
     for (min12int i = 0; i < nrOfBones; i++)
     {
         nPos = mul(float4(currPos, 1.0f), InverseTransform[i]);
@@ -78,33 +83,32 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
             //Change the color of the particle
             //currColor = float4(0, 1, 0, 1);
-            currColor.y =  1;
+            //currColor.y =  1;
             currColor.w = 0.2;
         }
     }
 
-
-
-    if (nrOfBonesEffected > 0)
-    { 
-        currentVelocity = float3(0, 0, 0);
-        for (int i = 0; i < nrOfBonesEffected; i++)
-        {
-            currentVelocity += velocities[i] * force;
-        }
-        currentVelocity *= (1 / nrOfBonesEffected);
-    }
-    else
+    if (currColor.z == 1)
     {
-        currentVelocity *= (1 - (drag * dt));
-   
-        currColor.x = 1;
-        currColor.w = 0.2;
-        currentVelocity += float3(0, -9.81, 0) * dt * dt;
-        
+
+        if (nrOfBonesEffected > 0)
+        {
+            currentVelocity = float3(0, 0, 0);
+            for (int i = 0; i < nrOfBonesEffected; i++)
+            {
+                currentVelocity += velocities[i] * force;
+            }
+            currentVelocity *= (1 / nrOfBonesEffected);
+        }
+        else {
+            currentVelocity *= (1 - (drag * dt));
+
+            //currColor.x = 1;
+            currColor.w = 0.2;
+            currentVelocity += float3(0, -9.81, 0) * dt * dt;
+
+        }
     }
-    
-    
     currPos += currentVelocity;
     
     
