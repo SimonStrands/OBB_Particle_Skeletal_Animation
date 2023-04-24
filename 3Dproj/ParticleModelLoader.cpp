@@ -105,7 +105,8 @@ void loadBoneDataToVertecies(
 
 			}
 		}
-		#endif 
+		#endif
+
 	}
 	#ifdef TRADITIONALSKELETALANIMATION
 	//normalize weights to make all weights sum 1
@@ -224,6 +225,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 
 	aiMesh* mesh = scene->mMeshes[0];
 	
+
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];

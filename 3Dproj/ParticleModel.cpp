@@ -176,8 +176,10 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
+	//if(getkey('P')){
+		time += dt * animation.tick;
+	//}
 
-	time += dt * animation.tick;
 	getPose(rootJoint, animation, time);
 	
 	D3D11_MAPPED_SUBRESOURCE resource;
