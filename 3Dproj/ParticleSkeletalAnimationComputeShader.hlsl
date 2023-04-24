@@ -3,8 +3,8 @@
 cbuffer Time : register(b0)
 {
     float dt;
-    float2 padding;
     int random;
+    float2 padding;
 };
 
 //need to check padding and other
@@ -38,7 +38,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     if (currPos.y <= 0)
     {
-        float4x4 temp = inverse(Transformations[random]);
+        float4x4 temp = Transformations[random];
 
         
         float x = temp[3][0];
@@ -60,7 +60,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     //CHECKING IF POINT IS INSIDE AN OBB
     for (min12int i = 0; i < nrOfBones; i++)
     {
-        nPos = mul(float4(currPos, 1.0f), Transformations[i]);
+        nPos = mul(float4(currPos, 1.0f), InverseTransform[i]);
         if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
         {
             //Get velocity of max 3 bones
@@ -96,6 +96,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         currentVelocity += float3(0, -9.81, 0) * dt * dt;
         
     }
+    
     
     currPos += currentVelocity;
     
