@@ -27,7 +27,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
 {   
     
     static const float drag = 0.9f;
-    static const float force = 1.0001f;
+    //static const float force = 1.0001f;
+    static const float force = 1.0011f;
     
     //LOAD DATA IN BETTER NAMES
     float3 currPos = float3(particleData[DTid.x * 10 + 0], particleData[DTid.x * 10 + 1], particleData[DTid.x * 10 + 2]);
@@ -39,18 +40,24 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     if (currPos.y <= 0)
     {
-        float4x4 temp = Transformations[random];
-
+        int ourRandomNumber = (random * (DTid.x + 1));
+        int randomBone = ourRandomNumber % (nrOfBones - 1);
         
-        float x = temp[3][0];
-        float y = temp[3][1];
-        float z = temp[3][2];
-
+        float4x4 temp = Transformations[randomBone];
+        
+        float deltaRandom = (dt * 1000000000) % 7;
+        
+        //x and z offset needs to be between -0.5 and 0.5 while y needs to be between 0 and 1
+        float offsetX = ((ourRandomNumber % 100) / 100.f) - 0.5f;
+        float offsetY = (((ourRandomNumber * 3) % 100.f) / 100);
+        float offsetZ = (((ourRandomNumber * deltaRandom) % 100.f) / 100) - 0.5f;
+    
+        float4 offset = float4(offsetX, offsetY, offsetZ, 1.0f);
+        float4 rotatedOffset = mul(offset, temp);
+        
         //randomize a offset position 
-        ////
-        currPos = float3(x, y, z);
-        //currPos.y += 6;
-        //currentVelocity = float3(0,0,0);
+        currPos = rotatedOffset;
+        currentVelocity = float3(0,0,0);
     }
     
     ///////////////REAL CODE/////////////////////////
@@ -71,14 +78,14 @@ void main( uint3 DTid : SV_DispatchThreadID )
             {
                 break;
             }
-
+    
             //Change the color of the particle
-            currColor = float4(0, 1, 0, 1);
+            //currColor = float4(0, 1, 0, 1);
         }
     }
-
-
-
+    
+    
+    
     if (nrOfBonesEffected > 0)
     { 
         currentVelocity = float3(0, 0, 0);
@@ -91,9 +98,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
     else
     {
         currentVelocity *= (1 - (drag * dt));
-   
-        currColor = float4(1, 0, 0, 1);
- 
+    
+        //currColor = float4(1, 0, 0, 1);
+    
         currentVelocity += float3(0, -9.81, 0) * dt * dt;
         
     }
