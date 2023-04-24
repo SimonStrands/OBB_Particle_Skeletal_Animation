@@ -9,10 +9,10 @@ cbuffer Time : register(b0)
 cbuffer OBBSkeleton : register(b1)
 {
     row_major matrix Transformations[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
+    row_major matrix InverseTransform[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
     row_major matrix DeltaTransformations[MAXNUMBEROFBONES];
-    row_major matrix view;
-    row_major matrix projection;
     int nrOfBones;
+    int3 obbSkeletalPadding;
 };
 
 RWBuffer<float> particleData;
@@ -22,12 +22,8 @@ RWBuffer<float> particleData;
 [numthreads(16, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {   
-    static const float drag = 0.9f;
-    static const float force = 1.00001f;
-    
-    //pos 3
-    //color 4
-    //velocity 3
+    static const float drag = 0.1f;
+    static const float force = 1.f;
     
     //LOAD DATA IN BETTER NAMES
     float3 currPos = float3(particleData[DTid.x * 10 + 0], particleData[DTid.x * 10 + 1], particleData[DTid.x * 10 + 2]);
@@ -35,51 +31,59 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float3 currentVelocity = float3(particleData[DTid.x * 10 + 7], particleData[DTid.x * 10 + 8], particleData[DTid.x * 10 + 9]);
     
     ///////////////REAL CODE/////////////////////////
-    //currColor = float4(0, 0, 1, 1);
     float4 nPos;
     int nrOfBonesEffected = 0;
     float3 velocities[3];
     
-    for (min12int i = 0; i < nrOfBones; i++)
+    if (currPos.y < -5)
     {
-        //CHECK IF POINTS IS INSIDE A BONE OR NOT
-        nPos = mul(float4(currPos, 1.0f), Transformations[i]);
-        
-        // Y will probably be change when the boxes starts at y=0 instead of in the middle of the box
-        if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
-        {
-            //FOR DEBUG JUST CHANGE THE COLOR FOR NOW
-            velocities[nrOfBonesEffected] = mul(nPos, DeltaTransformations[i]).xyz;
-            nrOfBonesEffected++;
-            if (nrOfBonesEffected > 2)
-            {
-                break;
-            }
-            currColor = float4(0, 1, 0, 1);
-        }
-    }
-    if (nrOfBonesEffected > 0)
-    { 
         currentVelocity = float3(0, 0, 0);
-        for (int i = 0; i < nrOfBonesEffected; i++)
-        {
-            currentVelocity += velocities[i] * force;
-        }
-        currentVelocity *= (1 / nrOfBonesEffected);
+        currPos.x = Transformations[DTid.x % nrOfBones][3][0];
+        currPos.y = Transformations[DTid.x % nrOfBones][3][1];
+        currPos.z = Transformations[DTid.x % nrOfBones][3][2];
     }
-    else
-    {
-        if (currColor.y == 1)
-        {
-            currColor = float4(1, 0, 0, 1);
-        }
-        if (currColor.x == 1)
-        {
+    
+    //CHECKING IF POINT IS INSIDE AN OBB
+    //for (min12int i = 0; i < nrOfBones; i++)
+    //{
+    //    nPos = mul(float4(currPos, 1.0f), InverseTransform[i]);
+    //    if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
+    //    {
+    //        //Get velocity of max 3 bones
+    //        velocities[nrOfBonesEffected] = mul(nPos, DeltaTransformations[i]).xyz;
+    //        nrOfBonesEffected++;
+    //        if (nrOfBonesEffected > 2)
+    //        {
+    //            break;
+    //        }
+    //        
+    //        //Change the color of the particle
+    //        currColor = float4(0, 1, 0, 1);
+    //    }
+    //}
+    //
+    //
+    //if (nrOfBonesEffected > 0)
+    //{ 
+    //    currentVelocity = float3(0, 0, 0);
+    //    for (int i = 0; i < nrOfBonesEffected; i++)
+    //    {
+    //        currentVelocity += velocities[i] * force;
+    //    }
+    //    currentVelocity *= (1 / nrOfBonesEffected);
+    //}
+    //else
+    //{
+    //    currentVelocity *= (1 - (drag * dt));
+    //    if (currColor.y == 1)
+    //    {
+    //        currColor = float4(1, 0, 0, 1);
+    //    }
+    //    if (currColor.x == 1)
+    //    {
             currentVelocity += float3(0, -9.81, 0) * dt * dt;
-        }
-    }
-
-    currentVelocity *= (1 - (drag * dt));
+    //    }
+    //}
     
     currPos += currentVelocity;
     
@@ -100,6 +104,4 @@ void main( uint3 DTid : SV_DispatchThreadID )
     particleData[DTid.x * 10 + 7] = currentVelocity.x;
     particleData[DTid.x * 10 + 8] = currentVelocity.y;
     particleData[DTid.x * 10 + 9] = currentVelocity.z;
-    
-
 }

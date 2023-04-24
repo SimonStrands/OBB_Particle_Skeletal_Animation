@@ -209,7 +209,6 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
 
-	OBBSkeleton->inverseAndUpload(gfx);
     #endif
 }
 

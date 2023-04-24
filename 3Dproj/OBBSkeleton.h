@@ -5,31 +5,36 @@
 #include "point.h"
 #include "ParticleModelLoader.h"
 
+static const int MAXNUMBEROFBONES = 55;
+
 struct OBBSkeletonOBBBufferTime : CB {
 	struct{
 		float element;
 	}dt;
 	struct{
-		float pad[3];
+		float element;
+	}random;
+	struct{
+		float pad[2];
 	}padding;
 };
 
 struct OBBSkeletonOBBBuffer : CB{
 	struct{
-		DirectX::XMMATRIX element[70];
+		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
 	}transform;
+	struct{
+		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
+	}InverseTransform;
 	struct {
-		DirectX::XMMATRIX element[70];
+		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
 	}deltaTransform;
-	struct{
-		DirectX::XMMATRIX element;
-	}view;
-	struct{
-		DirectX::XMMATRIX element;
-	}projection;
 	struct {
 		int element;
 	}nrOfBones;
+	struct{
+		int padding[3];
+	}padding;
 	OBBSkeletonOBBBuffer operator-(const OBBSkeletonOBBBuffer& other)const
 	{
 		OBBSkeletonOBBBuffer temp;
@@ -37,6 +42,18 @@ struct OBBSkeletonOBBBuffer : CB{
 			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
 		return temp;
 	}
+};
+
+struct OBBSkeletonOBBBufferDebugDraw : CB{
+	struct{
+		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
+	}transform;
+	struct{
+		DirectX::XMMATRIX element;
+	}view;
+	struct{
+		DirectX::XMMATRIX element;
+	}projection;
 };
 
 
@@ -52,13 +69,11 @@ public:
 	void draw(Graphics*& gfx);
 	ID3D11Buffer*& getSkeletalTransformConstBuffer();
 	ID3D11Buffer*& getSkeletalTimeConstBuffer();
-	void inverseAndUpload(Graphics*& gfx);
 
 private:
 	
 	std::vector<DirectX::XMMATRIX> transform;//rotation position
 	std::vector<DirectX::XMMATRIX> size;//the size of the OBB
-	int nrOfBones;
 	void inverseTransforms();
 	void inverseDeltaTransforms();
 	
@@ -67,9 +82,12 @@ private:
 	std::vector<DWORD> indecies;
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indeciesBuffer;
+
 	ID3D11Buffer* constantBuffer;
 	ID3D11Buffer* constantBufferTime;
+	ID3D11Buffer* constantBufferDebugDraw;
 
+	OBBSkeletonOBBBufferDebugDraw constBufferConverterDebugDraw;
 	OBBSkeletonOBBBufferTime constBufferConverterTime;
 	OBBSkeletonOBBBuffer constBufferConverter;
 	OBBSkeletonOBBBuffer constBufferConverterPrev;
