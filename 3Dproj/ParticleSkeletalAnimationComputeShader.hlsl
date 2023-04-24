@@ -4,6 +4,7 @@ cbuffer Time : register(b0)
 {
     float dt;
     int random;
+    float4 offset;
     float2 padding;
 };
 
@@ -48,7 +49,10 @@ void main( uint3 DTid : SV_DispatchThreadID )
 
         //randomize a offset position 
         ////
-        currPos = float3(x, y, z);
+        currPos = float3(x+ offset.x, y+ offset.y, z+ offset.z);
+        currColor.x = 0;
+        currColor.z = 0;
+        currColor.w = 1.0;
         //currPos.y += 6;
         //currentVelocity = float3(0,0,0);
     }
@@ -73,7 +77,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
             }
 
             //Change the color of the particle
-            currColor = float4(0, 1, 0, 1);
+            //currColor = float4(0, 1, 0, 1);
+            currColor.y =  1;
+            currColor.w = 0.2;
         }
     }
 
@@ -92,8 +98,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
     {
         currentVelocity *= (1 - (drag * dt));
    
-        currColor = float4(1, 0, 0, 1);
- 
+        currColor.x = 1;
+        currColor.w = 0.2;
         currentVelocity += float3(0, -9.81, 0) * dt * dt;
         
     }

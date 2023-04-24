@@ -152,6 +152,14 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 	int randNr = RandomNumber(0, int(transform.size()));
 	constBufferConverterTime.random.element = randNr;
 
+	float nrX = RandomNumber(0.f, 0.01f);
+	float nrY = RandomNumber(0.f, 0.01f);
+	float nrZ = RandomNumber(0.f, 0.01f);
+	constBufferConverterTime.offset.element[0] = nrX;
+	constBufferConverterTime.offset.element[1] = nrY;
+	constBufferConverterTime.offset.element[2] = nrZ;
+	constBufferConverterTime.offset.element[3] = 0;
+
 	this->constBufferConverterPrev = this->constBufferConverter;
 	
 	//update constantBuffer
