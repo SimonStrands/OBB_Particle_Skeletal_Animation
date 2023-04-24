@@ -8,8 +8,8 @@ cbuffer Time : register(b0)
 //need to check padding and other
 cbuffer OBBSkeleton : register(b1)
 {
-    row_major matrix Transformations[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
-    row_major matrix InverseTransform[MAXNUMBEROFBONES]; //max number of bones are 70 (NOT FINAL!)
+    row_major matrix Transformations[MAXNUMBEROFBONES]; //max number of bones are 55 (NOT FINAL!)
+    row_major matrix InverseTransform[MAXNUMBEROFBONES]; //max number of bones are 55 (NOT FINAL!)
     row_major matrix DeltaTransformations[MAXNUMBEROFBONES];
     int nrOfBones;
     int3 obbSkeletalPadding;
