@@ -75,6 +75,7 @@ private:
 	//should never be 0
 	float time = 0.000001f;
 	Bone rootJoint;
+	bool hasAnimation;
 
 	
 };

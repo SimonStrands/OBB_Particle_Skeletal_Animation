@@ -212,10 +212,148 @@ bool loadAnimation(const aiScene* scene, Animation& animation){
 	return true;
 }
 
+float vertexLenght(const VolumetricVertex& a, const VolumetricVertex& b){
+	return sqrt(
+		a.pos[0] - b.pos[0] * a.pos[0] - b.pos[0] + 
+		a.pos[1] - b.pos[1] * a.pos[1] - b.pos[1] + 
+		a.pos[2] - b.pos[2] * a.pos[2] - b.pos[2]
+	);
+}
+
+vec3 lerp(const VolumetricVertex& a, const VolumetricVertex& b, float procent){
+	vec3 theReturn;
+	theReturn.x = a.pos[0] + ((b.pos[0] - a.pos[0]) * procent);
+	theReturn.y = a.pos[1] + ((b.pos[1] - a.pos[1]) * procent);
+	theReturn.z = a.pos[2] + ((b.pos[2] - a.pos[2]) * procent);
+	return theReturn;
+}
+vec3 lerp(const vec3& a, const vec3& b, float procent){
+	vec3 theReturn;
+	theReturn.x = a.x + ((b.x - a.x) * procent);
+	theReturn.y = a.y + ((b.y - a.y) * procent);
+	theReturn.z = a.z + ((b.z - a.z) * procent);
+	return theReturn;
+}
+
+void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<VolumetricVertex> &vertecies)
+{
+
+	//find the 50% of point 
+	//a -> b = x
+	//b -> c = y
+	//c -> a = z
+	vec3 vx = lerp(newVertecies[0], newVertecies[1], 0.5f);
+	VolumetricVertex x(vx.x, vx.y, vx.z, 0, 1, 1, 0.75);
+
+
+	vec3 vy = lerp(newVertecies[1], newVertecies[2], 0.5f);
+	VolumetricVertex y(vy.x, vy.y, vy.z, 0, 1, 1, 0.75);
+
+	vec3 vz = lerp(newVertecies[2], newVertecies[0], 0.5f);
+	VolumetricVertex z(vz.x, vz.y, vz.z, 0, 1, 1, 0.75);
+
+	//find the middle of the triangle
+	vec3 vm = vec3((vx.x + vy.x + vz.x) / 3, (vx.y + vy.y + vz.y) / 3, (vx.z + vy.z + vz.z) / 3);
+	VolumetricVertex m(vm.x, vm.y, vm.z, 0, 1, 1, 0.75);
+
+#ifdef TRADITIONALSKELETALANIMATION
+	//x.boneIDs[0] = newVertecies[0].boneIDs[0];
+	//x.boneIDs[1] = newVertecies[1].boneIDs[0];
+	//x.boneIDs[2] = newVertecies[0].boneIDs[1];
+	//x.boneIDs[3] = newVertecies[1].boneIDs[1];
+	//x.boneWeights[0] = newVertecies[0].boneWeights[0];
+	//x.boneWeights[1] = newVertecies[1].boneWeights[0];
+	//x.boneWeights[2] = newVertecies[0].boneWeights[1];
+	//x.boneWeights[3] = newVertecies[1].boneWeights[1];
+	//
+	//y.boneIDs[0] = newVertecies[1].boneIDs[0];
+	//y.boneIDs[1] = newVertecies[2].boneIDs[0];
+	//y.boneIDs[2] = newVertecies[1].boneIDs[1];
+	//y.boneIDs[3] = newVertecies[2].boneIDs[1];
+	//y.boneWeights[0] = newVertecies[1].boneWeights[0];
+	//y.boneWeights[1] = newVertecies[2].boneWeights[0];
+	//y.boneWeights[2] = newVertecies[1].boneWeights[1];
+	//y.boneWeights[3] = newVertecies[2].boneWeights[1];
+	//
+	//z.boneIDs[0] = newVertecies[2].boneIDs[0];
+	//z.boneIDs[1] = newVertecies[0].boneIDs[0];
+	//z.boneIDs[2] = newVertecies[2].boneIDs[1];
+	//z.boneIDs[3] = newVertecies[0].boneIDs[1];
+	//z.boneWeights[0] = newVertecies[2].boneWeights[0];
+	//z.boneWeights[1] = newVertecies[0].boneWeights[0];
+	//z.boneWeights[2] = newVertecies[2].boneWeights[1];
+	//z.boneWeights[3] = newVertecies[0].boneWeights[1];
+	//
+	//m.boneIDs[0] = x.boneIDs[0];
+	//m.boneIDs[1] = y.boneIDs[0];
+	//m.boneIDs[2] = z.boneIDs[0];
+	//m.boneWeights[0] = x.boneWeights[0];
+	//m.boneWeights[1] = y.boneWeights[0];
+	//m.boneWeights[2] = z.boneWeights[0];
+	//
+	//std::vector<VolumetricVertex*> vert;
+	//vert.push_back(&x);
+	//vert.push_back(&y);
+	//vert.push_back(&z);
+	//vert.push_back(&m);
+	//
+	//for (int w = 0; w < vert.size(); w++) {
+	//	
+	//	float totalWeight = vert[w]->boneWeights[0]
+	//		+ vert[w]->boneWeights[1]
+	//		+ vert[w]->boneWeights[2]
+	//		+ vert[w]->boneWeights[3];
+	//
+	//	if (totalWeight > 0.0f) {
+	//		vert[w]->boneWeights[0] = vert[w]->boneWeights[0] / totalWeight;
+	//		vert[w]->boneWeights[1] = vert[w]->boneWeights[1] / totalWeight;
+	//		vert[w]->boneWeights[2] = vert[w]->boneWeights[2] / totalWeight;
+	//		vert[w]->boneWeights[3] = vert[w]->boneWeights[3] / totalWeight;
+	//	}
+	//}
+#endif // TRADITIONALSKELETALANIMATION
+
+
+	//add the points to the list
+	vertecies.push_back(x);
+	vertecies.push_back(y);
+	vertecies.push_back(z);
+	vertecies.push_back(m);
+
+	if(subDivision < 1){
+		return;
+	}
+
+	//subdivide
+	// m -> a -> x
+	VolumetricVertex tempArray[3] = {m, newVertecies[0], x};
+	subDivide(subDivision - 1, tempArray, vertecies);
+	// m -> x -> b
+	tempArray[1] = x;
+	tempArray[2] = newVertecies[1];
+	subDivide(subDivision - 1, tempArray, vertecies);
+	// m -> b -> y
+	tempArray[1] = newVertecies[1];
+	tempArray[2] = y;
+	subDivide(subDivision - 1, tempArray, vertecies);
+	// m -> y -> c
+	tempArray[1] = y;
+	tempArray[2] = newVertecies[2];
+	subDivide(subDivision - 1, tempArray, vertecies);
+	// m -> c -> z
+	tempArray[1] = newVertecies[2];
+	tempArray[2] = z;
+	subDivide(subDivision - 1, tempArray, vertecies);
+	// m -> z -> a
+	tempArray[1] = z;
+	tempArray[2] = newVertecies[0];
+	subDivide(subDivision - 1, tempArray, vertecies);
+}
+
 void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
 {
 	Assimp::Importer AImporter;
-	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices);
+	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 
 	//exit if no scene/file was found
 	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
@@ -225,23 +363,39 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 
 	aiMesh* mesh = scene->mMeshes[0];
 	
+	static const float nl = 1.00;
 
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
-		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.7f));
+		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.5f));
 	}
-	//for(unsigned int v = 0; v < mesh->mNumVertices; v++){
-	//	vertecies.push_back(VolumetricVertex(0, 0, v * 0.2f, 0, 0, 1, 0.7f));
-	//}
+
+	if(scene->HasAnimations()){
+		//load Bones
+		loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size());
+		
+		//load Animation
+		loadAnimation(scene, animation);
+		addEmptyAnimationForEmptyJoints(rootJoint, animation);
+	}
 	
-	//load Bones
-	loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size());
+	//add more particle if needed
+	for(unsigned int f = 0; f < mesh->mNumFaces; f++){
+		//get one lenght that we will use for all
+		float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
+		//int R = l / nl;
+		int R = 0;
 	
-	//load Animation
-	loadAnimation(scene, animation);
-	addEmptyAnimationForEmptyJoints(rootJoint, animation);
+		VolumetricVertex tempArray[3] = {
+			vertecies[mesh->mFaces[f].mIndices[0]], 
+			vertecies[mesh->mFaces[f].mIndices[1]], 
+			vertecies[mesh->mFaces[f].mIndices[2]]
+		};
 	
+		subDivide(R, tempArray, vertecies);
+	}
+	std::cout << "Number of particles " << vertecies.size() << std::endl;
 }
 
 void getOrginalPositions(

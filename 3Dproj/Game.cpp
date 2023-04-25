@@ -250,4 +250,5 @@ void Game::setUpObject()
 	
 	particleModel = new ParticleModel(gfx, "objects/sillydance2.fbx", vec3());
 	//particleModel = new ParticleModel(gfx, "objects/test2.fbx", vec3());
+	//particleModel = new ParticleModel(gfx, "objects/quad2.obj", vec3());
 }

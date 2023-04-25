@@ -70,6 +70,11 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	loadParticleModel(vertecies, filePath, animation, rootJoint);
+
+	hasAnimation = false;
+	if(rootJoint.id != -1){
+		hasAnimation = true;
+	}
 	
 	//make it a multiple of 16 or can cause crashes
 	if(vertecies.size() < 1){
@@ -131,7 +136,9 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 		return;
 	}
 
-	getPose(rootJoint, animation, time);
+	if(hasAnimation){
+		getPose(rootJoint, animation, time);
+	}
 
 	if(!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)){
 		std::cout << "failed to create const buffer" << std::endl;
@@ -176,8 +183,11 @@ ParticleModel::~ParticleModel()
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 {
+	if(!this->hasAnimation){
+		return;
+	}
 	//if(getkey('P')){
-		time += dt * animation.tick;
+		time += dt * animation.tick * 0.01f;
 	//}
 
 	getPose(rootJoint, animation, time);
@@ -203,10 +213,8 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 	
-	//if(getkey('P')){
 	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies / 16, 1, 1);//calc how many groups we need beacuse right now I do not know
-	//}
-
+	
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
@@ -232,6 +240,9 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 
 	#ifndef TRADITIONALSKELETALANIMATION
+	if(!this->hasAnimation){
+		return;
+	}
 	OBBSkeleton->draw(gfx);
     #endif
 }
