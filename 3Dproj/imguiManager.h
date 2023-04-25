@@ -7,6 +7,12 @@
 #include "Light.h"
 #include <string>
 
+#include <windows.h>
+#include "psapi.h"
+static ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
+static int numProcessors;
+static HANDLE self;
+
 class ImguiManager {
 public:
 	ImguiManager();
@@ -14,8 +20,14 @@ public:
 	void takeObject(object* obj);
 	void takeLight(Light* light);
 	void updateRender(int lightNr, float deltaTime);
-	//void updateSpecs(float deltaTime);
 private:
 	std::vector<object*> obj;
 	std::vector<Light*> light;
+
+	int frames;
+	double avfps;
+	double time;
+	double frameRate;
+
+	double getCurrentCPUValue();
 };
