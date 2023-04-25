@@ -22,7 +22,7 @@ void ImguiManager::takeLight(Light* light)
 	this->light.push_back(light);
 }
 
-void ImguiManager::updateRender(int lightNr)
+void ImguiManager::updateRender(int lightNr, float deltaTime)
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -49,7 +49,23 @@ void ImguiManager::updateRender(int lightNr)
 		ImGui::SliderFloat("ZRot", &light[lightNr]->getRotation().z, 6.3f, -6.3f);
 	}
 	ImGui::End();
+
+	
+	ImGui::Begin("Demo window");
+	ImGui::Text("Test");
+	ImGui::End();
+
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
+
+//void ImguiManager::updateSpecs(float deltaTime)
+//{
+//	ImGui_ImplDX11_NewFrame();
+//	ImGui_ImplWin32_NewFrame();
+//
+//	
+//	ImGui::Render();
+//	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+//}
 

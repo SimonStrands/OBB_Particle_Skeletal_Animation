@@ -118,7 +118,7 @@ void Game::run()
 		gfx->setTransparant(true);
 		gfx->setRenderTarget();
 		this->ForwardDraw();
-		gfx->present(this->lightNr);
+		gfx->present(this->lightNr, (float)dt.dt());
 
 	}
 	printf("quit");
