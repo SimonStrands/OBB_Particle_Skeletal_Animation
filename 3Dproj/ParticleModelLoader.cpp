@@ -243,18 +243,18 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	//b -> c = y
 	//c -> a = z
 	vec3 vx = lerp(newVertecies[0], newVertecies[1], 0.5f);
-	VolumetricVertex x(vx.x, vx.y, vx.z, 0, 1, 1, 0.75);
+	VolumetricVertex x(vx.x, vx.y, vx.z, 0, 0, 1, 0.75);
 
 
 	vec3 vy = lerp(newVertecies[1], newVertecies[2], 0.5f);
-	VolumetricVertex y(vy.x, vy.y, vy.z, 0, 1, 1, 0.75);
+	VolumetricVertex y(vy.x, vy.y, vy.z, 0, 0, 1, 0.75);
 
 	vec3 vz = lerp(newVertecies[2], newVertecies[0], 0.5f);
-	VolumetricVertex z(vz.x, vz.y, vz.z, 0, 1, 1, 0.75);
+	VolumetricVertex z(vz.x, vz.y, vz.z, 0, 0, 1, 0.75);
 
 	//find the middle of the triangle
 	vec3 vm = vec3((vx.x + vy.x + vz.x) / 3, (vx.y + vy.y + vz.y) / 3, (vx.z + vy.z + vz.z) / 3);
-	VolumetricVertex m(vm.x, vm.y, vm.z, 0, 1, 1, 0.75);
+	VolumetricVertex m(vm.x, vm.y, vm.z, 0, 0, 1, 0.75);
 
 #ifdef TRADITIONALSKELETALANIMATION
 	//x.boneIDs[0] = newVertecies[0].boneIDs[0];
@@ -385,7 +385,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		//get one lenght that we will use for all
 		float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
 		//int R = l / nl;
-		int R = 0;
+		int R = 2;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 

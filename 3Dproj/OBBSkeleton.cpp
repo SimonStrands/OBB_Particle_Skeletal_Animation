@@ -149,8 +149,9 @@ void OBBSkeletonDebug::inverseDeltaTransforms()
 void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
 	constBufferConverterTime.dt.element = dt;
-	int randNr = RandomNumber(0, RAND_MAX);
-	constBufferConverterTime.random.element = randNr;
+	constBufferConverterTime.random.element[0] = RandomNumber(0, 25500);
+	constBufferConverterTime.random.element[1] = RandomNumber(0, 25500);
+	constBufferConverterTime.random.element[2] = RandomNumber(0, 25500);
 
 	this->constBufferConverterPrev = this->constBufferConverter;
 	

@@ -12,11 +12,8 @@ struct OBBSkeletonOBBBufferTime : CB {
 		float element;
 	}dt;
 	struct{
-		int element;
+		int element[3];
 	}random;
-	struct{
-		float pad[2];
-	}padding;
 };
 
 struct OBBSkeletonOBBBuffer : CB{

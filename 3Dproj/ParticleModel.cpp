@@ -187,7 +187,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 		return;
 	}
 	//if(getkey('P')){
-		time += dt * animation.tick * 0.01f;
+		time += dt * animation.tick;
 	//}
 
 	getPose(rootJoint, animation, time);
@@ -243,7 +243,7 @@ void ParticleModel::draw(Graphics*& gfx)
 	if(!this->hasAnimation){
 		return;
 	}
-	OBBSkeleton->draw(gfx);
+	//OBBSkeleton->draw(gfx);
     #endif
 }
 
