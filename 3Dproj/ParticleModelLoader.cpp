@@ -368,7 +368,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
-		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.5f));
+		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 	}
 
 	if(scene->HasAnimations()){
