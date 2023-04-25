@@ -190,5 +190,5 @@ public:
 	//draw
 	void clearScreen();
 	void setRenderTarget();
-	void present(int lightNr = 0);	
+	void present(int lightNr = 0, float deltaTime=0);	
 };

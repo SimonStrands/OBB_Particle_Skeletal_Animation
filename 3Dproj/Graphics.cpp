@@ -363,8 +363,8 @@ void Graphics::setRenderTarget()
 	immediateContext->OMSetRenderTargets(1, &renderTarget, dsView);
 }
 
-void Graphics::present(int lightNr)
+void Graphics::present(int lightNr,float deltaTime)
 {
-	this->imguimanager->updateRender(lightNr);
+	this->imguimanager->updateRender(lightNr, deltaTime);
 	swapChain->Present(0, 0);
 }

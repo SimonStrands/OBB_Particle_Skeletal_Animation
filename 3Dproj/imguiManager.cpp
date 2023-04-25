@@ -5,6 +5,9 @@ ImguiManager::ImguiManager()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+
+	this->frameRate = 0;
+	this->avfps = 0.f;
 }
 
 ImguiManager::~ImguiManager()
@@ -22,7 +25,7 @@ void ImguiManager::takeLight(Light* light)
 	this->light.push_back(light);
 }
 
-void ImguiManager::updateRender(int lightNr)
+void ImguiManager::updateRender(int lightNr, float deltaTime)
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -49,7 +52,43 @@ void ImguiManager::updateRender(int lightNr)
 		ImGui::SliderFloat("ZRot", &light[lightNr]->getRotation().z, 6.3f, -6.3f);
 	}
 	ImGui::End();
+
+	ImGui::Begin("Application Specs");
+	std::string dtText = "Delta Time: " + std::to_string(deltaTime);
+
+	//virtual memory currently used by the process
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+	std::string virtualMemUsedByMe = "Virtual: " + std::to_string(pmc.PrivateUsage / (1024 * 1024))+" MB";
+
+	//Physical Memory currently used by current process:
+	std::string physMemUsedByMe = "Physical: " + std::to_string(pmc.WorkingSetSize / (1024 * 1024))+" MB";
+
+	frames++;
+	time += deltaTime;
+	if (time >= 1.f)
+	{
+		frameRate = frames;
+		if (avfps == 0.f)
+			avfps = frameRate;
+		else
+			avfps = (avfps + frameRate) / 2;
+		frames = 0;
+		time = 0;
+	}
+	std::string fps = std::to_string(frameRate)+ " FPS" ;
+	std::string afps = "Avarage FPS for entire runtime: " + std::to_string(avfps);
+
+	ImGui::Text(dtText.c_str());
+	ImGui::Text(fps.c_str());
+	ImGui::Text(afps.c_str());
+	ImGui::Text("Used memory by app");
+	ImGui::Text(virtualMemUsedByMe.c_str());
+	ImGui::Text(physMemUsedByMe.c_str());
+
+	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
+
 
