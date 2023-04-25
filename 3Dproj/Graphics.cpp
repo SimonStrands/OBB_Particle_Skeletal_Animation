@@ -366,6 +366,5 @@ void Graphics::setRenderTarget()
 void Graphics::present(int lightNr,float deltaTime)
 {
 	this->imguimanager->updateRender(lightNr, deltaTime);
-	//this->imguimanager->updateSpecs(deltaTime);
 	swapChain->Present(0, 0);
 }

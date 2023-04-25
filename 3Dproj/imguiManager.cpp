@@ -6,23 +6,8 @@ ImguiManager::ImguiManager()
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
-	this->frameRate = 0.f;
+	this->frameRate = 0;
 	this->avfps = 0.f;
-
-
-	SYSTEM_INFO sysInfo;
-	FILETIME ftime, fsys, fuser;
-
-	GetSystemInfo(&sysInfo);
-	numProcessors = sysInfo.dwNumberOfProcessors;
-
-	GetSystemTimeAsFileTime(&ftime);
-	memcpy(&lastCPU, &ftime, sizeof(FILETIME));
-
-	self = GetCurrentProcess();
-	GetProcessTimes(self, &ftime, &ftime, &fsys, &fuser);
-	memcpy(&lastSysCPU, &fsys, sizeof(FILETIME));
-	memcpy(&lastUserCPU, &fuser, sizeof(FILETIME));
 }
 
 ImguiManager::~ImguiManager()
@@ -74,68 +59,36 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 	//virtual memory currently used by the process
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
-	std::string virtualMemUsedByMe = "Virtual Memory used by process: " + std::to_string(pmc.PrivateUsage);
+	std::string virtualMemUsedByMe = "Virtual: " + std::to_string(pmc.PrivateUsage / (1024 * 1024))+" MB";
 
 	//Physical Memory currently used by current process:
-	std::string physMemUsedByMe = "Physical Memory used by process:" + std::to_string(pmc.WorkingSetSize);
-
-	//CPU currently used by current process:
-	std::string cpuUsedByMe = "CPU usage used by process: " + std::to_string(getCurrentCPUValue());
+	std::string physMemUsedByMe = "Physical: " + std::to_string(pmc.WorkingSetSize / (1024 * 1024))+" MB";
 
 	frames++;
 	time += deltaTime;
 	if (time >= 1.f)
 	{
 		frameRate = frames;
-
 		if (avfps == 0.f)
 			avfps = frameRate;
 		else
 			avfps = (avfps + frameRate) / 2;
-
 		frames = 0;
 		time = 0;
 	}
-	std::string fps = "FPS: "+ std::to_string(frameRate);
+	std::string fps = std::to_string(frameRate)+ " FPS" ;
 	std::string afps = "Avarage FPS for entire runtime: " + std::to_string(avfps);
 
 	ImGui::Text(dtText.c_str());
 	ImGui::Text(fps.c_str());
 	ImGui::Text(afps.c_str());
-
+	ImGui::Text("Used memory by app");
 	ImGui::Text(virtualMemUsedByMe.c_str());
 	ImGui::Text(physMemUsedByMe.c_str());
-	ImGui::Text(cpuUsedByMe.c_str());
 
 	ImGui::End();
-
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-}
-
-double ImguiManager::getCurrentCPUValue()
-{
-	
-	FILETIME ftime, fsys, fuser;
-	ULARGE_INTEGER now, sys, user;
-	double percent;
-
-	GetSystemTimeAsFileTime(&ftime);
-	memcpy(&now, &ftime, sizeof(FILETIME));
-
-	GetProcessTimes(self, &ftime, &ftime, &fsys, &fuser);
-	memcpy(&sys, &fsys, sizeof(FILETIME));
-	memcpy(&user, &fuser, sizeof(FILETIME));
-	percent = (sys.QuadPart - lastSysCPU.QuadPart) +
-		(user.QuadPart - lastUserCPU.QuadPart);
-	percent /= (now.QuadPart - lastCPU.QuadPart);
-	percent /= numProcessors;
-	lastCPU = now;
-	lastUserCPU = user;
-	lastSysCPU = sys;
-
-	return percent * 100;
-	
 }
 
 

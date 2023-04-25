@@ -9,9 +9,7 @@
 
 #include <windows.h>
 #include "psapi.h"
-static ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
-static int numProcessors;
-static HANDLE self;
+
 
 class ImguiManager {
 public:
@@ -27,7 +25,5 @@ private:
 	int frames;
 	double avfps;
 	double time;
-	double frameRate;
-
-	double getCurrentCPUValue();
+	int frameRate;
 };
