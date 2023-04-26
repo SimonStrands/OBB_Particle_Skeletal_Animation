@@ -7,4 +7,5 @@ cbuffer lightOCameraCBuf : register (b6)
     row_major matrix projection;
     row_major matrix lightViewProj[MAXNROFLIGHTS];
 	int nrOfLight; 
+    int3 padding;
 }

@@ -7,19 +7,16 @@
 
 static const int MAXNUMBEROFBONES = 55;
 
-struct OBBSkeletonOBBBufferTime : CB {
+struct OBBSkeletonOBBBufferTime : public CB {
 	struct{
 		float element;
 	}dt;
 	struct{
-		int element;
+		int element[3];
 	}random;
-	struct{
-		float pad[2];
-	}padding;
 };
 
-struct OBBSkeletonOBBBuffer : CB{
+struct OBBSkeletonOBBBuffer : public CB{
 	struct{
 		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
 	}transform;
@@ -44,7 +41,7 @@ struct OBBSkeletonOBBBuffer : CB{
 	}
 };
 
-struct OBBSkeletonOBBBufferDebugDraw : CB{
+struct OBBSkeletonOBBBufferDebugDraw : public CB{
 	struct{
 		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
 	}transform;
@@ -59,8 +56,10 @@ struct OBBSkeletonOBBBufferDebugDraw : CB{
 
 class OBBSkeletonDebug{
 public:
-	OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);
+	OBBSkeletonDebug();
+	OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);//some reason doesn't work in release mode
 	~OBBSkeletonDebug();
+	void init(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);
 	void setTransformations(std::vector<DirectX::XMMATRIX>& transform);
 	void setTransform(int id, const DirectX::XMMATRIX transform);
 	std::vector<DirectX::XMMATRIX>& getTransforms();

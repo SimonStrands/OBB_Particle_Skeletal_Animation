@@ -9,10 +9,10 @@
 #include "Animation.h"
 #include "Graphics.h"
 
-static const int maxNumberOfBones = 70;
-struct SkeletonConstantBuffer : CB{
+static const int maxNumberOfBones = 55;
+struct SkeletonConstantBuffer : public CB {
 	struct{
-		DirectX::XMMATRIX element[maxNumberOfBones]; //max number of bones are 70 (NOT FINAL!)
+		DirectX::XMMATRIX element[maxNumberOfBones];
 	}Transformations;
 };
 

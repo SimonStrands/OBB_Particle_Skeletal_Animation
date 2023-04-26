@@ -3,7 +3,24 @@
 #include "CreateBuffer.h"
 #include "Random.h"
 
+OBBSkeletonDebug::OBBSkeletonDebug()
+{
+}
+
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
+{
+	init(nrOfBones, sizes, gfx);
+}
+
+OBBSkeletonDebug::~OBBSkeletonDebug()
+{
+	vertexBuffer->Release();
+	indeciesBuffer->Release();
+	constantBuffer->Release();
+	constantBufferTime->Release();
+}
+
+void OBBSkeletonDebug::init(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3>& sizes, Graphics*& gfx)
 {
 	constBufferConverterTime.dt.element = 0;
 	if(nrOfBones != sizes.size()){
@@ -49,18 +66,9 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 
 	CreateVertexBuffer(gfx->getDevice(), verteciesPoints, vertexBuffer, false);
 	CreateVertexBuffer(gfx->getDevice(), indecies, indeciesBuffer, true);
-	CreateConstBuffer(gfx, constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverterPrev);
-	CreateConstBuffer(gfx, constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
-	CreateConstBuffer(gfx, constantBufferDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw), &constBufferConverterDebugDraw);
-}
-
-OBBSkeletonDebug::~OBBSkeletonDebug()
-{
-	vertexBuffer->Release();
-	indeciesBuffer->Release();
-	constantBuffer->Release();
-	constantBufferTime->Release();
-	
+	CreateConstBuffer(gfx, this->constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverterPrev);
+	CreateConstBuffer(gfx, this->constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
+	CreateConstBuffer(gfx, this->constantBufferDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw), &constBufferConverterDebugDraw);
 }
 
 void OBBSkeletonDebug::setTransformations(std::vector<DirectX::XMMATRIX>& transform)
@@ -149,8 +157,9 @@ void OBBSkeletonDebug::inverseDeltaTransforms()
 void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
 	constBufferConverterTime.dt.element = dt;
-	int randNr = RandomNumber(0, RAND_MAX);
-	constBufferConverterTime.random.element = randNr;
+	constBufferConverterTime.random.element[0] = RandomNumber(0, 25500);
+	constBufferConverterTime.random.element[1] = RandomNumber(0, 25500);
+	constBufferConverterTime.random.element[2] = RandomNumber(0, 25500);
 
 	this->constBufferConverterPrev = this->constBufferConverter;
 	

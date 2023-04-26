@@ -75,11 +75,10 @@ bool CreateConstBuffer(Graphics*& gfx, ID3D11Buffer*& buff, UINT size, CB *initd
 
 	D3D11_SUBRESOURCE_DATA InitData;
 
-	InitData.SysMemPitch = 0;
-	InitData.SysMemSlicePitch = 0;
 	InitData.pSysMem = &initdata;
 
 	HRESULT hr = gfx->getDevice()->CreateBuffer(&CbDesc, &InitData, &buff);
+
 	if (FAILED(hr)) {
 		printf("failed");
 		return false;

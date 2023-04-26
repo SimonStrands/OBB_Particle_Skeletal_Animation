@@ -3,8 +3,7 @@
 cbuffer Time : register(b0)
 {
     float dt;
-    int random;
-    float2 padding;
+    int3 random;
 };
 
 //need to check padding and other
@@ -27,8 +26,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
 {   
     
     static const float drag = 0.9f;
-    //static const float force = 1.0001f;
-    static const float force = 1.0011f;
+    //static const float drag = 1.0f;
+    static const float force = 1.0001f;
+    //static const float force = 1.0000f;
     
     //LOAD DATA IN BETTER NAMES
     float3 currPos = float3(particleData[DTid.x * 10 + 0], particleData[DTid.x * 10 + 1], particleData[DTid.x * 10 + 2]);
@@ -40,23 +40,22 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     if (currPos.y <= 0)
     {
-        int ourRandomNumber = (random * (DTid.x + 1));
-        int randomBone = ourRandomNumber % (nrOfBones - 1);
+        unsigned int ourRandomNumber1 = random.x * (DTid.x + 1);
+        unsigned int ourRandomNumber2 = random.y * (DTid.x + 1);
+        unsigned int ourRandomNumber3 = random.z * (DTid.x + 1);
+        unsigned int randomBone = ourRandomNumber1 % (nrOfBones - 1);
         
         float4x4 temp = Transformations[randomBone];
         
-        float deltaRandom = (dt * 1000000000) % 7;
-        
-        //x and z offset needs to be between -0.5 and 0.5 while y needs to be between 0 and 1
-        float offsetX = ((ourRandomNumber % 100) / 100.f) - 0.5f;
-        float offsetY = (((ourRandomNumber * 3) % 100.f) / 100);
-        float offsetZ = (((ourRandomNumber * deltaRandom) % 100.f) / 100) - 0.5f;
+        float offsetX = (((ourRandomNumber1 % 100) / 100.f) - 0.5f);
+        float offsetY = ((ourRandomNumber2 % 100) / 100.f);
+        float offsetZ = (((ourRandomNumber3 % 100.f) / 100.f) - 0.5f);
     
         float4 offset = float4(offsetX, offsetY, offsetZ, 1.0f);
         float4 rotatedOffset = mul(offset, temp);
         
         //randomize a offset position 
-        currPos = rotatedOffset;
+        currPos = rotatedOffset.xyz;
         currentVelocity = float3(0,0,0);
     }
     
@@ -80,11 +79,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
             }
     
             //Change the color of the particle
-            //currColor = float4(0, 1, 0, 1);
         }
     }
-    
-    
     
     if (nrOfBonesEffected > 0)
     { 
@@ -93,7 +89,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         {
             currentVelocity += velocities[i] * force;
         }
-        currentVelocity *= (1 / nrOfBonesEffected);
+        currentVelocity *= (1.f / nrOfBonesEffected);
     }
     else
     {
