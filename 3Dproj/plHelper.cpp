@@ -198,6 +198,35 @@ bool CreateInputLayoutOwn(ID3D11Device* device, ID3D11InputLayout*& inputLayout,
 	return !FAILED(hr);
 }
 
+bool getPixelArray(std::string file, std::vector<vec3>& colors)
+{
+	struct stat buffer;
+	if (file == "" || stat(file.c_str(), &buffer) != 0) {
+		return false;
+	}
+	int textureWidth;
+	int textureHeight;
+	int channels;
+
+	unsigned char * textureData = stbi_load(file.c_str(), &textureWidth, &textureHeight, &channels, 3);
+
+	int i = 0;
+	unsigned bytePerPixel = channels;
+	for(int x = 0; x < textureWidth; x++){
+		for(int y = 0; y < textureHeight; y++){
+			unsigned char* pixelOffset = textureData + (i * bytePerPixel);
+			unsigned char r = pixelOffset[0];
+			unsigned char g = pixelOffset[1];
+			unsigned char b = pixelOffset[2];
+			unsigned char a = channels >= 4 ? pixelOffset[3] : 0xff;
+			i++;
+			colors.push_back(vec3((float)r/255.f, (float)g/255.f, (float)b/255.f));
+		}
+	}
+	delete[] textureData;
+	return true;
+}
+
 bool CreateInputLayoutBill(ID3D11Device* device, ID3D11InputLayout*& inputLayout, std::string& VbyteCode) {
 	const int nrOfEl = 1;
 	D3D11_INPUT_ELEMENT_DESC inputDesc[nrOfEl] =

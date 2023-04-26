@@ -1,6 +1,7 @@
 #pragma once
 #include <d3d11.h>
 #include "vertex.h"
+#include <vector>
 #include <string>
 
 #include "BuildDefines.h"
@@ -21,3 +22,4 @@ bool loadHShader(std::string name, ID3D11Device* device, ID3D11HullShader*& hSha
 bool loadDShader(std::string name, ID3D11Device* device, ID3D11DomainShader*& dShader);
 bool CreateTexture(std::string file, ID3D11Device* device, ID3D11Texture2D*& tex, ID3D11ShaderResourceView*& texSRV);
 bool CreateInputLayoutOwn(ID3D11Device* device, ID3D11InputLayout*& inputLayout, std::string& VbyteCode, D3D11_INPUT_ELEMENT_DESC inputDesc[], int nrOfElements);
+bool getPixelArray(std::string file, std::vector<vec3>& colors);

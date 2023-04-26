@@ -235,7 +235,7 @@ vec3 lerp(const vec3& a, const vec3& b, float procent){
 	return theReturn;
 }
 
-void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<VolumetricVertex> &vertecies)
+void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<VolumetricVertex> &vertecies, const std::vector<vec3>& colors)
 {
 	if(subDivision < 1){
 		return;
@@ -246,18 +246,21 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	//b -> c = y
 	//c -> a = z
 	vec3 vx = lerp(newVertecies[0], newVertecies[1], 0.5f);
-	VolumetricVertex x(vx.x, vx.y, vx.z, 0, 0, 1, 0.75);
+	vec3 c = colors[RandomNumber(0, colors.size())];
+	VolumetricVertex x(vx.x, vx.y, vx.z, c.x, c.y, c.z, 1.0f);
 
-
+	c = colors[RandomNumber(0, colors.size())];
 	vec3 vy = lerp(newVertecies[1], newVertecies[2], 0.5f);
-	VolumetricVertex y(vy.x, vy.y, vy.z, 0, 0, 1, 0.75);
+	VolumetricVertex y(vy.x, vy.y, vy.z, c.x, c.y, c.z, 1.0f);
 
+	c = colors[RandomNumber(0, colors.size())];
 	vec3 vz = lerp(newVertecies[2], newVertecies[0], 0.5f);
-	VolumetricVertex z(vz.x, vz.y, vz.z, 0, 0, 1, 0.75);
+	VolumetricVertex z(vz.x, vz.y, vz.z, c.x, c.y, c.z, 1.0f);
 
+	c = colors[RandomNumber(0, colors.size())];
 	//find the middle of the triangle
 	vec3 vm = vec3((vx.x + vy.x + vz.x) / 3, (vx.y + vy.y + vz.y) / 3, (vx.z + vy.z + vz.z) / 3);
-	VolumetricVertex m(vm.x, vm.y, vm.z, 0, 0, 1, 0.75);
+	VolumetricVertex m(vm.x, vm.y, vm.z, c.x, c.y, c.z, 1.0f);
 
 #ifdef TRADITIONALSKELETALANIMATION
 	//x.boneIDs[0] = newVertecies[0].boneIDs[0];
@@ -330,27 +333,27 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	//subdivide
 	// m -> a -> x
 	VolumetricVertex tempArray[3] = {m, newVertecies[0], x};
-	subDivide(subDivision - 1, tempArray, vertecies);
+	subDivide(subDivision - 1, tempArray, vertecies, colors);
 	// m -> x -> b
 	tempArray[1] = x;
 	tempArray[2] = newVertecies[1];
-	subDivide(subDivision, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies, colors);
 	// m -> b -> y
 	tempArray[1] = newVertecies[1];
 	tempArray[2] = y;
-	subDivide(subDivision, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies, colors);
 	// m -> y -> c
 	tempArray[1] = y;
 	tempArray[2] = newVertecies[2];
-	subDivide(subDivision, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies, colors);
 	// m -> c -> z
 	tempArray[1] = newVertecies[2];
 	tempArray[2] = z;
-	subDivide(subDivision, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies, colors);
 	// m -> z -> a
 	tempArray[1] = z;
 	tempArray[2] = newVertecies[0];
-	subDivide(subDivision, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies, colors);
 }
 
 void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
@@ -367,20 +370,22 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 	aiMesh* mesh = scene->mMeshes[0];
 	
 	static const float nl = 1.00;
-
-	//load mesh/particle form
-	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
-		aiVector3D vertex = mesh->mVertices[v];
-		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
-	}
+	std::vector<vec3> colors;
 
 	if(scene->HasMaterials() || scene->HasTextures()){
 		aiMaterial* pMaterial = scene->mMaterials[0];
 		aiString path;
 		pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL);
 		std::string p(path.data);
-		std::cout << p << std::endl;
-		
+		//getPixelArray(p, sandColors);
+		getPixelArray("objects/sandTexture.jpg", colors);
+    }
+
+	//load mesh/particle form
+	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
+		aiVector3D vertex = mesh->mVertices[v];
+		vec3 c = colors[RandomNumber(0, colors.size())];
+		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, c.x, c.y, c.z, 1.0f));
 	}
 
 	if(scene->HasAnimations()){
@@ -397,7 +402,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		//get one lenght that we will use for all
 		float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
 		//int R = l / nl;
-		int R = 1;
+		int R = 3;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 
@@ -405,7 +410,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			vertecies[mesh->mFaces[f].mIndices[2]]
 		};
 	
-		subDivide(R, tempArray, vertecies);
+		subDivide(R, tempArray, vertecies, colors);
 	}
 	std::cout << "Number of particles " << vertecies.size() << std::endl;
 }

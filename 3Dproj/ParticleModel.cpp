@@ -206,9 +206,9 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	if(!this->hasAnimation){
 		return;
 	}
-	//if(getkey('P')){
+	if(getkey('P')){
 		time += dt * animation.tick;
-	//}
+	}
 
 	getPose(rootJoint, animation, time);
 	
