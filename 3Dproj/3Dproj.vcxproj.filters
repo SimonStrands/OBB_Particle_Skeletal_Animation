@@ -417,9 +417,6 @@
     <FxCompile Include="PixelBillShader.hlsl">
       <Filter>Resource Files\Shaders\Pixel</Filter>
     </FxCompile>
-    <FxCompile Include="SkeletonAnimationVS.hlsl">
-      <Filter>Resource Files\Shaders\Vertex</Filter>
-    </FxCompile>
     <FxCompile Include="Debugging_test.hlsl">
       <Filter>Resource Files\Shaders\Geometry</Filter>
     </FxCompile>
