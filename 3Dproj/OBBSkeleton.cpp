@@ -49,9 +49,9 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 
 	CreateVertexBuffer(gfx->getDevice(), verteciesPoints, vertexBuffer, false);
 	CreateVertexBuffer(gfx->getDevice(), indecies, indeciesBuffer, true);
-	CreateConstBuffer(gfx, constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverterPrev);
-	CreateConstBuffer(gfx, constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
-	CreateConstBuffer(gfx, constantBufferDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw), &constBufferConverterDebugDraw);
+	CreateConstBuffer(gfx, this->constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverterPrev);
+	CreateConstBuffer(gfx, this->constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
+	CreateConstBuffer(gfx, this->constantBufferDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw), &constBufferConverterDebugDraw);
 }
 
 OBBSkeletonDebug::~OBBSkeletonDebug()

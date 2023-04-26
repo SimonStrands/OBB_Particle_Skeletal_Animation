@@ -89,7 +89,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         {
             currentVelocity += velocities[i] * force;
         }
-        currentVelocity *= (1 / nrOfBonesEffected);
+        currentVelocity *= (1.f / nrOfBonesEffected);
     }
     else
     {

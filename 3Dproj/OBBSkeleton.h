@@ -7,7 +7,7 @@
 
 static const int MAXNUMBEROFBONES = 55;
 
-struct OBBSkeletonOBBBufferTime : CB {
+struct OBBSkeletonOBBBufferTime : public CB {
 	struct{
 		float element;
 	}dt;
@@ -16,7 +16,7 @@ struct OBBSkeletonOBBBufferTime : CB {
 	}random;
 };
 
-struct OBBSkeletonOBBBuffer : CB{
+struct OBBSkeletonOBBBuffer : public CB{
 	struct{
 		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
 	}transform;
@@ -41,7 +41,7 @@ struct OBBSkeletonOBBBuffer : CB{
 	}
 };
 
-struct OBBSkeletonOBBBufferDebugDraw : CB{
+struct OBBSkeletonOBBBufferDebugDraw : public CB{
 	struct{
 		DirectX::XMMATRIX element[MAXNUMBEROFBONES];
 	}transform;

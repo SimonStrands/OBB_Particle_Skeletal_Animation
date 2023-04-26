@@ -39,6 +39,9 @@ struct LCBGS : public CB {
 	struct {
 		int element;//use this as a flag so nroflights = i - MAXNROFLIGHTS;
 	}nrOfLights;
+	struct{
+		int element[3];
+	}padding;
 };
 
 struct Vcb : public CB{
