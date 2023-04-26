@@ -237,7 +237,10 @@ vec3 lerp(const vec3& a, const vec3& b, float procent){
 
 void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<VolumetricVertex> &vertecies)
 {
-
+	if(subDivision < 1){
+		return;
+	}
+	subDivision = subDivision - 1;
 	//find the 50% of point 
 	//a -> b = x
 	//b -> c = y
@@ -331,23 +334,23 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	// m -> x -> b
 	tempArray[1] = x;
 	tempArray[2] = newVertecies[1];
-	subDivide(subDivision - 1, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies);
 	// m -> b -> y
 	tempArray[1] = newVertecies[1];
 	tempArray[2] = y;
-	subDivide(subDivision - 1, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies);
 	// m -> y -> c
 	tempArray[1] = y;
 	tempArray[2] = newVertecies[2];
-	subDivide(subDivision - 1, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies);
 	// m -> c -> z
 	tempArray[1] = newVertecies[2];
 	tempArray[2] = z;
-	subDivide(subDivision - 1, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies);
 	// m -> z -> a
 	tempArray[1] = z;
 	tempArray[2] = newVertecies[0];
-	subDivide(subDivision - 1, tempArray, vertecies);
+	subDivide(subDivision, tempArray, vertecies);
 }
 
 void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
@@ -385,7 +388,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		//get one lenght that we will use for all
 		float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
 		//int R = l / nl;
-		int R = 2;
+		int R = 1;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 
