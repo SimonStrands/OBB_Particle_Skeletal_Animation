@@ -38,6 +38,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
  
     //currColor = float4(0, 0, 1, 1);
     
+
+
     if (currPos.y <= 0)
     {
         int ourRandomNumber = (random * (DTid.x + 1));
@@ -58,6 +60,16 @@ void main( uint3 DTid : SV_DispatchThreadID )
         //randomize a offset position 
         currPos = rotatedOffset;
         currentVelocity = float3(0,0,0);
+
+
+        if (randomBone == 5 || (randomBone >= 9 &&randomBone <= 24)||(randomBone>=28&&randomBone<=43))
+        {
+            currColor = float4(0.3f, 0.4f, 0.f,1.f);
+        }
+        else
+        {
+            currColor = float4(0.0f, 0.6f, 3.f, 1.f);
+        }
     }
     
     ///////////////REAL CODE/////////////////////////
