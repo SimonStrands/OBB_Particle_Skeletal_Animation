@@ -1,4 +1,6 @@
 //hereChange
+#include "SkeletalData.hlsli"
+
 struct VertexShaderInput {
 	float3 position : POSITION;
 	float2 uv : UV;
@@ -25,7 +27,7 @@ cbuffer CBuf
 	row_major matrix view;
 	row_major matrix projection;
 	row_major matrix lightView;
-	row_major matrix jointTransforms[50];//max bones 50;
+    row_major matrix jointTransforms[MAXNUMBEROFBONES];
 };
 
 VertexShaderOutput main(VertexShaderInput input) {
