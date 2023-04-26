@@ -374,6 +374,15 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, 0, 0, 1, 0.75f));
 	}
 
+	if(scene->HasMaterials() || scene->HasTextures()){
+		aiMaterial* pMaterial = scene->mMaterials[0];
+		aiString path;
+		pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL);
+		std::string p(path.data);
+		std::cout << p << std::endl;
+		
+	}
+
 	if(scene->HasAnimations()){
 		//load Bones
 		loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size());
