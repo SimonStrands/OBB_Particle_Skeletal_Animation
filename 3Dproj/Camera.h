@@ -40,7 +40,7 @@ private:
 
 	vec3 FUL[3];//Forward, Up, Left
 	DirectX::XMFLOAT3 translation;
-	float movementspeed = 20;
+	float movementspeed = 10;
 	void Translate(float dt);
 
 	//data

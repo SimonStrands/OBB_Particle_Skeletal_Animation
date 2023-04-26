@@ -70,7 +70,6 @@ Game::~Game()
 	for (int i = 0; i < obj.size(); i++) {
 		delete obj[i];
 	}
-	delete particleModel;
 }
 
 
@@ -153,7 +152,7 @@ void Game::Update()
 	}
 	static bool onceUpdate = false;
 	if(onceUpdate){
-		particleModel->updateParticles((float)dt.dt(), gfx);
+		particleModel.updateParticles((float)dt.dt(), gfx);
 	}
 	onceUpdate = true;
 	
@@ -205,7 +204,7 @@ void Game::DrawToBuffer()
 
 void Game::ForwardDraw()
 {
-	particleModel->draw(gfx);
+	particleModel.draw(gfx);
 }
 
 void Game::DrawAllShadowObject()
@@ -247,7 +246,9 @@ void Game::setUpObject()
 	//cameras
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 0.f, 10.f), vec3(0.f, 0.f, 0.f), vec3(2.f, 2.0f, 2.0f)));//main
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(2.f, 2.0f, 2.0f)));//second
-	
-	particleModel = new ParticleModel(gfx, "objects/sillydance2.fbx", vec3());
+
+	//particleModel.init(gfx, "objects/sillydance2.fbx", vec3());
+	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
 	//particleModel = new ParticleModel(gfx, "objects/test2.fbx", vec3());
+	//particleModel = new ParticleModel(gfx, "objects/quad2.obj", vec3());
 }

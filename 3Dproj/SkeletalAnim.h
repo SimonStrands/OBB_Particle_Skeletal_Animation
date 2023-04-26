@@ -9,7 +9,7 @@
 struct Bone {
 	std::vector<Bone> childJoints;
 	//Bone* parent = nullptr;
-	int id;
+	int id = -1;
 	std::string name;
 	DirectX::XMMATRIX inverseBindPoseMatrix;
 	DirectX::XMMATRIX boneMatrix;

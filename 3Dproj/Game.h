@@ -51,7 +51,7 @@ private:
 	Light **light;
 	std::vector<GameObject*> LightVisualizers;
 	std::vector<GameObject*> obj;
-	ParticleModel* particleModel;
+	ParticleModel particleModel;
 
 	//var
 	int nrOfLight;//must still exist

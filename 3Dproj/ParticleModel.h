@@ -9,7 +9,7 @@
 #include <fstream>
 
 //for skeletal animation and moving particles
-struct ComputerShaderParticleModelConstBuffer : CB{
+struct ComputerShaderParticleModelConstBuffer : public CB{
 	struct{
 		DirectX::XMMATRIX element;
 	}Transformations;
@@ -24,7 +24,9 @@ struct ComputerShaderParticleModelConstBuffer : CB{
 
 class ParticleModel{
 public:
-	ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position);
+	ParticleModel();
+	ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 position);//some weird way doesn't work in release if we create * new
+	void init(Graphics*& gfx, const std::string& filePath, vec3 position);
 	~ParticleModel();
 	void addAnimation(const std::string& filePath);
 	void updateParticles(float dt, Graphics*& gfx);
@@ -32,7 +34,9 @@ public:
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
-	OBBSkeletonDebug* OBBSkeleton;
+	#ifndef TRADITIONALSKELETALANIMATION
+	OBBSkeletonDebug OBBSkeleton;
+	#endif
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);
@@ -75,6 +79,7 @@ private:
 	//should never be 0
 	float time = 0.000001f;
 	Bone rootJoint;
+	bool hasAnimation;
 
 	
 };
