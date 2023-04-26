@@ -34,7 +34,9 @@ public:
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
-	OBBSkeletonDebug* OBBSkeleton;
+	#ifndef TRADITIONALSKELETALANIMATION
+	OBBSkeletonDebug OBBSkeleton;
+	#endif
 private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);

@@ -56,8 +56,10 @@ struct OBBSkeletonOBBBufferDebugDraw : public CB{
 
 class OBBSkeletonDebug{
 public:
-	OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);
+	OBBSkeletonDebug();
+	OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);//some reason doesn't work in release mode
 	~OBBSkeletonDebug();
+	void init(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> &sizes, Graphics*& gfx);
 	void setTransformations(std::vector<DirectX::XMMATRIX>& transform);
 	void setTransform(int id, const DirectX::XMMATRIX transform);
 	std::vector<DirectX::XMMATRIX>& getTransforms();

@@ -3,7 +3,24 @@
 #include "CreateBuffer.h"
 #include "Random.h"
 
+OBBSkeletonDebug::OBBSkeletonDebug()
+{
+}
+
 OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3> & sizes, Graphics*& gfx)
+{
+	init(nrOfBones, sizes, gfx);
+}
+
+OBBSkeletonDebug::~OBBSkeletonDebug()
+{
+	vertexBuffer->Release();
+	indeciesBuffer->Release();
+	constantBuffer->Release();
+	constantBufferTime->Release();
+}
+
+void OBBSkeletonDebug::init(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT3>& sizes, Graphics*& gfx)
 {
 	constBufferConverterTime.dt.element = 0;
 	if(nrOfBones != sizes.size()){
@@ -52,15 +69,6 @@ OBBSkeletonDebug::OBBSkeletonDebug(unsigned int nrOfBones, std::vector<DirectX::
 	CreateConstBuffer(gfx, this->constantBuffer, sizeof(OBBSkeletonOBBBuffer), &constBufferConverterPrev);
 	CreateConstBuffer(gfx, this->constantBufferTime, sizeof(OBBSkeletonOBBBufferTime), &constBufferConverterTime);
 	CreateConstBuffer(gfx, this->constantBufferDebugDraw, sizeof(OBBSkeletonOBBBufferDebugDraw), &constBufferConverterDebugDraw);
-}
-
-OBBSkeletonDebug::~OBBSkeletonDebug()
-{
-	vertexBuffer->Release();
-	indeciesBuffer->Release();
-	constantBuffer->Release();
-	constantBufferTime->Release();
-	
 }
 
 void OBBSkeletonDebug::setTransformations(std::vector<DirectX::XMMATRIX>& transform)

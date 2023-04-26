@@ -184,8 +184,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	}
 
 	sizesFile.close();
-	OBBSkeleton = new OBBSkeletonDebug((unsigned int)sizes.size(), sizes, gfx);
-	getHitBoxPosition(rootJoint, OBBSkeleton->getTransforms());
+	OBBSkeleton.init((unsigned int)sizes.size(), sizes, gfx);
+	getHitBoxPosition(rootJoint, OBBSkeleton.getTransforms());
 
 	#endif // DEBUG
 }
@@ -199,9 +199,6 @@ ParticleModel::~ParticleModel()
 	cUpdate->Release();
 	billUAV->Release();
 	SkeletonConstBuffer->Release();
-	if(OBBSkeleton != nullptr){
-		delete OBBSkeleton;
-	}
 }
 
 void ParticleModel::updateParticles(float dt, Graphics*& gfx)
@@ -225,14 +222,14 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	#ifndef TRADITIONALSKELETALANIMATION
 	
-	OBBSkeleton->updateObbPosition(rootJoint, SkeletonConstBufferConverter);
-	OBBSkeleton->update(gfx, dt);
+	OBBSkeleton.updateObbPosition(rootJoint, SkeletonConstBufferConverter);
+	OBBSkeleton.update(gfx, dt);
 	
 	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
 	
-	gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &OBBSkeleton->getSkeletalTimeConstBuffer());
-	gfx->get_IMctx()->CSSetConstantBuffers(1, 1, &OBBSkeleton->getSkeletalTransformConstBuffer());
+	gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &OBBSkeleton.getSkeletalTimeConstBuffer());
+	gfx->get_IMctx()->CSSetConstantBuffers(1, 1, &OBBSkeleton.getSkeletalTransformConstBuffer());
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 	
@@ -266,7 +263,7 @@ void ParticleModel::draw(Graphics*& gfx)
 	if(!this->hasAnimation){
 		return;
 	}
-	OBBSkeleton->draw(gfx);
+	OBBSkeleton.draw(gfx);
     #endif
 }
 
