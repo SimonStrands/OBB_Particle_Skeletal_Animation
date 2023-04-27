@@ -111,7 +111,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	for (int i = 0; i < vertecies.size(); i++)
 	{
 
-		DirectX::XMMATRIX boneTransform;
+		DirectX::XMMATRIX boneTransform = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 		if (ids[i].x > -0.5f)
 		{
