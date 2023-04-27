@@ -112,12 +112,6 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	{
 
 		DirectX::XMMATRIX boneTransform;
-		DirectX::XMFLOAT4X4 mat = { 0.f, 0.f, 0.f, 0.f,
-									 0.f, 0.f, 0.f, 0.f,
-									 0.f, 0.f, 0.f, 0.f,
-									 0.f, 0.f, 0.f, 0.f };
-		boneTransform = DirectX::XMLoadFloat4x4(&mat);
-
 
 		if (ids[i].x > -0.5f)
 		{
@@ -135,8 +129,6 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 		{
 			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].w)] * weights[i].w;
 		}
-
-		DirectX::XMStoreFloat4x4(&mat, boneTransform);
 	
 		DirectX::XMFLOAT4 temp = DirectX::XMFLOAT4(vertecies[i].pos[0], vertecies[i].pos[1], vertecies[i].pos[2], 1.f);
 		DirectX::XMVECTOR vPoint = DirectX::XMLoadFloat4(&temp);
