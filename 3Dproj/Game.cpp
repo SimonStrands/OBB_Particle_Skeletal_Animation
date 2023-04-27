@@ -12,12 +12,9 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	rm = new ResourceManager(gfx);
 	
 	//create lights
-	nrOfLight = 4;
+	nrOfLight = 1;
 	light = new Light * [nrOfLight];
-	light[0] = new DirLight(vec3(0,60,8), vec3(0.1f, -PI/2, 1.f), 50,50);
-	light[1] = new SpotLight(vec3(18, 46, 45), vec3(-2.4f, -0.5, 1));
-	light[2] = new SpotLight(vec3(8, 47.f, 0), vec3(0, -1, 1));
-	light[3] = new SpotLight(vec3(30, 50, 0), vec3(-1, -1, 1));
+	light[0] = new SpotLight(vec3(0, 12, 7.0f), vec3(0.f, -3.14f/2.f, 0.f));
 	gfx->getLightconstbufferforCS()->nrOfLights.element = nrOfLight;
 	
 	//shadow map needs to take more lights
@@ -103,6 +100,7 @@ void Game::run()
 		camera->setPosition(camLP);
 		camera->setRotation(camLR);
 		gfx->setProjection(0);//last can be dir light
+		gfx->RsetViewPort();
 
 
 		Update();
@@ -113,6 +111,8 @@ void Game::run()
 		this->DrawToBuffer();
 		
 		defRend->BindSecondPass(shadowMap->GetshadowResV());
+
+		gfx->get_IMctx()->PSSetShaderResources(5, 1, &shadowMap->GetshadowResV());
 
 		gfx->setTransparant(true);
 		gfx->setRenderTarget();
@@ -213,9 +213,9 @@ void Game::DrawAllShadowObject()
 	gfx->get_IMctx()->GSSetShader(nullptr, nullptr, 0);
 	gfx->get_IMctx()->PSSetShader(nullptr, nullptr, 0);
 	for (int i = 0; i < obj.size(); i++) {
-
 		obj[i]->draw(gfx, true);
 	}
+	particleModel.drawShadow(gfx);
 	camera->calcFURVectors();
 }
 
@@ -244,8 +244,8 @@ void Game::setUpObject()
 {
 	////////OBJECTS///////////
 	//cameras
-	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 0.f, 10.f), vec3(0.f, 0.f, 0.f), vec3(2.f, 2.0f, 2.0f)));//main
-	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(2.f, 2.0f, 2.0f)));//second
+	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 0.f, 10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f, 0.01f, 0.01f)));//main
+	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(1.f, 1.0f, 1.0f)));//second
 
 	//particleModel.init(gfx, "objects/sillydance2.fbx", vec3());
 	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());

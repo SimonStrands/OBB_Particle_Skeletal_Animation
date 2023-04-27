@@ -263,60 +263,42 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	VolumetricVertex m(vm.x, vm.y, vm.z, c.x, c.y, c.z, 1.0f);
 
 #ifdef TRADITIONALSKELETALANIMATION
-	//x.boneIDs[0] = newVertecies[0].boneIDs[0];
-	//x.boneIDs[1] = newVertecies[1].boneIDs[0];
-	//x.boneIDs[2] = newVertecies[0].boneIDs[1];
-	//x.boneIDs[3] = newVertecies[1].boneIDs[1];
-	//x.boneWeights[0] = newVertecies[0].boneWeights[0];
-	//x.boneWeights[1] = newVertecies[1].boneWeights[0];
-	//x.boneWeights[2] = newVertecies[0].boneWeights[1];
-	//x.boneWeights[3] = newVertecies[1].boneWeights[1];
-	//
-	//y.boneIDs[0] = newVertecies[1].boneIDs[0];
-	//y.boneIDs[1] = newVertecies[2].boneIDs[0];
-	//y.boneIDs[2] = newVertecies[1].boneIDs[1];
-	//y.boneIDs[3] = newVertecies[2].boneIDs[1];
-	//y.boneWeights[0] = newVertecies[1].boneWeights[0];
-	//y.boneWeights[1] = newVertecies[2].boneWeights[0];
-	//y.boneWeights[2] = newVertecies[1].boneWeights[1];
-	//y.boneWeights[3] = newVertecies[2].boneWeights[1];
-	//
-	//z.boneIDs[0] = newVertecies[2].boneIDs[0];
-	//z.boneIDs[1] = newVertecies[0].boneIDs[0];
-	//z.boneIDs[2] = newVertecies[2].boneIDs[1];
-	//z.boneIDs[3] = newVertecies[0].boneIDs[1];
-	//z.boneWeights[0] = newVertecies[2].boneWeights[0];
-	//z.boneWeights[1] = newVertecies[0].boneWeights[0];
-	//z.boneWeights[2] = newVertecies[2].boneWeights[1];
-	//z.boneWeights[3] = newVertecies[0].boneWeights[1];
-	//
-	//m.boneIDs[0] = x.boneIDs[0];
-	//m.boneIDs[1] = y.boneIDs[0];
-	//m.boneIDs[2] = z.boneIDs[0];
-	//m.boneWeights[0] = x.boneWeights[0];
-	//m.boneWeights[1] = y.boneWeights[0];
-	//m.boneWeights[2] = z.boneWeights[0];
-	//
-	//std::vector<VolumetricVertex*> vert;
-	//vert.push_back(&x);
-	//vert.push_back(&y);
-	//vert.push_back(&z);
-	//vert.push_back(&m);
-	//
-	//for (int w = 0; w < vert.size(); w++) {
-	//	
-	//	float totalWeight = vert[w]->boneWeights[0]
-	//		+ vert[w]->boneWeights[1]
-	//		+ vert[w]->boneWeights[2]
-	//		+ vert[w]->boneWeights[3];
-	//
-	//	if (totalWeight > 0.0f) {
-	//		vert[w]->boneWeights[0] = vert[w]->boneWeights[0] / totalWeight;
-	//		vert[w]->boneWeights[1] = vert[w]->boneWeights[1] / totalWeight;
-	//		vert[w]->boneWeights[2] = vert[w]->boneWeights[2] / totalWeight;
-	//		vert[w]->boneWeights[3] = vert[w]->boneWeights[3] / totalWeight;
-	//	}
-	//}
+	x.boneIDs[0]		= newVertecies[0].boneIDs[0];
+	x.boneIDs[1]		= newVertecies[0].boneIDs[1];
+	x.boneIDs[2]		= newVertecies[0].boneIDs[2];
+	x.boneIDs[3]		= newVertecies[0].boneIDs[3];
+	x.boneWeights[0]    = newVertecies[0].boneWeights[0];
+	x.boneWeights[1]    = newVertecies[0].boneWeights[1];
+	x.boneWeights[2]    = newVertecies[0].boneWeights[2];
+	x.boneWeights[3]    = newVertecies[0].boneWeights[3];
+	
+	y.boneIDs[0]        = newVertecies[1].boneIDs[0];
+	y.boneIDs[1]        = newVertecies[1].boneIDs[1];
+	y.boneIDs[2]        = newVertecies[1].boneIDs[2];
+	y.boneIDs[3]        = newVertecies[1].boneIDs[3];
+	y.boneWeights[0]    = newVertecies[1].boneWeights[0];
+	y.boneWeights[1]    = newVertecies[1].boneWeights[1];
+	y.boneWeights[2]    = newVertecies[1].boneWeights[2];
+	y.boneWeights[3]    = newVertecies[1].boneWeights[3];
+	
+	z.boneIDs[0]        = newVertecies[2].boneIDs[0];
+	z.boneIDs[1]        = newVertecies[2].boneIDs[1];
+	z.boneIDs[2]        = newVertecies[2].boneIDs[2];
+	z.boneIDs[3]        = newVertecies[2].boneIDs[3];
+	z.boneWeights[0]    = newVertecies[2].boneWeights[0];
+	z.boneWeights[1]    = newVertecies[2].boneWeights[1];
+	z.boneWeights[2]    = newVertecies[2].boneWeights[2];
+	z.boneWeights[3]    = newVertecies[2].boneWeights[3];
+	
+	m.boneIDs[0]       = newVertecies[2].boneIDs[0];
+	m.boneIDs[1]       = newVertecies[2].boneIDs[1];
+	m.boneIDs[2]       = newVertecies[2].boneIDs[2];
+	m.boneIDs[3]       = newVertecies[2].boneIDs[3];
+	m.boneWeights[0]   = newVertecies[2].boneWeights[0]; 
+	m.boneWeights[1]   = newVertecies[2].boneWeights[1]; 
+	m.boneWeights[2]   = newVertecies[2].boneWeights[2]; 
+	m.boneWeights[3]   = newVertecies[2].boneWeights[3]; 
+	
 #endif // TRADITIONALSKELETALANIMATION
 
 
@@ -402,7 +384,7 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		//get one lenght that we will use for all
 		//float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
 		//int R = l / nl;
-		const int R = 1;
+		const int R = 3;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 
