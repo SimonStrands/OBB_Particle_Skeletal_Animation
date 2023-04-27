@@ -140,7 +140,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	
 		DirectX::XMFLOAT4 temp = DirectX::XMFLOAT4(vertecies[i].pos[0], vertecies[i].pos[1], vertecies[i].pos[2], 1.f);
 		DirectX::XMVECTOR vPoint = DirectX::XMLoadFloat4(&temp);
-		DirectX::XMVector4Transform(vPoint, boneTransform);
+		boneTransform = DirectX::XMMatrixTranspose(boneTransform);
+		vPoint = DirectX::XMVector4Transform(vPoint, boneTransform);
 		DirectX::XMStoreFloat4(&temp, vPoint);
 		vertecies[i].pos[0] = temp.x;
 		vertecies[i].pos[1] = temp.y;
