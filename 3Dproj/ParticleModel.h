@@ -31,6 +31,7 @@ public:
 	void addAnimation(const std::string& filePath);
 	void updateParticles(float dt, Graphics*& gfx);
 	void draw(Graphics*& gfx);
+	void drawShadow(Graphics*& gfx);
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
@@ -47,6 +48,7 @@ private:
 	//vertex geometry and pixel shader for drawing the particles
 	ID3D11VertexShader* VS;
 	ID3D11PixelShader* PS;
+	ID3D11PixelShader* PSShadow;
 	ID3D11GeometryShader* GS;
 
 	//vertex buffer with position, velocity and color

@@ -7,12 +7,16 @@ ShadowMap::ShadowMap(SpotLight** light, int nrOfLights, Graphics* gfx)
 	this->gfx = gfx;
 	this->light = light;
 	this->nrOfLights = nrOfLights;
+	//dont know if the const here should be two or three based on viewers angle
+	int WIDTH = (UINT)gfx->getWH().x * 2;
+	int HEIGHT = (UINT)gfx->getWH().y * 2;
 	std::string a;
 	loadVShader("VertexShadow.cso", gfx->getDevice(), vertexShadow, a);
 	loadPShader("PixelShadow.cso", gfx->getDevice(), pixelShadow);
-	if (!CreateDepthStencil(gfx->getDevice(), (UINT)gfx->getWH().x, (UINT)gfx->getWH().y)) {
+	if (!CreateDepthStencil(gfx->getDevice(), WIDTH, HEIGHT)) {
 		printf("something didnt go right");
 	}
+	SetViewport(ShadowViewPort, WIDTH, HEIGHT);
 }
 
 ShadowMap::~ShadowMap()
@@ -49,7 +53,6 @@ ID3D11ShaderResourceView*& ShadowMap::GetshadowResV()
 	return this->shadowResV;
 }
 
-
 ID3D11ShaderResourceView*& ShadowMap::fromDepthToSRV()
 {	
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -73,9 +76,9 @@ ID3D11ShaderResourceView*& ShadowMap::fromDepthToSRV()
 	return shadowResV;
 }
 
-
 void ShadowMap::setUpdateShadow()
 {
+	gfx->get_IMctx()->RSSetViewports(1, &this->ShadowViewPort);
 	for (int i = 0; i < nrOfLights; i++) {
 		gfx->get_IMctx()->ClearDepthStencilView(dsViews[i], D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 	}

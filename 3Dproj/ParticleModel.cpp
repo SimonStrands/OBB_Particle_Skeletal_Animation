@@ -166,6 +166,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
 	this->PS = gfx->getPS()[4];
+	this->PSShadow = gfx->getPS()[3];
 	this->inputLayout = gfx->getInputLayout()[2];
 
 	loadCShader("ParticleSkeletalAnimationComputeShader.cso", gfx->getDevice(), cUpdate);
@@ -319,6 +320,25 @@ void ParticleModel::draw(Graphics*& gfx)
 	}
 	OBBSkeleton.draw(gfx);
     #endif
+}
+
+void ParticleModel::drawShadow(Graphics*& gfx)
+{
+		UINT offset = 0;
+	static UINT strid = sizeof(VolumetricVertex);
+
+	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+	this->updateShaders(gfx);
+	gfx->get_IMctx()->VSSetShader(this->VS, nullptr, 0);
+	gfx->get_IMctx()->GSSetShader(this->GS, nullptr, 0);
+	gfx->get_IMctx()->PSSetShader(this->PSShadow, nullptr, 0);
+	gfx->get_IMctx()->PSSetShaderResources(0, 1, &diffuseTexture);
+	gfx->get_IMctx()->VSSetConstantBuffers(0, 1, &Vg_pConstantBuffer);
+	gfx->get_IMctx()->IASetInputLayout(this->inputLayout);
+
+	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
+	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 }
 
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
