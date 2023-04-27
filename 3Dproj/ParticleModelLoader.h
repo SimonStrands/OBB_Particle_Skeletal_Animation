@@ -15,6 +15,10 @@ struct SkeletonConstantBuffer : public CB {
 		DirectX::XMMATRIX element[maxNumberOfBones];
 	}Transformations;
 };
+struct IdAndWeight{
+	vec4 IDs;
+	vec4 weights;
+};
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
 void loadWeightsAndIds(std::vector<DirectX::XMFLOAT4>& weights,
@@ -23,7 +27,8 @@ void loadParticleModel(
 	std::vector<VolumetricVertex>& vertecies, 
 	const std::string& filePath,
 	Animation& animation,
-	Bone& rootJoint
+	Bone& rootJoint,
+	std::map<int, IdAndWeight>& idandWeight
 );
 
 void getHitBoxPosition(

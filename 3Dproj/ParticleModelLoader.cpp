@@ -66,7 +66,8 @@ void loadBoneDataToVertecies(
 	Bone& rootJoint, 
 	aiMesh* mesh,
 	aiNode* node,
-	int verteciesSize
+	int verteciesSize,
+	std::map<int, IdAndWeight>& idandWeight
 ){
 	std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo = {};
 	std::vector<uint16_t> boneCounts;
@@ -105,6 +106,37 @@ void loadBoneDataToVertecies(
 
 			}
 		}
+        #else
+		for(int i = 0; i < verteciesSize; i++){
+			idandWeight.insert(std::pair<int, IdAndWeight>(i, IdAndWeight()));
+		}
+		for (unsigned int j = 0; j < bone->mNumWeights; j++) {
+			unsigned int id = bone->mWeights[j].mVertexId;
+			float weight = bone->mWeights[j].mWeight;
+			boneCounts[id]++;
+			switch (boneCounts[id]) {
+			case 1:
+				idandWeight[id].IDs.xyz.x = i;
+				idandWeight[id].weights.xyz.x = weight;
+				break;
+			case 2:
+				idandWeight[id].IDs.xyz.y = i;
+				idandWeight[id].weights.xyz.y = weight;
+				break;
+			case 3:
+				idandWeight[id].IDs.xyz.z = i;
+				idandWeight[id].weights.xyz.z = weight;
+				break;
+			case 4:
+				idandWeight[id].IDs.w = i;
+				idandWeight[id].weights.w = weight;
+				break;
+			default:
+
+				break;
+
+			}
+		}
 		#endif
 
 	}
@@ -122,6 +154,21 @@ void loadBoneDataToVertecies(
 			vertecies[w].boneWeights[1] = vertecies[w].boneWeights[1] / totalWeight;
 			vertecies[w].boneWeights[2] = vertecies[w].boneWeights[2] / totalWeight;
 			vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
+		}
+	}
+    #else
+	for (auto & x : idandWeight){
+		
+		float totalWeight = x.second.weights.xyz.x
+			+ x.second.weights.xyz.y
+			+ x.second.weights.xyz.z
+			+ x.second.weights.w;
+	
+		if (totalWeight > 0.0f) {
+			x.second.weights.xyz.x = x.second.weights.xyz.x / totalWeight;
+			x.second.weights.xyz.y = x.second.weights.xyz.y / totalWeight;
+			x.second.weights.xyz.z = x.second.weights.xyz.z / totalWeight;
+			x.second.weights.w     = x.second.weights.w     / totalWeight;
 		}
 	}
 	#endif 
@@ -235,7 +282,14 @@ vec3 lerp(const vec3& a, const vec3& b, float procent){
 	return theReturn;
 }
 
-void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<VolumetricVertex> &vertecies, const std::vector<vec3>& colors)
+void subDivide(
+	int subDivision, 
+	VolumetricVertex newVertecies[],
+	unsigned int id[],
+	std::vector<VolumetricVertex> &vertecies, 
+	const std::vector<vec3>& colors,
+	std::map<int, IdAndWeight>& idandWeight
+)
 {
 	if(subDivision < 1){
 		return;
@@ -246,18 +300,18 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	//b -> c = y
 	//c -> a = z
 	vec3 vx = lerp(newVertecies[0], newVertecies[1], 0.5f);
-	vec3 c = colors[RandomNumber(0, colors.size())];
+	vec3 c = colors[RandomNumber(0, (int)colors.size())];
 	VolumetricVertex x(vx.x, vx.y, vx.z, c.x, c.y, c.z, 1.0f);
 
-	c = colors[RandomNumber(0, colors.size())];
+	c = colors[RandomNumber(0, (int)colors.size())];
 	vec3 vy = lerp(newVertecies[1], newVertecies[2], 0.5f);
 	VolumetricVertex y(vy.x, vy.y, vy.z, c.x, c.y, c.z, 1.0f);
 
-	c = colors[RandomNumber(0, colors.size())];
+	c = colors[RandomNumber(0, (int)colors.size())];
 	vec3 vz = lerp(newVertecies[2], newVertecies[0], 0.5f);
 	VolumetricVertex z(vz.x, vz.y, vz.z, c.x, c.y, c.z, 1.0f);
 
-	c = colors[RandomNumber(0, colors.size())];
+	c = colors[RandomNumber(0, (int)colors.size())];
 	//find the middle of the triangle
 	vec3 vm = vec3((vx.x + vy.x + vz.x) / 3, (vx.y + vy.y + vz.y) / 3, (vx.z + vy.z + vz.z) / 3);
 	VolumetricVertex m(vm.x, vm.y, vm.z, c.x, c.y, c.z, 1.0f);
@@ -298,7 +352,11 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	m.boneWeights[1]   = newVertecies[2].boneWeights[1]; 
 	m.boneWeights[2]   = newVertecies[2].boneWeights[2]; 
 	m.boneWeights[3]   = newVertecies[2].boneWeights[3]; 
-	
+#else
+	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size(), idandWeight[id[0]]));
+	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size() + 1, idandWeight[id[1]]));
+	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size() + 2, idandWeight[id[2]]));
+	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size() + 3, idandWeight[id[2]]));
 #endif // TRADITIONALSKELETALANIMATION
 
 
@@ -315,83 +373,36 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	//subdivide
 	// m -> a -> x
 	VolumetricVertex tempArray[3] = {m, newVertecies[0], x};
-	subDivide(subDivision - 1, tempArray, vertecies, colors);
+	subDivide(subDivision - 1, tempArray, id, vertecies, colors, idandWeight);
 	// m -> x -> b
 	tempArray[1] = x;
 	tempArray[2] = newVertecies[1];
-	subDivide(subDivision, tempArray, vertecies, colors);
+	subDivide(subDivision, tempArray, id, vertecies, colors, idandWeight);
 	// m -> b -> y
 	tempArray[1] = newVertecies[1];
 	tempArray[2] = y;
-	subDivide(subDivision, tempArray, vertecies, colors);
+	subDivide(subDivision, tempArray, id, vertecies, colors, idandWeight);
 	// m -> y -> c
 	tempArray[1] = y;
 	tempArray[2] = newVertecies[2];
-	subDivide(subDivision, tempArray, vertecies, colors);
+	subDivide(subDivision, tempArray, id, vertecies, colors, idandWeight);
 	// m -> c -> z
 	tempArray[1] = newVertecies[2];
 	tempArray[2] = z;
-	subDivide(subDivision, tempArray, vertecies, colors);
+	subDivide(subDivision, tempArray, id, vertecies, colors, idandWeight);
 	// m -> z -> a
 	tempArray[1] = z;
 	tempArray[2] = newVertecies[0];
-	subDivide(subDivision, tempArray, vertecies, colors);
+	subDivide(subDivision, tempArray, id, vertecies, colors, idandWeight);
 }
 
-void loadWeightsAndIds(
-	std::vector<DirectX::XMFLOAT4> &weights, 
-	std::vector<DirectX::XMFLOAT4> &ids, std::string filePath)
-{
-	Assimp::Importer AImporter;
-	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
-	//exit if no scene/file was found
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		std::cout << "ERROR could find scene or file" << std::endl;
-		exit(-2);
-	}
-	aiMesh* mesh = scene->mMeshes[0];
-	//aiNode* node
-
-	std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo = {};
-	std::vector<uint16_t> boneCounts;
-	boneCounts.resize(weights.size());
-
-	for (unsigned int i = 0; i < mesh->mNumBones; i++) {
-		aiBone* bone = mesh->mBones[i];
-		DirectX::XMMATRIX m = AiMatrixToXMMATRIX(bone->mOffsetMatrix);
-		boneInfo[bone->mName.C_Str()] = { i, m };
-		//loop through each vertex that have that bone
-		for (unsigned int j = 0; j < bone->mNumWeights; j++) {
-			unsigned int id = bone->mWeights[j].mVertexId;
-			float weight = bone->mWeights[j].mWeight;
-			boneCounts[id]++;
-			switch (boneCounts[id]) {
-			case 1:
-				ids[id].x = i;
-				weights[id].x = weight;
-				break;
-			case 2:
-				ids[id].y = i;
-				weights[id].y = weight;
-				break;
-			case 3:
-				ids[id].z = i;
-				weights[id].z = weight;
-				break;
-			case 4:
-				ids[id].w = i;
-				weights[id].w = weight;
-				break;
-			default:
-
-				break;
-
-			}
-		}
-	}
-
-}
-void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
+void loadParticleModel(
+	std::vector<VolumetricVertex>& vertecies, 
+	const std::string& filePath, 
+	Animation& animation, 
+	Bone& rootJoint,
+	std::map<int, IdAndWeight>& idandWeight
+)
 {
 	Assimp::Importer AImporter;
 	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
@@ -412,20 +423,19 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 		aiString path;
 		pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL);
 		std::string p(path.data);
-		//getPixelArray(p, sandColors);
 		getPixelArray("objects/sandTexture.jpg", colors);
     }
 
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
-		vec3 c = colors[RandomNumber(0, colors.size())];
+		vec3 c = colors[RandomNumber(0, (int)colors.size())];
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, c.x, c.y, c.z, 1.0f));
 	}
 
 	if(scene->HasAnimations()){
 		//load Bones
-		loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size());
+		loadBoneDataToVertecies(vertecies, rootJoint, mesh, scene->mRootNode, (int)vertecies.size(), idandWeight);
 		
 		//load Animation
 		loadAnimation(scene, animation);
@@ -444,8 +454,9 @@ void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::stri
 			vertecies[mesh->mFaces[f].mIndices[1]], 
 			vertecies[mesh->mFaces[f].mIndices[2]]
 		};
-	
-		subDivide(R, tempArray, vertecies, colors);
+
+		unsigned int verteciesID[] = {mesh->mFaces[f].mIndices[0], mesh->mFaces[f].mIndices[0], mesh->mFaces[f].mIndices[0]};
+		subDivide(R, tempArray, verteciesID, vertecies, colors, idandWeight);
 	}
 	std::cout << "Number of particles " << vertecies.size() << std::endl;
 }
