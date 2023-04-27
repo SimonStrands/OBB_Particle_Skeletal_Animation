@@ -55,7 +55,7 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 
 	ImGui::Begin("Application Specs");
 	std::string dtText = "Delta Time: " + std::to_string(deltaTime);
-
+	
 	//virtual memory currently used by the process
 	PROCESS_MEMORY_COUNTERS_EX pmc;
 	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
