@@ -90,33 +90,5 @@ float4 main(PixelShaderInput input) : SV_TARGET
             lightning += float4(ambientColor, 0);
         }
     }
-    
-    return lightning;
-    
-    //for (int i = 0; i < nrOfLight; i++)
-    //{
-    //    float3 lightDir = normalize(lightPos[i].xyz - input.fragpos.xyz);
-    //    
-    //    if (dot(input.normal, lightDir.xyz) > -0.1)
-    //    {
-    //        float3 viewDir = normalize(cameraPos.xyz - input.fragpos.xyz);
-    //        float3 halfWayDir = normalize(lightDir - viewDir);
-    //
-    //        //defuse
-    //        float3 defuse_light;
-    //        float ammount_diffuse = max(dot(input.normal.xyz, lightDir), 0.0f);
-    //        defuse_light = ammount_diffuse * color.xyz * lightColor.xyz;
-    //            
-    //        //no specular
-    //        lightning.xyz += saturate(ambient_light + defuse_light);
-    //    }
-    //    else
-    //    {
-	//		//we are in shadow
-    //        lightning += float4((ambient_light * color.xyz * lightColor), 0);
-    //    }
-    //    
-    //}
-    
-        return float4(lightning.xyz, input.color.w);
+    return float4(lightning.xyz, input.color.w);
 }
