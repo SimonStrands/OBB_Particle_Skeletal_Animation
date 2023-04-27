@@ -87,7 +87,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
-	loadParticleModel(vertecies, filePath, animation, rootJoint);
+	std::map<int, IdAndWeight> idandWeight;
+	loadParticleModel(vertecies, filePath, animation, rootJoint, idandWeight);
 
 	hasAnimation = false;
 	if(rootJoint.id != -1){
@@ -100,34 +101,27 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	if (!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)) {
 		std::cout << "failed to create const buffer" << std::endl;
 	}
-
-	// get transforms matrix from get pose, every joint for first frame
-	std::vector<DirectX::XMFLOAT4> weights;
-	weights.resize(vertecies.size());
-	std::vector<DirectX::XMFLOAT4> ids;
-	ids.resize(vertecies.size());
-	loadWeightsAndIds(weights, ids, filePath);
-
+	
 	for (int i = 0; i < vertecies.size(); i++)
 	{
 
 		DirectX::XMMATRIX boneTransform = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
-		if (ids[i].x > -0.5f)
+		if (idandWeight[i].IDs.xyz.x > -0.5f)
 		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].x)] * weights[i].x;
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.x)] * idandWeight[i].weights.xyz.x;
 		}
-		if (ids[i].y > -0.5f)
+		if (idandWeight[i].IDs.xyz.y > -0.5f)
 		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].y)] * weights[i].y;
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.y)] * idandWeight[i].weights.xyz.y;
 		}
-		if (ids[i].z > -0.5f)
+		if (idandWeight[i].IDs.xyz.z > -0.5f)
 		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].z)] * weights[i].z;
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.z)] * idandWeight[i].weights.xyz.z;
 		}
-		if (ids[i].w > -0.5f)
+		if (idandWeight[i].IDs.w > -0.5f)
 		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].w)] * weights[i].w;
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.w)] * idandWeight[i].weights.w;
 		}
 	
 		DirectX::XMFLOAT4 temp = DirectX::XMFLOAT4(vertecies[i].pos[0], vertecies[i].pos[1], vertecies[i].pos[2], 1.f);
@@ -140,9 +134,6 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 		vertecies[i].pos[2] = temp.z;
 
 	}
-
-
-
 
 	//make it a multiple of 16 or can cause crashes
 	if(vertecies.size() < 1){
@@ -255,9 +246,10 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	if(!this->hasAnimation){
 		return;
 	}
-	//if(getkey('P')){
-		time += dt * animation.tick;
+	//if(!getkey('P')){
+	//	return;
 	//}
+	time += dt * animation.tick;
 
 	getPose(rootJoint, animation, time);
 	
