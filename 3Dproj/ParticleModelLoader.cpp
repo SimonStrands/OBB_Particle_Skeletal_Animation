@@ -447,7 +447,7 @@ void loadParticleModel(
 		//get one lenght that we will use for all
 		//float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
 		//int R = l / nl;
-		const int R = 3;
+		const int R = 1;//3;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 
