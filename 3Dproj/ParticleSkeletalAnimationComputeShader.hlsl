@@ -76,45 +76,45 @@ void main( uint3 DTid : SV_DispatchThreadID )
     int nrOfBonesEffected = 0;
     float3 velocities[3];
     
-    //CHECKING IF POINT IS INSIDE AN OBB
-    for (min12int i = 0; i < nrOfBones; i++)
-    {
-        nPos = mul(float4(currPos, 1.0f), InverseTransform[i]);
-        if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
-        {
-            //Get velocity of max 3 bones
-            velocities[nrOfBonesEffected] = mul(nPos, DeltaTransformations[i]).xyz;
-            nrOfBonesEffected++;
-            if (nrOfBonesEffected > 2)
-            {
-                break;
-            }
-    
-            //Change the color of the particle
-        }
-    }
-    
-    if (nrOfBonesEffected > 0)
-    { 
-        currentVelocity = float3(0, 0, 0);
-        for (int i = 0; i < nrOfBonesEffected; i++)
-        {
-            currentVelocity += velocities[i] * force;
-        }
-        currentVelocity *= (1.f / nrOfBonesEffected);
-    }
-    else
-    {
-        currentVelocity *= (1 - (drag * dt));
-    
-        //currColor = float4(1, 0, 0, 1);
-    
-        currentVelocity += float3(0, -9.81, 0) * dt * dt;
-        
-    }
-    
-    
-    currPos += currentVelocity;
+    ////CHECKING IF POINT IS INSIDE AN OBB
+    //for (min12int i = 0; i < nrOfBones; i++)
+    //{
+    //    nPos = mul(float4(currPos, 1.0f), InverseTransform[i]);
+    //    if ((abs(nPos.x) <= 0.5) && (nPos.y <= 1 && nPos.y >= 0) && (abs(nPos.z) <= 0.5))
+    //    {
+    //        //Get velocity of max 3 bones
+    //        velocities[nrOfBonesEffected] = mul(nPos, DeltaTransformations[i]).xyz;
+    //        nrOfBonesEffected++;
+    //        if (nrOfBonesEffected > 2)
+    //        {
+    //            break;
+    //        }
+    //
+    //        //Change the color of the particle
+    //    }
+    //}
+    //
+    //if (nrOfBonesEffected > 0)
+    //{ 
+    //    currentVelocity = float3(0, 0, 0);
+    //    for (int i = 0; i < nrOfBonesEffected; i++)
+    //    {
+    //        currentVelocity += velocities[i] * force;
+    //    }
+    //    currentVelocity *= (1.f / nrOfBonesEffected);
+    //}
+    //else
+    //{
+    //    currentVelocity *= (1 - (drag * dt));
+    //
+    //    //currColor = float4(1, 0, 0, 1);
+    //
+    //    currentVelocity += float3(0, -9.81, 0) * dt * dt;
+    //    
+    //}
+    //
+    //
+    //currPos += currentVelocity;
     
     
     /////////////////////////////////////////////////
