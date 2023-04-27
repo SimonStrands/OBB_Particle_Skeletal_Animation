@@ -28,9 +28,6 @@ void ImguiManager::takeLight(Light* light)
 void ImguiManager::takeBoxes(std::vector<DirectX::XMFLOAT3>& boxes)
 {
 	this->boxes = &boxes;
-	//for(int i = 0; i < boxes.size(); i++){
-	//	this->boxes.push_back(&boxes[i]);
-	//}
 }
 
 void ImguiManager::updateRender(int lightNr, float deltaTime)
