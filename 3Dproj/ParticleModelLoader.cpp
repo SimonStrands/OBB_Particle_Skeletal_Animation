@@ -338,6 +338,59 @@ void subDivide(int subDivision, VolumetricVertex newVertecies[], std::vector<Vol
 	subDivide(subDivision, tempArray, vertecies, colors);
 }
 
+void loadWeightsAndIds(
+	std::vector<DirectX::XMFLOAT4> &weights, 
+	std::vector<DirectX::XMFLOAT4> &ids, std::string filePath)
+{
+	Assimp::Importer AImporter;
+	const aiScene* scene = AImporter.ReadFile(filePath, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
+	//exit if no scene/file was found
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+		std::cout << "ERROR could find scene or file" << std::endl;
+		exit(-2);
+	}
+	aiMesh* mesh = scene->mMeshes[0];
+	//aiNode* node
+
+	std::unordered_map<std::string, std::pair<int, DirectX::XMMATRIX>> boneInfo = {};
+	std::vector<uint16_t> boneCounts;
+	boneCounts.resize(weights.size());
+
+	for (unsigned int i = 0; i < mesh->mNumBones; i++) {
+		aiBone* bone = mesh->mBones[i];
+		DirectX::XMMATRIX m = AiMatrixToXMMATRIX(bone->mOffsetMatrix);
+		boneInfo[bone->mName.C_Str()] = { i, m };
+		//loop through each vertex that have that bone
+		for (unsigned int j = 0; j < bone->mNumWeights; j++) {
+			unsigned int id = bone->mWeights[j].mVertexId;
+			float weight = bone->mWeights[j].mWeight;
+			boneCounts[id]++;
+			switch (boneCounts[id]) {
+			case 1:
+				ids[id].x = i;
+				weights[id].x = weight;
+				break;
+			case 2:
+				ids[id].y = i;
+				weights[id].y = weight;
+				break;
+			case 3:
+				ids[id].z = i;
+				weights[id].z = weight;
+				break;
+			case 4:
+				ids[id].w = i;
+				weights[id].w = weight;
+				break;
+			default:
+
+				break;
+
+			}
+		}
+	}
+
+}
 void loadParticleModel(std::vector<VolumetricVertex>& vertecies, const std::string& filePath, Animation& animation, Bone& rootJoint)
 {
 	Assimp::Importer AImporter;

@@ -17,7 +17,8 @@ struct SkeletonConstantBuffer : public CB {
 };
 
 DirectX::XMMATRIX AiMatrixToXMMATRIX(aiMatrix4x4 mat);
-
+void loadWeightsAndIds(std::vector<DirectX::XMFLOAT4>& weights,
+	std::vector<DirectX::XMFLOAT4>& ids, std::string filePath);
 void loadParticleModel(
 	std::vector<VolumetricVertex>& vertecies, 
 	const std::string& filePath,

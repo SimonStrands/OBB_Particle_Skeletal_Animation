@@ -82,6 +82,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
         position.x, position.y, position.z, 1.0f
     );
 
+
+
 	//some kind of load file here
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
@@ -91,7 +93,57 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	if(rootJoint.id != -1){
 		hasAnimation = true;
 	}
+	if (hasAnimation) {
+		getPose(rootJoint, animation, time);
+	}
+
+	if (!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)) {
+		std::cout << "failed to create const buffer" << std::endl;
+	}
+
+	// get transforms matrix from get pose, every joint for first frame
+	std::vector<DirectX::XMFLOAT4> weights;
+	weights.resize(vertecies.size());
+	std::vector<DirectX::XMFLOAT4> ids;
+	ids.resize(vertecies.size());
+	loadWeightsAndIds(weights, ids, filePath);
+
+	for (int i = 0; i < vertecies.size(); i++)
+	{
+
+		DirectX::XMMATRIX boneTransform = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+		if (ids[i].x > -0.5f)
+		{
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].x)] * weights[i].x;
+		}
+		if (ids[i].y > -0.5f)
+		{
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].y)] * weights[i].y;
+		}
+		if (ids[i].z > -0.5f)
+		{
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].z)] * weights[i].z;
+		}
+		if (ids[i].w > -0.5f)
+		{
+			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(ids[i].w)] * weights[i].w;
+		}
 	
+		DirectX::XMFLOAT4 temp = DirectX::XMFLOAT4(vertecies[i].pos[0], vertecies[i].pos[1], vertecies[i].pos[2], 1.f);
+		DirectX::XMVECTOR vPoint = DirectX::XMLoadFloat4(&temp);
+		boneTransform = DirectX::XMMatrixTranspose(boneTransform);
+		vPoint = DirectX::XMVector4Transform(vPoint, boneTransform);
+		DirectX::XMStoreFloat4(&temp, vPoint);
+		vertecies[i].pos[0] = temp.x;
+		vertecies[i].pos[1] = temp.y;
+		vertecies[i].pos[2] = temp.z;
+
+	}
+
+
+
+
 	//make it a multiple of 16 or can cause crashes
 	if(vertecies.size() < 1){
 		std::cout << "didn't get any vertecies" << std::endl;
@@ -160,13 +212,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 		return;
 	}
 
-	if(hasAnimation){
-		getPose(rootJoint, animation, time);
-	}
-	
-	if(!CreateConstBuffer(gfx, this->SkeletonConstBuffer, sizeof(SkeletonConstantBuffer), &SkeletonConstBufferConverter)){
-		std::cout << "failed to create const buffer" << std::endl;
-	}
+
 
 	#ifndef TRADITIONALSKELETALANIMATION
 	//get bone orginal position
