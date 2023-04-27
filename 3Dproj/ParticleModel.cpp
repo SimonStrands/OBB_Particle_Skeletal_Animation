@@ -224,6 +224,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	float x, y, z;
 	while (!sizesFile.eof())
 	{
+		std::string info;
+		sizesFile >> info;
 		sizesFile >> x;
 		sizesFile >> y;
 		sizesFile >> z;
