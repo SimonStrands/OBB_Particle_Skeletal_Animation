@@ -32,6 +32,7 @@ public:
 	void updateParticles(float dt, Graphics*& gfx);
 	void draw(Graphics*& gfx);
 	void drawShadow(Graphics*& gfx);
+	OBBSkeletonDebug& getOBBSkeleton();
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;

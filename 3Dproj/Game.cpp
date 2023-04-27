@@ -249,6 +249,7 @@ void Game::setUpObject()
 
 	//particleModel.init(gfx, "objects/sillydance2.fbx", vec3());
 	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
+	this->UIManager.takeBoxes(particleModel.getOBBSkeleton().getSizes());
 	//particleModel = new ParticleModel(gfx, "objects/test2.fbx", vec3());
 	//particleModel = new ParticleModel(gfx, "objects/quad2.obj", vec3());
 }

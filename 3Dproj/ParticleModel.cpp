@@ -325,6 +325,11 @@ void ParticleModel::drawShadow(Graphics*& gfx)
 	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
 }
 
+OBBSkeletonDebug& ParticleModel::getOBBSkeleton()
+{
+	return this->OBBSkeleton;
+}
+
 void ParticleModel::setShaders(ID3D11DeviceContext*& immediateContext)
 {
 	immediateContext->VSSetShader(this->VS, nullptr, 0);

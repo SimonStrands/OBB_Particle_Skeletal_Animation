@@ -17,10 +17,12 @@ public:
 	~ImguiManager();
 	void takeObject(object* obj);
 	void takeLight(Light* light);
+	void takeBoxes(std::vector<DirectX::XMFLOAT3>& boxes);
 	void updateRender(int lightNr, float deltaTime);
 private:
 	std::vector<object*> obj;
 	std::vector<Light*> light;
+	std::vector<DirectX::XMFLOAT3>* boxes;
 
 	int frames;
 	double avfps;

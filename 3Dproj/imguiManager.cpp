@@ -25,6 +25,14 @@ void ImguiManager::takeLight(Light* light)
 	this->light.push_back(light);
 }
 
+void ImguiManager::takeBoxes(std::vector<DirectX::XMFLOAT3>& boxes)
+{
+	this->boxes = &boxes;
+	//for(int i = 0; i < boxes.size(); i++){
+	//	this->boxes.push_back(&boxes[i]);
+	//}
+}
+
 void ImguiManager::updateRender(int lightNr, float deltaTime)
 {
 	ImGui_ImplDX11_NewFrame();
@@ -52,6 +60,20 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 		ImGui::SliderFloat("ZRot", &light[lightNr]->getRotation().z, 6.3f, -6.3f);
 	}
 	ImGui::End();
+
+	if(boxes->size() > 0){
+		static int boxnr = 0;
+		
+		if(ImGui::Begin("boxes")){
+			 ImGui::SliderInt("WhatBox", &boxnr, 0, boxes->size() - 1);
+			 ImGui::SliderFloat("height", &(boxes[0][boxnr]).x, 0.f, 5.f);
+			 ImGui::SliderFloat("width", &(boxes[0][boxnr]).y, 0.f, 5.f);
+			 ImGui::SliderFloat("depth", &(boxes[0][boxnr]).z, 0.f, 5.f);
+			
+			ImGui::End();
+		}
+	}
+	
 
 	ImGui::Begin("Application Specs");
 	std::string dtText = "Delta Time: " + std::to_string(deltaTime);
