@@ -76,17 +76,17 @@ float4 main(PixelShaderInput input) : SV_TARGET
             float ammount_diffuse = max(dot(input.normal.xyz, lightDir), 0.0f);
             defuse_light = ammount_diffuse * color.xyz * lightColor.xyz;
                 
-                //specular
+            //specular
             //float3 reflectDir = reflect(-lightDir, input.normal.xyz);
-            //float spec = pow(max(dot(viewDir, reflectDir), 0.0), gSpecular.w);
-            //float3 specular = gSpecular.xyz * spec;
+            //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 2.0f);
+            //float3 specular = float3(0.5f,0.5f,0.5f) * spec;
                 
             //lightning.xyz += saturate(ambient_light + defuse_light) + specular;
             lightning.xyz += saturate(ambient_light + defuse_light);
         }
         else
         {
-				//we are in shadow
+			//we are in shadow
             lightning += float4(ambientColor, 0);
         }
     }
