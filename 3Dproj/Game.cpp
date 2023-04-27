@@ -104,6 +104,7 @@ void Game::run()
 		camera->setPosition(camLP);
 		camera->setRotation(camLR);
 		gfx->setProjection(0);//last can be dir light
+		gfx->RsetViewPort();
 
 
 		Update();
@@ -249,6 +250,7 @@ void Game::setUpObject()
 	//cameras
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 0.f, 10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f, 0.01f, 0.01f)));//main
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(2.f, 2.0f, 2.0f)));//second
+	obj.push_back(new GameObject(rm->get_Models("stormtrooper.obj",gfx), gfx, vec3(0,2,0.2f), vec3(0,0,0), vec3(0.2f,0.2f,0.2f)));
 
 	//particleModel.init(gfx, "objects/sillydance2.fbx", vec3());
 	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());

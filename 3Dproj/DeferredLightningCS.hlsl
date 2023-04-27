@@ -9,6 +9,8 @@ Texture2D<float4> gTexSpecular : register(t4);
 //maps
 Texture2DArray<float4> shadowMapping : register(t5);
 
+SamplerState testSampler;
+
 [numthreads(32, 8, 1)]//32 16
 void main( uint3 DTid : SV_DispatchThreadID )
 {
@@ -30,10 +32,11 @@ void main( uint3 DTid : SV_DispatchThreadID )
             float3 lightDir = normalize(lightPos[i].xyz - fragPos.xyz);
 			//calculate if we are in shadow
             const float4 shadowCamera = fragPos;
-            const float4 shadowHomo = mul(shadowCamera, lightViewProj[i]);
+            const float4 shadowHomo = mul(fragPos, lightViewProj[i]);
             float4 shadowMapCoords = shadowHomo * float4(0.5, -0.5, 1.0f, 1.0f) + (float4(0.5f, 0.5f, 0.0f, 0.0f) * shadowHomo.w);
             shadowMapCoords.xyz = shadowMapCoords.xyz / shadowMapCoords.w;
-            float4 SM = shadowMapping.Load(int4(shadowMapCoords.x * SMWIDTH, shadowMapCoords.y * SMHEIGHT, i, 0));
+
+            float4 SM = shadowMapping.SampleLevel(testSampler, float3(shadowMapCoords.x, shadowMapCoords.y, i), 0);
             
             //ambient
             float3 ambient_light = gAmbient.xyz * lightColor;

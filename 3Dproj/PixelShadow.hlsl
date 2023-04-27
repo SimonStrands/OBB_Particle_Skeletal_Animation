@@ -19,6 +19,6 @@ float4 main(PixelShaderInput input) : SV_TARGET
     clip(diffuseTexture.w < 0.1f ? -1 : 1);
     clip(input.color.w < 0.0001f ? -1 : 1);
 	float4 a = input.position;
-	return float4(1,0,0,0.4f);
+	return float4(1,0,0,1.0f);
 }
 

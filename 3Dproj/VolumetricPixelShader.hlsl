@@ -55,7 +55,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
         
         float4 shadowMapCoords = shadowHomo * float4(0.5, -0.5, 1.0f, 1.0f) + (float4(0.5f, 0.5f, 0.0f, 0.0f) * shadowHomo.w);
         shadowMapCoords.xyz = shadowMapCoords.xyz / shadowMapCoords.w;
-        float4 SM = shadowMapping.Load(int4(shadowMapCoords.x * 1920, shadowMapCoords.y * 1080, i, 0));
+        float4 SM = shadowMapping.SampleLevel(testSampler, float3(shadowMapCoords.x, shadowMapCoords.y, i), 0);
         
         //ambient
         float3 ambientColor = color.xyz * 0.1f;
