@@ -274,6 +274,7 @@ vec3 lerp(const VolumetricVertex& a, const VolumetricVertex& b, float procent){
 	theReturn.z = a.pos[2] + ((b.pos[2] - a.pos[2]) * procent);
 	return theReturn;
 }
+
 vec3 lerp(const vec3& a, const vec3& b, float procent){
 	vec3 theReturn;
 	theReturn.x = a.x + ((b.x - a.x) * procent);
@@ -447,7 +448,7 @@ void loadParticleModel(
 		//get one lenght that we will use for all
 		//float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
 		//int R = l / nl;
-		const int R = 3;
+		const int R = 1;//3;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 
