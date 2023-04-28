@@ -210,8 +210,10 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	
 	std::vector<DirectX::XMFLOAT3> sizes; //x =height, y= Width, z=Depth
 	std::ifstream sizesFile;
-	//sizesFile.open("objects/obb_joint-boxessizes_1.txt");
-	sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
+
+	//THEMODELCHANGE
+	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	//sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
 	
 	float x, y, z;
 	while (!sizesFile.eof())
