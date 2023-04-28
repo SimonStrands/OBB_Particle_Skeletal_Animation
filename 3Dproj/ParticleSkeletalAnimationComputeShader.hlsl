@@ -40,7 +40,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
 
 
-    if (currPos.y <= 0)
+    if (currPos.y <= -5)
     {
         unsigned int ourRandomNumber1 = random.x * (DTid.x + 1);
         unsigned int ourRandomNumber2 = random.y * (DTid.x + 1);

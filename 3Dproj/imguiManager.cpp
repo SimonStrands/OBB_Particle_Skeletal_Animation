@@ -58,7 +58,7 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 	}
 	ImGui::End();
 
-	if(boxes->size() > 0){
+	if(boxes != nullptr){
 		static int boxnr = 0;
 		
 		if(ImGui::Begin("boxes")){

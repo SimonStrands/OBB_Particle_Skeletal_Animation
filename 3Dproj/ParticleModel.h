@@ -32,7 +32,9 @@ public:
 	void updateParticles(float dt, Graphics*& gfx);
 	void draw(Graphics*& gfx);
 	void drawShadow(Graphics*& gfx);
+	#ifndef TRADITIONALSKELETALANIMATION
 	OBBSkeletonDebug& getOBBSkeleton();
+    #endif
 private:
 	float voxelScale;
 	DirectX::XMMATRIX positionMatris;
