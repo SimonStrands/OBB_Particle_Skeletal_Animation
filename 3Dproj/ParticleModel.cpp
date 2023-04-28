@@ -102,6 +102,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 		std::cout << "failed to create const buffer" << std::endl;
 	}
 	
+#ifndef TRADITIONALSKELETALANIMATION 
+
 	for (int i = 0; i < vertecies.size(); i++)
 	{
 
@@ -134,6 +136,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 		vertecies[i].pos[2] = temp.z;
 
 	}
+#endif // 
 
 	//make it a multiple of 16 or can cause crashes
 	if(vertecies.size() < 1){

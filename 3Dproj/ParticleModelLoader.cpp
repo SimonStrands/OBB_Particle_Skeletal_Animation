@@ -274,6 +274,7 @@ vec3 lerp(const VolumetricVertex& a, const VolumetricVertex& b, float procent){
 	theReturn.z = a.pos[2] + ((b.pos[2] - a.pos[2]) * procent);
 	return theReturn;
 }
+
 vec3 lerp(const vec3& a, const vec3& b, float procent){
 	vec3 theReturn;
 	theReturn.x = a.x + ((b.x - a.x) * procent);
