@@ -247,9 +247,13 @@ void Game::setUpObject()
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 0.f, 10.f), vec3(0.f, 0.f, 0.f), vec3(0.01f, 0.01f, 0.01f)));//main
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(1.f, 1.0f, 1.0f)));//second
 
-	//particleModel.init(gfx, "objects/sillydance2.fbx", vec3());
+	//THEMODELCHANGE
 	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
+	//particleModel.init(gfx, "objects/Herobrine.fbx", vec3());
+
+#ifndef TRADITIONALSKELETALANIMATION
 	this->UIManager.takeBoxes(particleModel.getOBBSkeleton().getSizes());
+#endif
 	//particleModel = new ParticleModel(gfx, "objects/test2.fbx", vec3());
 	//particleModel = new ParticleModel(gfx, "objects/quad2.obj", vec3());
 }
