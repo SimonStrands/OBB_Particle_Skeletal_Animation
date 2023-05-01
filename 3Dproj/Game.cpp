@@ -22,7 +22,7 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	
 	gfx->takeIM(&this->UIManager);
 	mus = new Mouse(gfx->getWH());
-	camera = new Camera(gfx, mus, vec3(0,5,2), vec3(0,-1.67,0));
+	camera = new Camera(gfx, mus, vec3(0,0,3), vec3(0,-1.67,0));
 	camera->setData();
 	
 	setUpObject();
@@ -251,8 +251,8 @@ void Game::setUpObject()
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(1.f, 1.0f, 1.0f)));//second
 
 	//THEMODELCHANGE
-	//particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
-	particleModel.init(gfx, "objects/Herobrine.fbx", vec3());
+	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
+	//particleModel.init(gfx, "objects/Herobrine.fbx", vec3());
 
 #ifndef TRADITIONALSKELETALANIMATION
 	this->UIManager.takeBoxes(particleModel.getOBBSkeleton().getSizes());

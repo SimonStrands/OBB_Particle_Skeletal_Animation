@@ -40,7 +40,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
 
 
-    if (currPos.z <= -5)
+    if (currPos.y <= -5)
     {
         unsigned int ourRandomNumber1 = random.x * (DTid.x + 1);
         unsigned int ourRandomNumber2 = random.y * (DTid.x + 1);
@@ -109,7 +109,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
         //currColor = float4(1, 0, 0, 1);
     
-        currentVelocity += float3(0, 0, -9.81) * dt * dt;
+        currentVelocity += float3(0, -9.81, 0) * dt * dt;
         
     }
     

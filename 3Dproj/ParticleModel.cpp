@@ -215,8 +215,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	std::ifstream sizesFile;
 
 	//THEMODELCHANGE
-	//sizesFile.open("objects/obb_joint-boxessizes_1.txt");
-	sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
+	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	//sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
 	
 	float x, y, z;
 	while (!sizesFile.eof())
