@@ -215,8 +215,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	std::ifstream sizesFile;
 
 	//THEMODELCHANGE
-	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
-	//sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
+	//sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
 	
 	float x, y, z;
 	while (!sizesFile.eof())
@@ -252,9 +252,6 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	if(!this->hasAnimation){
 		return;
 	}
-	if(getkey('P')){
-		dt *= 20;
-	}
 	time += dt * animation.tick;
 	
 	getPose(rootJoint, animation, time);
@@ -272,7 +269,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	OBBSkeleton.updateObbPosition(rootJoint, SkeletonConstBufferConverter);
 	OBBSkeleton.update(gfx, dt);
 	
-	////dispathc shit
+	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
 	
 	gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &OBBSkeleton.getSkeletalTimeConstBuffer());

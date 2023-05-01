@@ -27,7 +27,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     static const float drag = 0.9f;
     //static const float drag = 1.0f;
-    static const float force = 1.0001f;
+    static const float force = 1.0011f;
     //static const float force = 1.0000f;
     
     //LOAD DATA IN BETTER NAMES
@@ -40,7 +40,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
 
 
-    if (currPos.y <= -5)
+    if (currPos.z <= -5)
     {
         unsigned int ourRandomNumber1 = random.x * (DTid.x + 1);
         unsigned int ourRandomNumber2 = random.y * (DTid.x + 1);
@@ -109,7 +109,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
         //currColor = float4(1, 0, 0, 1);
     
-        currentVelocity += float3(0, -9.81, 0) * dt * dt;
+        currentVelocity += float3(0, 0, -9.81) * dt * dt;
         
     }
     
