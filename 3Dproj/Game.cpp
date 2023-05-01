@@ -161,24 +161,6 @@ void Game::Update()
 
 	gfx->Update((float)dt.dt(), camera->getPos());
 
-#pragma region camera_settings
-	//if (getkey('C')) {
-	//	camera->setPosition(light[lightNr]->getPos());
-	//	camera->setRotation(light[lightNr]->getRotation());
-	//}
-	//if (getkey('1')) {
-	//	lightNr = 0;
-	//}
-	//if (getkey('2')) {
-	//	lightNr = 1;
-	//}
-	//if (getkey('3')) {
-	//	lightNr = 2;
-	//}
-	//if (getkey('4')) {
-	//	lightNr = 3;
-	//}
-#pragma endregion camera_settings
 }
 
 void Game::DrawToBuffer()
