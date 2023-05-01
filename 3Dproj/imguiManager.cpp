@@ -117,6 +117,8 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 		ImGui::Text(dtText.c_str());
 		ImGui::Text(fps.c_str());
 		ImGui::Text(afps.c_str());
+		ImGui::Text(minFPSStr.c_str());
+		ImGui::Text(maxFPSStr.c_str());
 		ImGui::Text("Used memory by app");
 		ImGui::Text(virtualMemUsedByMe.c_str());
 		ImGui::Text(physMemUsedByMe.c_str());
