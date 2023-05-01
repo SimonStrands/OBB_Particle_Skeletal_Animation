@@ -25,6 +25,11 @@ void ImguiManager::takeLight(Light* light)
 	this->light.push_back(light);
 }
 
+void ImguiManager::takeBoxes(std::vector<DirectX::XMFLOAT3>& boxes)
+{
+	this->boxes = &boxes;
+}
+
 void ImguiManager::updateRender(int lightNr, float deltaTime)
 {
 	ImGui_ImplDX11_NewFrame();
@@ -53,39 +58,71 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 	}
 	ImGui::End();
 
-	ImGui::Begin("Application Specs");
-	std::string dtText = "Delta Time: " + std::to_string(deltaTime);
-	
-	//virtual memory currently used by the process
-	PROCESS_MEMORY_COUNTERS_EX pmc;
-	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
-	std::string virtualMemUsedByMe = "Virtual: " + std::to_string(pmc.PrivateUsage / (1024 * 1024))+" MB";
-
-	//Physical Memory currently used by current process:
-	std::string physMemUsedByMe = "Physical: " + std::to_string(pmc.WorkingSetSize / (1024 * 1024))+" MB";
-
-	frames++;
-	time += deltaTime;
-	if (time >= 1.f)
-	{
-		frameRate = frames;
-		if (avfps == 0.f)
-			avfps = frameRate;
-		else
-			avfps = (avfps + frameRate) / 2;
-		frames = 0;
-		time = 0;
+	if(boxes != nullptr){
+		static int boxnr = 0;
+		
+		if(ImGui::Begin("boxes")){
+			 ImGui::SliderInt("WhatBox", &boxnr, 0, boxes->size() - 1);
+			 ImGui::SliderFloat("height", &(boxes[0][boxnr]).x, 0.f, 5.f);
+			 ImGui::SliderFloat("width", &(boxes[0][boxnr]).y, 0.f, 5.f);
+			 ImGui::SliderFloat("depth", &(boxes[0][boxnr]).z, 0.f, 5.f);
+			
+			ImGui::End();
+		}
 	}
-	std::string fps = std::to_string(frameRate)+ " FPS" ;
-	std::string afps = "Avarage FPS for entire runtime: " + std::to_string(avfps);
+	
+	static bool startSpecTesting = false;
+	if(getkey('L')){
+		startSpecTesting = true;
+	}
 
-	ImGui::Text(dtText.c_str());
-	ImGui::Text(fps.c_str());
-	ImGui::Text(afps.c_str());
-	ImGui::Text("Used memory by app");
-	ImGui::Text(virtualMemUsedByMe.c_str());
-	ImGui::Text(physMemUsedByMe.c_str());
+	ImGui::Begin("Application Specs");
+	if(startSpecTesting){
+		std::string dtText = "Delta Time: " + std::to_string(deltaTime);
+		
+		//virtual memory currently used by the process
+		PROCESS_MEMORY_COUNTERS_EX pmc;
+		GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+		std::string virtualMemUsedByMe = "Virtual: " + std::to_string(pmc.PrivateUsage / (1024 * 1024))+" MB";
 
+		//Physical Memory currently used by current process:
+		std::string physMemUsedByMe = "Physical: " + std::to_string(pmc.WorkingSetSize / (1024 * 1024))+" MB";
+
+		frames++;
+		time += deltaTime;
+		if (time >= 1.f)
+		{
+			frameRate = frames;
+			if (avfps == 0.f)
+				avfps = frameRate;
+			else
+				avfps = (avfps + frameRate) / 2;
+			frames = 0;
+			time = 0;
+		}
+
+		if(minimumFPS < deltaTime){
+			minimumFPS = deltaTime;
+		}
+		std::string minFPSStr = "Min FPS: " + std::to_string(1.0/minimumFPS);
+
+		if(maxFPS > deltaTime){
+			maxFPS = deltaTime;
+		}
+		std::string maxFPSStr = "Max FPS: " + std::to_string(1.0/maxFPS);
+
+		std::string fps = std::to_string(frameRate)+ " FPS" ;
+		std::string afps = "Avarage FPS for entire runtime: " + std::to_string(avfps);
+
+		ImGui::Text(dtText.c_str());
+		ImGui::Text(fps.c_str());
+		ImGui::Text(afps.c_str());
+		ImGui::Text(minFPSStr.c_str());
+		ImGui::Text(maxFPSStr.c_str());
+		ImGui::Text("Used memory by app");
+		ImGui::Text(virtualMemUsedByMe.c_str());
+		ImGui::Text(physMemUsedByMe.c_str());
+	}
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

@@ -68,10 +68,12 @@ public:
 	void draw(Graphics*& gfx);
 	ID3D11Buffer*& getSkeletalTransformConstBuffer();
 	ID3D11Buffer*& getSkeletalTimeConstBuffer();
+	std::vector<DirectX::XMFLOAT3>& getSizes();
 
 private:
 	
 	std::vector<DirectX::XMMATRIX> transform;//rotation position
+	std::vector<DirectX::XMFLOAT3> sizes;
 	std::vector<DirectX::XMMATRIX> size;//the size of the OBB
 	void inverseTransforms();
 	void inverseDeltaTransforms();

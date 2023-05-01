@@ -26,6 +26,9 @@ void OBBSkeletonDebug::init(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT
 	if(nrOfBones != sizes.size()){
 		std::cout << "not the same size" << std::endl;
 	}
+	for(int i = 0; i < sizes.size(); i++){
+		this->sizes.push_back(sizes[i]);
+	}
 	constBufferConverter.nrOfBones.element = nrOfBones;
 	for(unsigned int i = 0; i < nrOfBones; i++){
 		size.push_back(DirectX::XMMATRIX(
@@ -138,6 +141,11 @@ ID3D11Buffer*& OBBSkeletonDebug::getSkeletalTimeConstBuffer()
 	return constantBufferTime;
 }
 
+std::vector<DirectX::XMFLOAT3>& OBBSkeletonDebug::getSizes()
+{
+	return this->sizes;
+}
+
 void OBBSkeletonDebug::inverseTransforms()
 {
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
@@ -163,6 +171,16 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 
 	this->constBufferConverterPrev = this->constBufferConverter;
 	
+	//DEBUG
+	for(unsigned int i = 0; i < sizes.size(); i++){
+		size[i] = DirectX::XMMATRIX(
+			sizes[i].y, 0, 0, 0,
+			0, sizes[i].x, 0, 0,
+			0, 0, sizes[i].z, 0,
+			0, 0, 0, 1
+		);
+	}
+
 	//update constantBuffer
 	for(int i = 0; i < transform.size(); i++){
 		constBufferConverter.transform.element[i] = size[i] * transform[i];
