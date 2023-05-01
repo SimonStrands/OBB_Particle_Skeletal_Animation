@@ -26,6 +26,8 @@ private:
 
 	int frames;
 	double avfps;
+	double minimumFPS;
+	double maxFPS;
 	double time;
 	int frameRate;
 };
