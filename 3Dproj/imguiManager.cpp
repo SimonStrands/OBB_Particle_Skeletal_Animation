@@ -67,8 +67,8 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 			 ImGui::SliderFloat("width", &(boxes[0][boxnr]).y, 0.f, 5.f);
 			 ImGui::SliderFloat("depth", &(boxes[0][boxnr]).z, 0.f, 5.f);
 			
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 	
 	static bool startSpecTesting = false;

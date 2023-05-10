@@ -210,6 +210,8 @@ bool getPixelArray(std::string file, std::vector<vec3>& colors)
 
 	unsigned char * textureData = stbi_load(file.c_str(), &textureWidth, &textureHeight, &channels, 3);
 
+	colors.reserve(textureWidth * textureHeight);
+
 	int i = 0;
 	unsigned bytePerPixel = channels;
 	for(int x = 0; x < textureWidth; x++){

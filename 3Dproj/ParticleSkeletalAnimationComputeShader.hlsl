@@ -27,16 +27,13 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
     static const float drag = 0.9f;
     //static const float drag = 1.0f;
-    static const float force = 1.0001f;
+    static const float force = 1.002f;
     //static const float force = 1.0000f;
     
     //LOAD DATA IN BETTER NAMES
     float3 currPos = float3(particleData[DTid.x * 10 + 0], particleData[DTid.x * 10 + 1], particleData[DTid.x * 10 + 2]);
     float4 currColor = float4(particleData[DTid.x * 10 + 3], particleData[DTid.x * 10 + 4], particleData[DTid.x * 10 + 5], particleData[DTid.x * 10 + 6]);
     float3 currentVelocity = float3(particleData[DTid.x * 10 + 7], particleData[DTid.x * 10 + 8], particleData[DTid.x * 10 + 9]);
-    
- 
-    //currColor = float4(0, 0, 1, 1);
     
 
 
@@ -49,9 +46,9 @@ void main( uint3 DTid : SV_DispatchThreadID )
         
         float4x4 temp = Transformations[randomBone];
         
-        float offsetX = (((ourRandomNumber1 % 100) / 100.f) - 0.5f);
-        float offsetY = ((ourRandomNumber2 % 100) / 100.f);
-        float offsetZ = (((ourRandomNumber3 % 100.f) / 100.f) - 0.5f);
+        float offsetX = (((ourRandomNumber1 % 100) / 100.f) - 0.5f) * 0.99f;
+        float offsetY = ((ourRandomNumber2 % 100) / 100.f) * 0.99f;
+        float offsetZ = (((ourRandomNumber3 % 100.f) / 100.f) - 0.5f) * 0.99f;
     
         float4 offset = float4(offsetX, offsetY, offsetZ, 1.0f);
         float4 rotatedOffset = mul(offset, temp);
@@ -59,22 +56,15 @@ void main( uint3 DTid : SV_DispatchThreadID )
         //randomize a offset position 
         currPos = rotatedOffset.xyz;
         currentVelocity = float3(0,0,0);
-
-
-   /*     if (randomBone == 5 || (randomBone >= 9 &&randomBone <= 24)||(randomBone>=28&&randomBone<=43))
-        {
-            currColor = float4(0.3f, 0.4f, 0.f,1.f);
-        }
-        else
-        {
-            currColor = float4(0.0f, 0.6f, 3.f, 1.f);
-        }*/
+        
     }
+    
     
     ///////////////REAL CODE/////////////////////////
     float4 nPos;
     int nrOfBonesEffected = 0;
     float3 velocities[3];
+    
     
     //CHECKING IF POINT IS INSIDE AN OBB
     for (min12int i = 0; i < nrOfBones; i++)
@@ -99,9 +89,8 @@ void main( uint3 DTid : SV_DispatchThreadID )
         currentVelocity = float3(0, 0, 0);
         for (int i = 0; i < nrOfBonesEffected; i++)
         {
-            currentVelocity += velocities[i] * force;
+            currentVelocity += velocities[i] * force * (1.f / nrOfBonesEffected);
         }
-        currentVelocity *= (1.f / nrOfBonesEffected);
     }
     else
     {
@@ -109,7 +98,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
     
         //currColor = float4(1, 0, 0, 1);
     
-        currentVelocity += float3(0, -9.81, 0) * dt * dt;
+        currentVelocity += float3(0, -9.81f, 0) * dt * dt;
         
     }
     

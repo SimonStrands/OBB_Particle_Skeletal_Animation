@@ -2,7 +2,7 @@
 
 std::pair<unsigned int, float> ParticleModel::getTimeFraction(const std::vector<float>& times, float& dt) {
 	unsigned int segment = 0;
-	while (dt > times[segment]){
+	while (dt >= times[segment]){
 		segment++;
 	}
 	float start = times[segment - 1];
@@ -254,8 +254,10 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	}
 	if(getkey('P')){
 		dt *= 20;
+		
 	}
 	time += dt * animation.tick;
+	
 	
 	getPose(rootJoint, animation, time);
 	
