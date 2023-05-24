@@ -88,6 +88,7 @@ void loadBoneDataToVertecies(
 				vertecies[id].boneIDs[0] = i;
 				vertecies[id].boneWeights[0] = weight;
 				break;
+#ifndef ONEBONE
 			case 2:
 				vertecies[id].boneIDs[1] = i;
 				vertecies[id].boneWeights[1] = weight;
@@ -100,6 +101,7 @@ void loadBoneDataToVertecies(
 				vertecies[id].boneIDs[3] = i;
 				vertecies[id].boneWeights[3] = weight;
 				break;
+#endif // ONEBONE
 			default:
 
 				break;
@@ -141,6 +143,12 @@ void loadBoneDataToVertecies(
 
 	}
 	#ifdef TRADITIONALSKELETALANIMATION
+#ifdef ONEBONE
+	//normalize weights to make all weights sum 1
+	for (int w = 0; w < vertecies.size(); w++) {
+		vertecies[w].boneWeights[0] = 1;
+	}
+#else
 	//normalize weights to make all weights sum 1
 	for (int w = 0; w < vertecies.size(); w++) {
 		
@@ -156,6 +164,9 @@ void loadBoneDataToVertecies(
 			vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
 		}
 	}
+#endif // ONEBONE
+
+	
     #else
 	for (auto & x : idandWeight){
 		
@@ -322,40 +333,50 @@ void subDivide(
 
 #ifdef TRADITIONALSKELETALANIMATION
 	x.boneIDs[0]		= newVertecies[0].boneIDs[0];
+	x.boneWeights[0]    = newVertecies[0].boneWeights[0];
+#ifndef ONEBONE
+
 	x.boneIDs[1]		= newVertecies[0].boneIDs[1];
 	x.boneIDs[2]		= newVertecies[0].boneIDs[2];
 	x.boneIDs[3]		= newVertecies[0].boneIDs[3];
-	x.boneWeights[0]    = newVertecies[0].boneWeights[0];
+
 	x.boneWeights[1]    = newVertecies[0].boneWeights[1];
 	x.boneWeights[2]    = newVertecies[0].boneWeights[2];
 	x.boneWeights[3]    = newVertecies[0].boneWeights[3];
+#endif // !ONEBONE
 	
 	y.boneIDs[0]        = newVertecies[1].boneIDs[0];
+	y.boneWeights[0]    = newVertecies[1].boneWeights[0];
+#ifndef ONEBONE
 	y.boneIDs[1]        = newVertecies[1].boneIDs[1];
 	y.boneIDs[2]        = newVertecies[1].boneIDs[2];
 	y.boneIDs[3]        = newVertecies[1].boneIDs[3];
-	y.boneWeights[0]    = newVertecies[1].boneWeights[0];
 	y.boneWeights[1]    = newVertecies[1].boneWeights[1];
 	y.boneWeights[2]    = newVertecies[1].boneWeights[2];
 	y.boneWeights[3]    = newVertecies[1].boneWeights[3];
+#endif // !ONEBONE
 	
 	z.boneIDs[0]        = newVertecies[2].boneIDs[0];
+	z.boneWeights[0]    = newVertecies[2].boneWeights[0];
+#ifndef ONEBONE
 	z.boneIDs[1]        = newVertecies[2].boneIDs[1];
 	z.boneIDs[2]        = newVertecies[2].boneIDs[2];
 	z.boneIDs[3]        = newVertecies[2].boneIDs[3];
-	z.boneWeights[0]    = newVertecies[2].boneWeights[0];
 	z.boneWeights[1]    = newVertecies[2].boneWeights[1];
 	z.boneWeights[2]    = newVertecies[2].boneWeights[2];
 	z.boneWeights[3]    = newVertecies[2].boneWeights[3];
+#endif // !ONEBONE
 	
 	m.boneIDs[0]       = newVertecies[2].boneIDs[0];
+	m.boneWeights[0]   = newVertecies[2].boneWeights[0]; 
+#ifndef ONEBONE
 	m.boneIDs[1]       = newVertecies[2].boneIDs[1];
 	m.boneIDs[2]       = newVertecies[2].boneIDs[2];
 	m.boneIDs[3]       = newVertecies[2].boneIDs[3];
-	m.boneWeights[0]   = newVertecies[2].boneWeights[0]; 
 	m.boneWeights[1]   = newVertecies[2].boneWeights[1]; 
 	m.boneWeights[2]   = newVertecies[2].boneWeights[2]; 
 	m.boneWeights[3]   = newVertecies[2].boneWeights[3]; 
+#endif // !ONEBONE
 #else
 	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size(), idandWeight[id[0]]));
 	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size() + 1, idandWeight[id[1]]));
@@ -457,7 +478,7 @@ void loadParticleModel(
 			vertecies[mesh->mFaces[f].mIndices[1]], 
 			vertecies[mesh->mFaces[f].mIndices[2]]
 		};
-
+	
 		unsigned int verteciesID[] = {mesh->mFaces[f].mIndices[0], mesh->mFaces[f].mIndices[0], mesh->mFaces[f].mIndices[0]};
 		subDivide(R, tempArray, verteciesID, vertecies, colors, idandWeight);
 	}

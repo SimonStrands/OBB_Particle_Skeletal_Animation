@@ -193,7 +193,11 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	UavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 	UavDesc.Buffer.FirstElement = 0;
 #ifdef TRADITIONALSKELETALANIMATION
-	UavDesc.Buffer.NumElements = nrOfVertecies * 18;
+#ifdef ONEBONE
+	UavDesc.Buffer.NumElements = nrOfVertecies * 9;
+#else
+	UavDesc.Buffer.NumElements = nrOfVertecies * 15;
+#endif
 #else
 	UavDesc.Buffer.NumElements = nrOfVertecies * 10;
 #endif // DEBUG

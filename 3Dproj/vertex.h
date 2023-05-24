@@ -37,10 +37,18 @@ struct vertex {
 struct VolumetricVertex {
 	float pos[3];
 	float color[4];
-	float velocity[3] = {0};
+#ifndef TRADITIONALSKELETALANIMATION
+	float velocity[3] = { 0 };
+#endif
 #ifdef TRADITIONALSKELETALANIMATION
-	int boneIDs[4] = {-1, -1, -1, -1};
-	float boneWeights[4] = {0,0,0,0};
+    #ifdef ONEBONE
+	    int boneIDs[1] = { -1 };
+		float boneWeights[1] = { 0 };
+    #else
+	    int boneIDs[4] = { -1, -1, -1, -1 };
+		float boneWeights[4] = { 0,0,0,0 };
+    #endif
+
 #endif 
 
 

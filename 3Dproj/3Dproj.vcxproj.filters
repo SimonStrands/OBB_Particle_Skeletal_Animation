@@ -477,6 +477,9 @@
     <FxCompile Include="VolumetrixVertexTraditionalSkeletalAnimaiton.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
     </FxCompile>
+    <FxCompile Include="VolumetrixVertexTraditionalSkeletalAnimaiton2.hlsl">
+      <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Help.txt">

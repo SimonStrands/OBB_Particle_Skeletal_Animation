@@ -317,7 +317,11 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		loadVShader("DebugDrawOBBVertex.cso",device, vShader[2], vShaderByteCode[2])&&
 		loadVShader("VertexShadow.cso",device, vShader[3], vShaderByteCode[2])&&
 #ifdef TRADITIONALSKELETALANIMATION
+#ifdef ONEBONE
+		loadVShader("VolumetrixVertexTraditionalSkeletalAnimaiton2.cso",device, vShader[4], vShaderByteCode[3])&&
+#else
 		loadVShader("VolumetrixVertexTraditionalSkeletalAnimaiton.cso",device, vShader[4], vShaderByteCode[3])&&
+#endif
 #else
 		loadVShader("VolumetricVertex.cso",device, vShader[4], vShaderByteCode[3])&&
 #endif
@@ -354,7 +358,7 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		return false;
 	}
 	#ifdef TRADITIONALSKELETALANIMATION
-	const int nrOfEl = 5;
+	const int nrOfEl = 4;
     #else
 	const int nrOfEl = 3;
     #endif
@@ -362,14 +366,21 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-		#ifdef TRADITIONALSKELETALANIMATION
-		,
+#ifndef TRADITIONALSKELETALANIMATION
+		{"VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+#else
+    #ifdef ONEBONE
+		{"BONEID", 0, DXGI_FORMAT_R32_SINT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"BoneWeight", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+    #else
 		{"BONEID", 0, DXGI_FORMAT_R32G32B32A32_SINT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BoneWeight", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-        #endif
+    #endif
+
+		
+#endif
 	};
-	if(!CreateInputLayoutOwn(device, inputLayout[2], vShaderByteCode[3],inputDesc,nrOfEl)){
+	if(!CreateInputLayoutOwn(device, inputLayout[2], vShaderByteCode[3], inputDesc, nrOfEl)){
 		std::cerr << "cant load own input layput 2" << std::endl;
 		return false;
 	}

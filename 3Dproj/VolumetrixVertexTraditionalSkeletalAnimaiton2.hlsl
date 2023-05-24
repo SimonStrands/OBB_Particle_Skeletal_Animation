@@ -3,8 +3,8 @@ struct VertexShaderInput
 {
     float3 position : POSITION;
     float4 color : COLOR;
-    int4 bondIDS : BONEID;
-    float4 boneWeights : BoneWeight;
+    int bondIDS : BONEID;
+    float boneWeights : BoneWeight;
 };
 
 struct VertexShaderOutput
@@ -44,7 +44,7 @@ bool f4eqf4(float4x4 a, float4x4 b)
 
         }
     }
-    return theReturn;      
+    return theReturn;
 };
 
 VertexShaderOutput main(VertexShaderInput input)
@@ -58,23 +58,11 @@ VertexShaderOutput main(VertexShaderInput input)
 		0.f, 0.f, 0.f, 0.f,
 		0.f, 0.f, 0.f, 0.f,
 		0.f, 0.f, 0.f, 0.f
-	};
+    };
     
     if (input.bondIDS.x > -0.5f)
     {
         boneTransform += mul(Transformations[int(input.bondIDS.x)], input.boneWeights.x);
-    }
-    if (input.bondIDS.y > -0.5f)
-    {
-        boneTransform += mul(Transformations[int(input.bondIDS.y)], input.boneWeights.y);
-    }
-    if (input.bondIDS.z > -0.5f)
-    {
-        boneTransform += mul(Transformations[int(input.bondIDS.z)], input.boneWeights.z);
-    }
-    if (input.bondIDS.w > -0.5f)
-    {
-        boneTransform += mul(Transformations[int(input.bondIDS.w)], input.boneWeights.w);
     }
     
     //DEBUG //THIS SHOULD BE REMOVED IN FINAL PRODUCT
