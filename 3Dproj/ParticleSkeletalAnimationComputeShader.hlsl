@@ -21,7 +21,7 @@ RWBuffer<float> particleData;
 //https://gist.github.com/mattatz/86fff4b32d198d0928d0fa4ff32cf6fa
 
 static const float3 downVec = float3(0, -1, 0);
-[numthreads(16, 1, 1)]
+[numthreads(32, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {   
     

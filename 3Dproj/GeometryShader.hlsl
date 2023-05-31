@@ -4,7 +4,7 @@ struct GSInput
 {
     float4 position : SV_POSITION;
     float4 color : COLOR;
-    float3 velocity : VELOCITY;
+    //float3 velocity : VELOCITY;
     row_major float4x4 model : MODEL;
     row_major float4x4 view : VIEW;
     row_major float4x4 projection : PR;

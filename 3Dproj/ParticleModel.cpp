@@ -73,6 +73,8 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	init(gfx, filePath, position);
 }
 
+#define NROFTHREADS 32
+
 void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 position)
 {
 	this->positionMatris = DirectX::XMMATRIX(
@@ -138,12 +140,11 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	}
 #endif // 
 
-	//make it a multiple of 16 or can cause crashes
 	if(vertecies.size() < 1){
 		std::cout << "didn't get any vertecies" << std::endl;
 		exit(-2);
 	}
-	while(vertecies.size() % 16 != 0){
+	while(vertecies.size() % NROFTHREADS != 0){
 		vertecies.push_back(vertecies[0]);
 	}
 
@@ -286,7 +287,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	
 	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
 	
-	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies / 16, 1, 1);//calc how many groups we need beacuse right now I do not know
+	gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies / NROFTHREADS, 1, 1);//calc how many groups we need beacuse right now I do not know
 	
 	//nulla unorderedaccesview
 	ID3D11UnorderedAccessView* nullUAV = nullptr;
