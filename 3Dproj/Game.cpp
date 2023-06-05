@@ -14,7 +14,7 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	//create lights
 	nrOfLight = 1;
 	light = new Light * [nrOfLight];
-	light[0] = new SpotLight(vec3(0, 12, 7.0f), vec3(0.f, -3.14f/2.f, 0.f));
+	light[0] = new SpotLight(vec3(0, 220.f, 70.0f), vec3(0.f, -3.14f/2.f, 0.f));
 	gfx->getLightconstbufferforCS()->nrOfLights.element = nrOfLight;
 	
 	//shadow map needs to take more lights
@@ -232,7 +232,8 @@ void Game::setUpObject()
 	obj.push_back(new GameObject(rm->get_Models("Camera.obj", gfx), gfx, vec3(0.f, 100.f, 0.f), vec3(0.f, -1.58f, 0.f), vec3(1.f, 1.0f, 1.0f)));//second
 
 	//THEMODELCHANGE
-	particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
+	//particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
+	particleModel.init(gfx, "objects/Capoeira2.fbx", vec3());
 	//particleModel.init(gfx, "objects/Herobrine.fbx", vec3());
 
 #ifndef TRADITIONALSKELETALANIMATION

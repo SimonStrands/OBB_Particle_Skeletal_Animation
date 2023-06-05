@@ -63,9 +63,9 @@ void ImguiManager::updateRender(int lightNr, float deltaTime)
 		
 		if(ImGui::Begin("boxes")){
 			 ImGui::SliderInt("WhatBox", &boxnr, 0, boxes->size() - 1);
-			 ImGui::SliderFloat("height", &(boxes[0][boxnr]).x, 0.f, 5.f);
-			 ImGui::SliderFloat("width", &(boxes[0][boxnr]).y, 0.f, 5.f);
-			 ImGui::SliderFloat("depth", &(boxes[0][boxnr]).z, 0.f, 5.f);
+			 ImGui::SliderFloat("height",&(boxes[0][boxnr]).x, 0.f, 30.f);
+			 ImGui::SliderFloat("width", &(boxes[0][boxnr]).y, 0.f, 30.f);
+			 ImGui::SliderFloat("depth", &(boxes[0][boxnr]).z, 0.f, 30.f);
 			
 		}
 		ImGui::End();

@@ -471,7 +471,7 @@ void loadParticleModel(
 	
 	//add more particle if needed
 	for(unsigned int f = 0; f < mesh->mNumFaces; f++){
-		const int R = 4;//3;
+		const int R = 3;//3;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 

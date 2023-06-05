@@ -220,7 +220,8 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	std::ifstream sizesFile;
 
 	//THEMODELCHANGE
-	sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	//sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	sizesFile.open("objects/obb_joint-boxsizes_EDDY.txt");
 	//sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
 	
 	float x, y, z;
@@ -257,8 +258,9 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	if(!this->hasAnimation){
 		return;
 	}
-	if(getkey('P')){
-		dt *= 20;
+	if(!getkey('P')){
+		//dt *= 0;
+		dt = 0;
 		
 	}
 	time += dt * animation.tick;
