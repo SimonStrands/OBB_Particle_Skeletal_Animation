@@ -3,7 +3,6 @@ struct VertexShaderInput
 {
     float3 position : POSITION;
     float4 color : COLOR;
-    float3 velocity : VELOCITY;
     int4 bondIDS : BONEID;
     float4 boneWeights : BoneWeight;
 };
@@ -12,7 +11,6 @@ struct VertexShaderOutput
 {
     float4 position : SV_POSITION;
     float4 color : COLOR;
-    float3 velocity : VELOCITY;
     row_major float4x4 model : MODEL;
     row_major float4x4 view : VIEW;
     row_major float4x4 projection : PR;
@@ -102,7 +100,6 @@ VertexShaderOutput main(VertexShaderInput input)
     output.color = input.color;
     
     output.position = mul(float4(input.position, 1.0f), boneTransform);
-    output.velocity = input.velocity;
     output.model = transform;
     output.view = view;
     output.projection = projection;

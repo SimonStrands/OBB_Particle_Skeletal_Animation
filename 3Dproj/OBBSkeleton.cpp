@@ -161,7 +161,6 @@ void OBBSkeletonDebug::inverseDeltaTransforms()
 	}
 }
 
-
 void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 {
 	constBufferConverterTime.dt.element = dt;

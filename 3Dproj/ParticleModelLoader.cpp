@@ -88,6 +88,7 @@ void loadBoneDataToVertecies(
 				vertecies[id].boneIDs[0] = i;
 				vertecies[id].boneWeights[0] = weight;
 				break;
+#ifndef ONEBONE
 			case 2:
 				vertecies[id].boneIDs[1] = i;
 				vertecies[id].boneWeights[1] = weight;
@@ -100,6 +101,7 @@ void loadBoneDataToVertecies(
 				vertecies[id].boneIDs[3] = i;
 				vertecies[id].boneWeights[3] = weight;
 				break;
+#endif // ONEBONE
 			default:
 
 				break;
@@ -141,6 +143,12 @@ void loadBoneDataToVertecies(
 
 	}
 	#ifdef TRADITIONALSKELETALANIMATION
+#ifdef ONEBONE
+	//normalize weights to make all weights sum 1
+	for (int w = 0; w < vertecies.size(); w++) {
+		vertecies[w].boneWeights[0] = 1;
+	}
+#else
 	//normalize weights to make all weights sum 1
 	for (int w = 0; w < vertecies.size(); w++) {
 		
@@ -156,6 +164,9 @@ void loadBoneDataToVertecies(
 			vertecies[w].boneWeights[3] = vertecies[w].boneWeights[3] / totalWeight;
 		}
 	}
+#endif // ONEBONE
+
+	
     #else
 	for (auto & x : idandWeight){
 		
@@ -283,6 +294,12 @@ vec3 lerp(const vec3& a, const vec3& b, float procent){
 	return theReturn;
 }
 
+vec3 setColor(const std::vector<vec3>& c, const vec3& v){
+	vec3 theReturn;
+	theReturn = c[RandomNumber(0, (int)c.size())];
+	return theReturn;
+}
+
 void subDivide(
 	int subDivision, 
 	VolumetricVertex newVertecies[],
@@ -296,63 +313,70 @@ void subDivide(
 		return;
 	}
 	subDivision = subDivision - 1;
-	//find the 50% of point 
-	//a -> b = x
-	//b -> c = y
-	//c -> a = z
+	vec3 c;
 	vec3 vx = lerp(newVertecies[0], newVertecies[1], 0.5f);
-	vec3 c = colors[RandomNumber(0, (int)colors.size())];
+	c = setColor(colors, vx);
 	VolumetricVertex x(vx.x, vx.y, vx.z, c.x, c.y, c.z, 1.0f);
 
-	c = colors[RandomNumber(0, (int)colors.size())];
 	vec3 vy = lerp(newVertecies[1], newVertecies[2], 0.5f);
+	c = setColor(colors, vy);
 	VolumetricVertex y(vy.x, vy.y, vy.z, c.x, c.y, c.z, 1.0f);
 
-	c = colors[RandomNumber(0, (int)colors.size())];
 	vec3 vz = lerp(newVertecies[2], newVertecies[0], 0.5f);
+	c = setColor(colors, vz);
 	VolumetricVertex z(vz.x, vz.y, vz.z, c.x, c.y, c.z, 1.0f);
 
-	c = colors[RandomNumber(0, (int)colors.size())];
 	//find the middle of the triangle
 	vec3 vm = vec3((vx.x + vy.x + vz.x) / 3, (vx.y + vy.y + vz.y) / 3, (vx.z + vy.z + vz.z) / 3);
+	c = setColor(colors, vm);
 	VolumetricVertex m(vm.x, vm.y, vm.z, c.x, c.y, c.z, 1.0f);
 
 #ifdef TRADITIONALSKELETALANIMATION
 	x.boneIDs[0]		= newVertecies[0].boneIDs[0];
+	x.boneWeights[0]    = newVertecies[0].boneWeights[0];
+#ifndef ONEBONE
+
 	x.boneIDs[1]		= newVertecies[0].boneIDs[1];
 	x.boneIDs[2]		= newVertecies[0].boneIDs[2];
 	x.boneIDs[3]		= newVertecies[0].boneIDs[3];
-	x.boneWeights[0]    = newVertecies[0].boneWeights[0];
+
 	x.boneWeights[1]    = newVertecies[0].boneWeights[1];
 	x.boneWeights[2]    = newVertecies[0].boneWeights[2];
 	x.boneWeights[3]    = newVertecies[0].boneWeights[3];
+#endif // !ONEBONE
 	
 	y.boneIDs[0]        = newVertecies[1].boneIDs[0];
+	y.boneWeights[0]    = newVertecies[1].boneWeights[0];
+#ifndef ONEBONE
 	y.boneIDs[1]        = newVertecies[1].boneIDs[1];
 	y.boneIDs[2]        = newVertecies[1].boneIDs[2];
 	y.boneIDs[3]        = newVertecies[1].boneIDs[3];
-	y.boneWeights[0]    = newVertecies[1].boneWeights[0];
 	y.boneWeights[1]    = newVertecies[1].boneWeights[1];
 	y.boneWeights[2]    = newVertecies[1].boneWeights[2];
 	y.boneWeights[3]    = newVertecies[1].boneWeights[3];
+#endif // !ONEBONE
 	
 	z.boneIDs[0]        = newVertecies[2].boneIDs[0];
+	z.boneWeights[0]    = newVertecies[2].boneWeights[0];
+#ifndef ONEBONE
 	z.boneIDs[1]        = newVertecies[2].boneIDs[1];
 	z.boneIDs[2]        = newVertecies[2].boneIDs[2];
 	z.boneIDs[3]        = newVertecies[2].boneIDs[3];
-	z.boneWeights[0]    = newVertecies[2].boneWeights[0];
 	z.boneWeights[1]    = newVertecies[2].boneWeights[1];
 	z.boneWeights[2]    = newVertecies[2].boneWeights[2];
 	z.boneWeights[3]    = newVertecies[2].boneWeights[3];
+#endif // !ONEBONE
 	
 	m.boneIDs[0]       = newVertecies[2].boneIDs[0];
+	m.boneWeights[0]   = newVertecies[2].boneWeights[0]; 
+#ifndef ONEBONE
 	m.boneIDs[1]       = newVertecies[2].boneIDs[1];
 	m.boneIDs[2]       = newVertecies[2].boneIDs[2];
 	m.boneIDs[3]       = newVertecies[2].boneIDs[3];
-	m.boneWeights[0]   = newVertecies[2].boneWeights[0]; 
 	m.boneWeights[1]   = newVertecies[2].boneWeights[1]; 
 	m.boneWeights[2]   = newVertecies[2].boneWeights[2]; 
 	m.boneWeights[3]   = newVertecies[2].boneWeights[3]; 
+#endif // !ONEBONE
 #else
 	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size(), idandWeight[id[0]]));
 	idandWeight.insert(std::pair<int, IdAndWeight>((int)vertecies.size() + 1, idandWeight[id[1]]));
@@ -413,7 +437,7 @@ void loadParticleModel(
 		std::cout << "ERROR could find scene or file" << std::endl;
 		exit(-2);
 	}
-
+	
 	aiMesh* mesh = scene->mMeshes[0];
 	
 	static const float nl = 1.00;
@@ -425,12 +449,13 @@ void loadParticleModel(
 		pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL);
 		std::string p(path.data);
 		getPixelArray("objects/sandTexture.jpg", colors);
+		//getPixelArray("objects/waterTex.jpg", colors);
     }
 
 	//load mesh/particle form
 	for(unsigned int v = 0; v < mesh->mNumVertices; v++){
 		aiVector3D vertex = mesh->mVertices[v];
-		vec3 c = colors[RandomNumber(0, (int)colors.size())];
+		vec3 c = setColor(colors, vec3(vertex.x, vertex.y, vertex.z));
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, c.x, c.y, c.z, 1.0f));
 	}
 
@@ -443,22 +468,21 @@ void loadParticleModel(
 		addEmptyAnimationForEmptyJoints(rootJoint, animation);
 	}
 	
+	
 	//add more particle if needed
 	for(unsigned int f = 0; f < mesh->mNumFaces; f++){
-		//get one lenght that we will use for all
-		//float l = vertexLenght(vertecies[mesh->mFaces[f].mIndices[0]], vertecies[mesh->mFaces[f].mIndices[1]]);
-		//int R = l / nl;
-		const int R = 3;//3;
+		const int R = 4;//3;
 	
 		VolumetricVertex tempArray[3] = {
 			vertecies[mesh->mFaces[f].mIndices[0]], 
 			vertecies[mesh->mFaces[f].mIndices[1]], 
 			vertecies[mesh->mFaces[f].mIndices[2]]
 		};
-
+	
 		unsigned int verteciesID[] = {mesh->mFaces[f].mIndices[0], mesh->mFaces[f].mIndices[0], mesh->mFaces[f].mIndices[0]};
 		subDivide(R, tempArray, verteciesID, vertecies, colors, idandWeight);
 	}
+
 	std::cout << "Number of particles " << vertecies.size() << std::endl;
 }
 

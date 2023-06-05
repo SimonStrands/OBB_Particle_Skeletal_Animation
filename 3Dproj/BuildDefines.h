@@ -1,2 +1,14 @@
 #pragma once
 //#define TRADITIONALSKELETALANIMATION //remove to have OBB skeletal animation else traditional skeletal animation is running
+//#define ONEBONE
+
+
+//OPTIONS
+// TRADITIONALSKELETALANIMATION = FALSE
+// ONEBONE = FALSE
+
+// TRADITIONALSKELETALANIMATION = TRUE
+// ONEBONE = FALSE
+
+// TRADITIONALSKELETALANIMATION = TRUE
+// ONEBONE = TRUE
