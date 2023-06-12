@@ -21,7 +21,7 @@ struct GSOutput
 	float4 fragpos: FRAG_POS;
 };
 
-cbuffer CBuf
+cbuffer CBuf : register(b1)
 {
 	float4 cameraPos;
 };
@@ -33,9 +33,7 @@ void main(
 )
 {
     GSOutput element;
-    float3 nCP = float3(input[0].position.xyz) + float3(0, -1, 0);
-    //element.color = input[0].color * length(nCP) * 1.5;
-    element.color.xyz = input[0].color.xyz * length(nCP) * 0.010f;
+    element.color.xyz = input[0].color.xyz;
     element.color.w = input[0].color.w;
 	
     float4x4 modelView = mul(input[0].model, input[0].view);
@@ -56,7 +54,7 @@ void main(
 
 	
 	//element.normal = normalize(float3(float3(modelView[0][2], modelView[1][2], modelView[2][2])));
-    element.normal = normalize(-camToPos);
+    element.normal = normalize(camToPos);
 	element.tangent = normalize(side);
 	element.bitangent = normalize(up);
     

@@ -31,7 +31,6 @@ float4 main(PixelShaderInput input) : SV_TARGET
     
     float3 color = diffuseTexture.xyz * input.color.xyz;
     
-    
     for (int i = 0; i < nrOfLight; i++)
     {
         float3 lightDir = normalize(lightPos[i].xyz - input.fragpos.xyz);
@@ -55,8 +54,8 @@ float4 main(PixelShaderInput input) : SV_TARGET
             float3 viewDir = normalize(cameraPos.xyz - input.fragpos.xyz);
             float3 halfWayDir = normalize(lightDir - viewDir);
                 
-				//////calc lightning//////
-				//defuse
+			//////calc lightning//////
+			//defuse
             float3 defuse_light;
             float ammount_diffuse = max(dot(input.normal.xyz, lightDir), 0.0f);
             defuse_light = ammount_diffuse * color.xyz * lightColor.xyz;
@@ -67,13 +66,13 @@ float4 main(PixelShaderInput input) : SV_TARGET
             float3 specular = float3(0.5f,0.5f,0.5f) * spec;
                 
             lightning.xyz += saturate(ambient_light + defuse_light) + specular;
-            //lightning.xyz += saturate(ambient_light + defuse_light);
         }
         else
         {
-			//we are in shadow
-            lightning += float4(ambientColor, 0);
+            lightning.xyz += ambientColor;
+
         }
+
     }
     return float4(lightning.xyz, input.color.w);
 }

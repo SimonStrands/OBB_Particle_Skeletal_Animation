@@ -262,8 +262,9 @@ void Graphics::Update(float dt, vec3 camPos)
 	memcpy(resource.pData, &CPCB, sizeof(CamPosCB));
 	immediateContext->Unmap(camConstBuffer, 0);
 	ZeroMemory(&resource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-	immediateContext->PSSetConstantBuffers(5, 1, &camConstBuffer);
 
+	immediateContext->GSSetConstantBuffers(1, 1, &camConstBuffer);
+	immediateContext->PSSetConstantBuffers(5, 1, &camConstBuffer);
 	immediateContext->HSSetConstantBuffers(5, 1, &camConstBuffer);
 
 	//fps
