@@ -40,14 +40,39 @@ void Graphics::setProjection(int flag)
 	}
 }
 
+void Graphics::setClearColor(float r, float g, float b, float a)
+{
+	this->clearColor[0] = r;
+	this->clearColor[1] = g;
+	this->clearColor[2] = b;
+	this->clearColor[3] = a;
+}
+
 void Graphics::CreateBlendState(int wBlend, bool transparance) {
+	//D3D11_BLEND_DESC bd = {};
+	//if (transparance) {
+	//	bd.RenderTarget[0].BlendEnable = TRUE;
+	//	bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	//	bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	//	bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	//	bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+	//	bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	//	bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	//	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//}
+	//else {
+	//	bd.RenderTarget[0].BlendEnable = FALSE;
+	//	bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	//}
 	D3D11_BLEND_DESC bd = {};
 	if (transparance) {
-		bd.RenderTarget[0].BlendEnable = TRUE;
+		bd.AlphaToCoverageEnable = false;
+		bd.IndependentBlendEnable = false;
+		bd.RenderTarget[0].BlendEnable = true;
 		bd.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		bd.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		bd.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+		bd.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 		bd.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 		bd.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
@@ -353,7 +378,6 @@ void Graphics::takeIM(ImguiManager* manager)
 
 void Graphics::clearScreen()
 {
-	float clearColor[4] = { 0.1f,0.1f,0.1f,0 };
 	immediateContext->ClearRenderTargetView(renderTarget, clearColor);
 	immediateContext->ClearDepthStencilView(dsView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 }

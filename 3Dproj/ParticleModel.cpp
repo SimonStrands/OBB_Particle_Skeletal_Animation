@@ -1,4 +1,5 @@
 #include "ParticleModel.h"
+#include <thread>
 
 std::pair<unsigned int, float> ParticleModel::getTimeFraction(const std::vector<float>& times, float& dt) {
 	unsigned int segment = 0;
@@ -73,8 +74,77 @@ ParticleModel::ParticleModel(Graphics*& gfx, const std::string& filePath, vec3 p
 	init(gfx, filePath, position);
 }
 
-#define NROFTHREADS 32
+//Make this faster with threads
+void ParticleModel::giveBoneID(std::vector<VolumetricVertex>& vertecies, int nrOfbones, int start, int nrOfThreads)
+{
+#ifdef ORGINALPOSITION
+	//for(int v = start; v < vertecies.size(); v += nrOfThreads){
+	//	DirectX::XMVECTOR position;
+	//	const DirectX::XMFLOAT4 F4Position(vertecies[v].pos[0], vertecies[v].pos[1], vertecies[v].pos[2], 1);
+	//	position = DirectX::XMLoadFloat4(&F4Position);
+	//
+	//	bool foundBone = false;
+	//	for(int i = 0; i < nrOfbones && !foundBone; i++){
+	//		DirectX::XMMATRIX collisionMatrix = DirectX::XMMatrixInverse(nullptr, this->OBBSkeleton.getOBBBuffer().transform.element[i]);
+	//		
+	//		DirectX::XMVECTOR nPosConv = DirectX::XMVector4Transform(position, collisionMatrix);
+	//		DirectX::XMFLOAT4 nPos; DirectX::XMStoreFloat4(&nPos, nPosConv);
+	//		if(std::abs(nPos.x) <= 0.5 &&  (nPos.y <= 1 && nPos.y >= 0) && std::abs(nPos.z) <= 0.5){
+	//			vertecies[v].orginalPos[3] = (float)i;//last one is bone id
+	//			foundBone = true;
+	//		}
+	//		
+	//	}
+	//}
+	#endif // ORGINALPOSITION
+}
 
+//make it for threads
+void TransformBeforeFirstFrameOfAnimation(std::vector<VolumetricVertex>& vertecies, std::map<int, IdAndWeight> idandWeight, SkeletonConstantBuffer SkeletonConstBufferConverter,
+	int start, int numThreads)
+{
+	#ifndef TRADITIONALSKELETALANIMATION
+	for (int i = start; i < vertecies.size(); i += numThreads)
+	{
+		DirectX::XMMATRIX boneTransform = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+		if (idandWeight[i].IDs.xyz.x > -0.5f)
+		{
+			boneTransform += SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.x)] * idandWeight[i].weights.xyz.x;
+		}
+		if (idandWeight[i].IDs.xyz.y > -0.5f)
+		{
+			boneTransform += SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.y)] * idandWeight[i].weights.xyz.y;
+		}
+		if (idandWeight[i].IDs.xyz.z > -0.5f)
+		{
+			boneTransform += SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.z)] * idandWeight[i].weights.xyz.z;
+		}
+		if (idandWeight[i].IDs.w > -0.5f)
+		{
+			boneTransform += SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.w)] * idandWeight[i].weights.w;
+		}
+	
+		DirectX::XMFLOAT4 temp = DirectX::XMFLOAT4(vertecies[i].pos[0], vertecies[i].pos[1], vertecies[i].pos[2], 1.f);
+		DirectX::XMVECTOR vPoint = DirectX::XMLoadFloat4(&temp);
+		boneTransform = DirectX::XMMatrixTranspose(boneTransform);
+		vPoint = DirectX::XMVector4Transform(vPoint, boneTransform);
+		DirectX::XMStoreFloat4(&temp, vPoint);
+		#ifdef ORGINALPOSITION
+			vertecies[i].orginalPos[0] = vertecies[i].pos[0];
+			vertecies[i].orginalPos[1] = vertecies[i].pos[1];
+			vertecies[i].orginalPos[2] = vertecies[i].pos[2];
+        #endif // ORGINALPOSITION
+
+		vertecies[i].pos[0] = temp.x;
+		vertecies[i].pos[1] = temp.y;
+		vertecies[i].pos[2] = temp.z;
+	}
+#endif
+		return;
+}
+
+#define NROFTHREADS 32
 void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 position)
 {
 	this->positionMatris = DirectX::XMMATRIX(
@@ -90,7 +160,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	//but now we just do this for debug
 	std::vector<VolumetricVertex> vertecies;
 	std::map<int, IdAndWeight> idandWeight;
-	loadParticleModel(vertecies, filePath, animation, rootJoint, idandWeight);
+	loadParticleModel(vertecies, filePath, animation, rootJoint, idandWeight, gfx);
 
 	hasAnimation = false;
 	if(rootJoint.id != -1){
@@ -105,39 +175,16 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	}
 	
 #ifndef TRADITIONALSKELETALANIMATION 
-
-	for (int i = 0; i < vertecies.size(); i++)
-	{
-
-		DirectX::XMMATRIX boneTransform = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-		if (idandWeight[i].IDs.xyz.x > -0.5f)
-		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.x)] * idandWeight[i].weights.xyz.x;
-		}
-		if (idandWeight[i].IDs.xyz.y > -0.5f)
-		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.y)] * idandWeight[i].weights.xyz.y;
-		}
-		if (idandWeight[i].IDs.xyz.z > -0.5f)
-		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.xyz.z)] * idandWeight[i].weights.xyz.z;
-		}
-		if (idandWeight[i].IDs.w > -0.5f)
-		{
-			boneTransform += this->SkeletonConstBufferConverter.Transformations.element[int(idandWeight[i].IDs.w)] * idandWeight[i].weights.w;
-		}
-	
-		DirectX::XMFLOAT4 temp = DirectX::XMFLOAT4(vertecies[i].pos[0], vertecies[i].pos[1], vertecies[i].pos[2], 1.f);
-		DirectX::XMVECTOR vPoint = DirectX::XMLoadFloat4(&temp);
-		boneTransform = DirectX::XMMatrixTranspose(boneTransform);
-		vPoint = DirectX::XMVector4Transform(vPoint, boneTransform);
-		DirectX::XMStoreFloat4(&temp, vPoint);
-		vertecies[i].pos[0] = temp.x;
-		vertecies[i].pos[1] = temp.y;
-		vertecies[i].pos[2] = temp.z;
-
+	std::vector<std::thread> threads;
+	int numberOfThreads = std::thread::hardware_concurrency();
+	threads.resize(numberOfThreads);
+	for(int i = 0; i < numberOfThreads; i++){
+		threads[i] = std::thread(TransformBeforeFirstFrameOfAnimation, std::ref(vertecies), idandWeight, SkeletonConstBufferConverter, i, numberOfThreads);
 	}
+	for(int i = 0; i < numberOfThreads; i++){
+		threads[i].join();
+	}
+
 #endif // 
 
 	if(vertecies.size() < 1){
@@ -156,7 +203,13 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	this->PSShadow = gfx->getPS()[3];
 	this->inputLayout = gfx->getInputLayout()[2];
 
+#ifdef ORGINALPOSITION
+	loadCShader("ParticleSkeletalAnimationComputeShader2.cso", gfx->getDevice(), cUpdate);
+#else
 	loadCShader("ParticleSkeletalAnimationComputeShader.cso", gfx->getDevice(), cUpdate);
+#endif // ORGINALPOSITION
+
+	
 	if (!CreateTexture("objects/Particle/SphereDiff.png", gfx->getDevice(), gfx->getTexture(), diffuseTexture)) {
 		std::cout << "cannot load particle texture" << std::endl;
 	}
@@ -165,6 +218,38 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	}
 
 	CreateVertexConstBuffer(gfx, this->Vg_pConstantBuffer);
+
+#ifndef TRADITIONALSKELETALANIMATION
+	//get bone orginal position
+	
+	std::vector<DirectX::XMFLOAT3> sizes; //x =height, y= Width, z=Depth
+	std::ifstream sizesFile;
+
+	//THEMODELCHANGE
+	//sizesFile.open("objects/obb_joint-boxessizes_1.txt");
+	sizesFile.open("objects/obb_joint-boxsizes_EDDY.txt");
+	//sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
+	
+	float x, y, z;
+	while (!sizesFile.eof())
+	{
+		std::string info;
+		sizesFile >> info;
+		sizesFile >> x;
+		sizesFile >> y;
+		sizesFile >> z;
+		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
+	}
+
+	sizesFile.close();
+	OBBSkeleton.init((unsigned int)sizes.size(), sizes, gfx);
+	getHitBoxPosition(rootJoint, OBBSkeleton.getTransforms());
+#ifdef ORGINALPOSITION
+			for(int i = 0; i < vertecies.size(); i++){
+				vertecies[i].orginalPos[3] = -1;//this is the bone ID
+			}
+#endif ORGINALPOSITION
+#endif // TRADITIONALSKELETALANIMATION
 
 	HRESULT hr;
 
@@ -200,7 +285,13 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	UavDesc.Buffer.NumElements = nrOfVertecies * 15;
 #endif
 #else
+#ifdef ORGINALPOSITION
+	UavDesc.Buffer.NumElements = nrOfVertecies * 14;
+#else
 	UavDesc.Buffer.NumElements = nrOfVertecies * 10;
+#endif // ORGINALPOSITION
+
+	
 #endif // DEBUG
 	UavDesc.Buffer.Flags = 0;
 
@@ -211,35 +302,32 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 		return;
 	}
 
+	//DO IT ON THE GPU
+#ifdef ORGINALPOSITION
+	        getPose(rootJoint, animation, time);
+			//I have no Idea why I need to do this twice
+			OBBSkeleton.updateObbPosition(rootJoint, SkeletonConstBufferConverter);
+			OBBSkeleton.update(gfx, 0);
+			OBBSkeleton.updateObbPosition(rootJoint, SkeletonConstBufferConverter);
+			OBBSkeleton.update(gfx, 0);
+			loadCShader("ParticleBoneSetUp.cso", gfx->getDevice(), cSetUp);
 
-
-	#ifndef TRADITIONALSKELETALANIMATION
-	//get bone orginal position
+			gfx->get_IMctx()->CSSetShader(cSetUp, nullptr, 0);
 	
-	std::vector<DirectX::XMFLOAT3> sizes; //x =height, y= Width, z=Depth
-	std::ifstream sizesFile;
+			gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &OBBSkeleton.getSkeletalTimeConstBuffer());
+			gfx->get_IMctx()->CSSetConstantBuffers(1, 1, &OBBSkeleton.getSkeletalTransformConstBuffer());
+			
+			gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &billUAV, nullptr);
+			
+			gfx->get_IMctx()->Dispatch((UINT)nrOfVertecies / NROFTHREADS, 1, 1);
+			
+			//nulla unorderedaccesview
+			ID3D11UnorderedAccessView* nullUAV = nullptr;
+			gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+#endif // ORGINALPOSITION
 
-	//THEMODELCHANGE
-	//sizesFile.open("objects/obb_joint-boxessizes_1.txt");
-	sizesFile.open("objects/obb_joint-boxsizes_EDDY.txt");
-	//sizesFile.open("objects/obb_joint-boxessizes_steave.txt");
-	
-	float x, y, z;
-	while (!sizesFile.eof())
-	{
-		std::string info;
-		sizesFile >> info;
-		sizesFile >> x;
-		sizesFile >> y;
-		sizesFile >> z;
-		sizes.push_back(DirectX::XMFLOAT3(x,y,z));
-	}
 
-	sizesFile.close();
-	OBBSkeleton.init((unsigned int)sizes.size(), sizes, gfx);
-	getHitBoxPosition(rootJoint, OBBSkeleton.getTransforms());
-
-	#endif // DEBUG
+std::cout << "hi" << std::endl;
 }
 
 ParticleModel::~ParticleModel()
@@ -281,7 +369,7 @@ void ParticleModel::updateParticles(float dt, Graphics*& gfx)
 	OBBSkeleton.updateObbPosition(rootJoint, SkeletonConstBufferConverter);
 	OBBSkeleton.update(gfx, dt);
 	
-	////dispathc shit
+	//dispathc shit
 	gfx->get_IMctx()->CSSetShader(cUpdate, nullptr, 0);
 	
 	gfx->get_IMctx()->CSSetConstantBuffers(0, 1, &OBBSkeleton.getSkeletalTimeConstBuffer());

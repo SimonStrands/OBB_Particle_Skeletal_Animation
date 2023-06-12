@@ -480,6 +480,15 @@
     <FxCompile Include="VolumetrixVertexTraditionalSkeletalAnimaiton2.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
     </FxCompile>
+    <FxCompile Include="VolumetricVertex2.hlsl">
+      <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleSkeletalAnimationComputeShader2.hlsl">
+      <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleBoneSetUp.hlsl">
+      <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Help.txt">

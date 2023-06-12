@@ -139,6 +139,7 @@ private:
 	SpotLight** light;
 	int nrOfLights;
 	ImguiManager *imguimanager;
+	float clearColor[4];
 
 	//variables
 	float speed;
@@ -152,6 +153,7 @@ private:
 public:
 	/*0 = perspective, 1 = orthographic*/
 	void setProjection(int flag = 0);
+	void setClearColor(float r, float g, float b, float a);
 	//get const Buffer
 	Vcb *getVertexconstbuffer();
 	Pcb *getPixelconstbuffer();

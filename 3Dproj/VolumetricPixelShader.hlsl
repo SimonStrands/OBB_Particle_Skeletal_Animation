@@ -21,8 +21,9 @@ float4 main(PixelShaderInput input) : SV_TARGET
     
     //check if the particle should disepear
     const float4 diffuseTexture = diffuseTex.Sample(testSampler, input.uv).xyzw;
+    //clip(diffuseTexture.w < 0.01f ? -1 : 1);
     clip(diffuseTexture.w < 0.1f ? -1 : 1);
-    clip(input.color.w < 0.0001f ? -1 : 1);
+    clip(input.color.w < 0.1f ? -1 : 1);
     
     //Calculate the normal/////////////////////////////////////////////////
     float3 nMapNormal;
@@ -46,6 +47,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
     static const float3 ambient_light = float3(0.1f, 0.1f, 0.1f);
     
     float3 color = diffuseTexture.xyz * input.color.xyz;
+    
     
     for (int i = 0; i < nrOfLight; i++)
     {

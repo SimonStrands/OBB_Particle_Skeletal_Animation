@@ -38,6 +38,7 @@ Game::Game(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWS
 	}
 	
 	gfx->takeLight((SpotLight**)light, nrOfLight);
+	gfx->setClearColor(0.2,0.2,0.2,0);
 	
 	lightNr = 0;
 

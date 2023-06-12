@@ -118,25 +118,25 @@ void loadBoneDataToVertecies(
 			boneCounts[id]++;
 			switch (boneCounts[id]) {
 			case 1:
-				idandWeight[id].IDs.xyz.x = i;
+				idandWeight[id].IDs.xyz.x = (float)i;
 				idandWeight[id].weights.xyz.x = weight;
 				break;
 			case 2:
-				idandWeight[id].IDs.xyz.y = i;
+				idandWeight[id].IDs.xyz.y = (float)i;
 				idandWeight[id].weights.xyz.y = weight;
 				break;
 			case 3:
-				idandWeight[id].IDs.xyz.z = i;
+				idandWeight[id].IDs.xyz.z = (float)i;
 				idandWeight[id].weights.xyz.z = weight;
 				break;
 			case 4:
-				idandWeight[id].IDs.w = i;
+				idandWeight[id].IDs.w = (float)i;
 				idandWeight[id].weights.w = weight;
 				break;
 			default:
-
+		
 				break;
-
+		
 			}
 		}
 		#endif
@@ -426,7 +426,8 @@ void loadParticleModel(
 	const std::string& filePath, 
 	Animation& animation, 
 	Bone& rootJoint,
-	std::map<int, IdAndWeight>& idandWeight
+	std::map<int, IdAndWeight>& idandWeight,
+	Graphics*& gfx
 )
 {
 	Assimp::Importer AImporter;
@@ -448,8 +449,9 @@ void loadParticleModel(
 		aiString path;
 		pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL);
 		std::string p(path.data);
-		getPixelArray("objects/sandTexture.jpg", colors);
+		//getPixelArray("objects/sandTexture.jpg", colors);
 		//getPixelArray("objects/waterTex.jpg", colors);
+		colors.push_back(vec3(0,0,1));
     }
 
 	//load mesh/particle form
@@ -458,6 +460,8 @@ void loadParticleModel(
 		vec3 c = setColor(colors, vec3(vertex.x, vertex.y, vertex.z));
 		vertecies.push_back(VolumetricVertex(vertex.x, vertex.y, vertex.z, c.x, c.y, c.z, 1.0f));
 	}
+
+
 
 	if(scene->HasAnimations()){
 		//load Bones

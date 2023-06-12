@@ -39,6 +39,14 @@ struct OBBSkeletonOBBBuffer : public CB{
 			temp.transform.element[i] = this->transform.element[i] - other.transform.element[i];
 		return temp;
 	}
+//#ifdef ORGINALPOSITION
+//	OBBSkeletonOBBBuffer operator=(const OBBSkeletonOBBBuffer& other)
+//	{
+//		std::copy(std::begin(other.InverseTransform.element), std::end(other.InverseTransform.element), this->InverseTransform.element);
+//		std::copy(std::begin(other.deltaTransform.element), std::end(other.deltaTransform.element), this->deltaTransform.element);
+//		this->nrOfBones = other.nrOfBones;
+//	}
+//#endif
 };
 
 struct OBBSkeletonOBBBufferDebugDraw : public CB{
@@ -69,6 +77,7 @@ public:
 	ID3D11Buffer*& getSkeletalTransformConstBuffer();
 	ID3D11Buffer*& getSkeletalTimeConstBuffer();
 	std::vector<DirectX::XMFLOAT3>& getSizes();
+	OBBSkeletonOBBBuffer& getOBBBuffer();
 
 private:
 	
@@ -92,5 +101,11 @@ private:
 	OBBSkeletonOBBBufferTime constBufferConverterTime;
 	OBBSkeletonOBBBuffer constBufferConverter;
 	OBBSkeletonOBBBuffer constBufferConverterPrev;
+
+#ifdef ORGINALPOSITION
+	std::vector<DirectX::XMMATRIX> TraditionalTransform;
+#endif // ORGINALPOSITION
+
+	
 
 };

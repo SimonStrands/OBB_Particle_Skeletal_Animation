@@ -39,6 +39,10 @@ struct VolumetricVertex {
 	float color[4];
 #ifndef TRADITIONALSKELETALANIMATION
 	float velocity[3] = { 0 };
+#ifdef ORGINALPOSITION
+	float orginalPos[4];//last pos is the boneID
+#endif // ORGINALPOSITION
+
 #endif
 #ifdef TRADITIONALSKELETALANIMATION
     #ifdef ONEBONE

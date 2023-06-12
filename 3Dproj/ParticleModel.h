@@ -45,6 +45,8 @@ private:
 	void setShaders(ID3D11DeviceContext*& immediateContext);
 	void updateShaders(Graphics*& gfx);
 
+	void giveBoneID(std::vector<VolumetricVertex>& vertecies, int nrOfbones, int start, int nrOfThreads);
+
 	ID3D11InputLayout* inputLayout;
 	UINT nrOfVertecies;
 
@@ -69,6 +71,7 @@ private:
 
 	//compute shader for updating particle position
 	ID3D11ComputeShader* cUpdate;
+	ID3D11ComputeShader* cSetUp;
 	ID3D11UnorderedAccessView* billUAV;
 	ID3D11Buffer* computeShaderConstantBuffer;
 

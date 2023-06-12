@@ -34,12 +34,12 @@ void main(
     GSOutput element;
     float3 nCP = float3(input[0].position.xyz) + float3(0, -1, 0);
     //element.color = input[0].color * length(nCP) * 1.5;
-    element.color = input[0].color * length(nCP) * 0.010f;
-    
+    element.color.xyz = input[0].color.xyz * length(nCP) * 0.010f;
+    element.color.w = input[0].color.w;
 	
     float4x4 modelView = mul(input[0].model, input[0].view);
 	float4x4 MVP = mul(modelView, input[0].projection);
-	float size = 0.100f;
+	float size = 0.200f;
 	//float size = 0.008f;
 	float3 side = float3(modelView[0][0], modelView[1][0], modelView[2][0]);
 	float3 up = float3(modelView[0][1], modelView[1][1], modelView[2][1]);

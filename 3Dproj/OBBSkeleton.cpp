@@ -29,6 +29,10 @@ void OBBSkeletonDebug::init(unsigned int nrOfBones, std::vector<DirectX::XMFLOAT
 	for(int i = 0; i < sizes.size(); i++){
 		this->sizes.push_back(sizes[i]);
 	}
+	#ifdef ORGINALPOSITION
+	   TraditionalTransform.resize(sizes.size());
+    #endif // ORGINALPOSITION
+
 	constBufferConverter.nrOfBones.element = nrOfBones;
 	for(unsigned int i = 0; i < nrOfBones; i++){
 		size.push_back(DirectX::XMMATRIX(
@@ -91,6 +95,9 @@ std::vector<DirectX::XMMATRIX>& OBBSkeletonDebug::getTransforms()
 
 void OBBSkeletonDebug::updateObbPosition(Bone& rootjoint, const SkeletonConstantBuffer skeltonConstBuffer)
 {
+#ifdef ORGINALPOSITION
+	TraditionalTransform[rootjoint.id] = skeltonConstBuffer.Transformations.element[rootjoint.id];
+#endif // ORGINALPOSITION
 
 	DirectX::XMMATRIX BoneOrginalPosition = DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(rootjoint.inverseBindPoseMatrix));
 
@@ -146,6 +153,14 @@ std::vector<DirectX::XMFLOAT3>& OBBSkeletonDebug::getSizes()
 	return this->sizes;
 }
 
+OBBSkeletonOBBBuffer& OBBSkeletonDebug::getOBBBuffer()
+{
+	for(int i = 0; i < transform.size(); i++){
+		constBufferConverter.transform.element[i] = size[i] * transform[i];
+	}
+	return constBufferConverter;
+}
+
 void OBBSkeletonDebug::inverseTransforms()
 {
 	for(unsigned int i = 0; i < constBufferConverter.nrOfBones.element; i++){
@@ -169,6 +184,8 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 	constBufferConverterTime.random.element[2] = RandomNumber(0, 25500);
 
 	this->constBufferConverterPrev = this->constBufferConverter;
+
+	inverseTransforms();
 	
 	//DEBUG
 	for(unsigned int i = 0; i < sizes.size(); i++){
@@ -189,8 +206,6 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 	constBufferConverterDebugDraw.projection.element = gfx->getVertexconstbuffer()->projection.element;
 	constBufferConverterDebugDraw.view.element = gfx->getVertexconstbuffer()->view.element;
 
-	inverseTransforms();
-
 	OBBSkeletonOBBBuffer constBufferConverterDelta = this->constBufferConverter - this->constBufferConverterPrev;
 
 	//plan is to send all delta matrices into shader
@@ -200,6 +215,12 @@ void OBBSkeletonDebug::update(Graphics*& gfx, float dt)
 	//since the constBufferConverterPrev now is sent to shader, we use it's delta slot
 
 	std::copy(std::begin(constBufferConverterDelta.transform.element), std::end(constBufferConverterDelta.transform.element), constBufferConverterPrev.deltaTransform.element);
+
+	#ifdef ORGINALPOSITION
+	   for(int i = 0; i < TraditionalTransform.size(); i++){
+		   constBufferConverterPrev.transform.element[i] = TraditionalTransform[i];
+	   }
+    #endif
 
 	D3D11_MAPPED_SUBRESOURCE resource;
     gfx->get_IMctx()->Map(constantBufferTime, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);

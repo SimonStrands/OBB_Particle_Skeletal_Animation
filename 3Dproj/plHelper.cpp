@@ -317,13 +317,18 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		loadVShader("DebugDrawOBBVertex.cso",device, vShader[2], vShaderByteCode[2])&&
 		loadVShader("VertexShadow.cso",device, vShader[3], vShaderByteCode[2])&&
 #ifdef TRADITIONALSKELETALANIMATION
-#ifdef ONEBONE
+    #ifdef ONEBONE
 		loadVShader("VolumetrixVertexTraditionalSkeletalAnimaiton2.cso",device, vShader[4], vShaderByteCode[3])&&
-#else
+    #else
 		loadVShader("VolumetrixVertexTraditionalSkeletalAnimaiton.cso",device, vShader[4], vShaderByteCode[3])&&
-#endif
+    #endif
 #else
+    #ifdef ORGINALPOSITION
+		loadVShader("VolumetricVertex2.cso",device, vShader[4], vShaderByteCode[3])&&
+    #else
 		loadVShader("VolumetricVertex.cso",device, vShader[4], vShaderByteCode[3])&&
+    #endif // ORGINALPOSITION
+
 #endif
 		loadGShader("GeometryShader.cso", device, gShader[0]) &&
 		loadGShader("Debugging_test.cso", device, gShader[1]) &&
@@ -358,16 +363,25 @@ bool SetupPipeline(ID3D11Device* device, ID3D11VertexShader**& vShader,
 		return false;
 	}
 	#ifdef TRADITIONALSKELETALANIMATION
-	const int nrOfEl = 4;
+	   const int nrOfEl = 4;
     #else
-	const int nrOfEl = 3;
+       #ifdef ORGINALPOSITION
+	      const int nrOfEl = 5;
+       #else
+	      const int nrOfEl = 3;
+       #endif // ORGINALPOSITION
     #endif
+
 	D3D11_INPUT_ELEMENT_DESC inputDesc[nrOfEl] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 #ifndef TRADITIONALSKELETALANIMATION
 		{"VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		#ifdef ORGINALPOSITION
+		    {"ORIGINALPOSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		    {"BONEID", 0, DXGI_FORMAT_R32_FLOAT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        #endif
 #else
     #ifdef ONEBONE
 		{"BONEID", 0, DXGI_FORMAT_R32_SINT, 0,D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},

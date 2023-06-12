@@ -28,7 +28,8 @@ void loadParticleModel(
 	const std::string& filePath,
 	Animation& animation,
 	Bone& rootJoint,
-	std::map<int, IdAndWeight>& idandWeight
+	std::map<int, IdAndWeight>& idandWeight,
+	Graphics *&gfx
 );
 
 void getHitBoxPosition(
