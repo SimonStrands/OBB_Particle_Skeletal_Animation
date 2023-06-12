@@ -4,10 +4,11 @@ struct GSInput
 {
     float4 position : SV_POSITION;
     float4 color : COLOR;
-    //float3 velocity : VELOCITY;
     row_major float4x4 model : MODEL;
     row_major float4x4 view : VIEW;
     row_major float4x4 projection : PR;
+	//only for specific case
+    bool Scale : Scale;
 };
 struct GSOutput
 {
@@ -40,6 +41,10 @@ void main(
     float4x4 modelView = mul(input[0].model, input[0].view);
 	float4x4 MVP = mul(modelView, input[0].projection);
 	float size = 0.200f;
+    if (input[0].Scale)
+    {
+        size = 0.75f;
+    }
 	//float size = 0.008f;
 	float3 side = float3(modelView[0][0], modelView[1][0], modelView[2][0]);
 	float3 up = float3(modelView[0][1], modelView[1][1], modelView[2][1]);
@@ -50,7 +55,8 @@ void main(
 	float4 shadowHomo;
 
 	
-	element.normal = normalize(float3(float3(modelView[0][2], modelView[1][2], modelView[2][2])));
+	//element.normal = normalize(float3(float3(modelView[0][2], modelView[1][2], modelView[2][2])));
+    element.normal = normalize(-camToPos);
 	element.tangent = normalize(side);
 	element.bitangent = normalize(up);
     

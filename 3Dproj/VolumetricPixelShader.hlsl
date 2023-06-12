@@ -21,26 +21,9 @@ float4 main(PixelShaderInput input) : SV_TARGET
     
     //check if the particle should disepear
     const float4 diffuseTexture = diffuseTex.Sample(testSampler, input.uv).xyzw;
-    //clip(diffuseTexture.w < 0.01f ? -1 : 1);
     clip(diffuseTexture.w < 0.1f ? -1 : 1);
     clip(input.color.w < 0.1f ? -1 : 1);
     
-    //Calculate the normal/////////////////////////////////////////////////
-    float3 nMapNormal;
-    float3x3 TBN = float3x3(
-		input.tangent.xyz,
-		input.bitangent.xyz,
-		input.normal.xyz
-	);
-    const float3 normalSample = nMap.Sample(testSampler, input.uv).xyz;
-    
-    nMapNormal.x = normalSample.x * 2.0f - 1.0f;
-    nMapNormal.y = normalSample.y * 2.0f - 1.0f;
-    nMapNormal.z = normalSample.z * 2.0f - 1.0f;
-    
-    //unsure if this should be -mul(nMapNormal, (float3x3) TBN);
-    input.normal = -mul(nMapNormal, (float3x3) TBN);
-    ///////////////////////////////////////////////////////////////////////
     
     float4 lightning = float4(0, 0, 0, 1);
     static const float3 lightColor = float3(1, 1, 1);
@@ -60,7 +43,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
         float4 SM = shadowMapping.SampleLevel(testSampler, float3(shadowMapCoords.x, shadowMapCoords.y, i), 0);
         
         //ambient
-        float3 ambientColor = color.xyz * 0.1f;
+        float3 ambientColor = color.xyz * 0.4f;
         float bias = 0.00001f;
         if (SM.r > shadowMapCoords.z - bias &&
                 shadowMapCoords.z <= 1.0f && //E
@@ -79,12 +62,12 @@ float4 main(PixelShaderInput input) : SV_TARGET
             defuse_light = ammount_diffuse * color.xyz * lightColor.xyz;
                 
             //specular
-            //float3 reflectDir = reflect(-lightDir, input.normal.xyz);
-            //float spec = pow(max(dot(viewDir, reflectDir), 0.0), 2.0f);
-            //float3 specular = float3(0.5f,0.5f,0.5f) * spec;
+            float3 reflectDir = reflect(-lightDir, input.normal.xyz);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 2.0f);
+            float3 specular = float3(0.5f,0.5f,0.5f) * spec;
                 
-            //lightning.xyz += saturate(ambient_light + defuse_light) + specular;
-            lightning.xyz += saturate(ambient_light + defuse_light);
+            lightning.xyz += saturate(ambient_light + defuse_light) + specular;
+            //lightning.xyz += saturate(ambient_light + defuse_light);
         }
         else
         {

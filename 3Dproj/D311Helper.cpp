@@ -78,9 +78,10 @@ bool CreateDepthStencil(ID3D11Device* device, UINT width, UINT height, ID3D11Tex
 bool CreateRasterizerState(ID3D11Device* device , ID3D11RasterizerState*& pRS) {
     D3D11_RASTERIZER_DESC rasterState;
     rasterState.FillMode = D3D11_FILL_SOLID;
+    rasterState.CullMode = D3D11_CULL_BACK;
     //rasterState.FillMode = D3D11_FILL_WIREFRAME;
     //rasterState.CullMode = D3D11_CULL_NONE;
-    rasterState.CullMode = D3D11_CULL_BACK;
+    
     rasterState.FrontCounterClockwise = false;
     rasterState.DepthBias = 0;
     rasterState.SlopeScaledDepthBias = 0;

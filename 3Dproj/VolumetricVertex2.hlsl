@@ -11,10 +11,11 @@ struct VertexShaderOutput
 {
     float4 position : SV_POSITION;
     float4 color : COLOR;
-    //float3 velocity : VELOCITY;
     row_major float4x4 model : MODEL;
     row_major float4x4 view : VIEW;
     row_major float4x4 projection : PR;
+    //only for specific case
+    bool Scale : Scale;
 };
 
 cbuffer CBuf
@@ -30,6 +31,12 @@ VertexShaderOutput main(VertexShaderInput input)
 
     output.position = float4(input.position, 1.f);
     output.color = input.color;
+    
+    output.Scale = false;
+    if (input.boneID > 100)
+    {
+        output.Scale = true;
+    }
     
     output.model = transform;
     output.view = view;

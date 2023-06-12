@@ -35,7 +35,13 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float4 currColor = float4(particleData[DTid.x * BUFFERSIZE + 3], particleData[DTid.x * BUFFERSIZE + 4], particleData[DTid.x * BUFFERSIZE + 5], particleData[DTid.x * BUFFERSIZE + 6]);
     float3 currentVelocity = float3(particleData[DTid.x * BUFFERSIZE + 7], particleData[DTid.x * BUFFERSIZE + 8], particleData[DTid.x * BUFFERSIZE + 9]);
     const float3 originalPosition = float3(particleData[DTid.x * BUFFERSIZE + 10], particleData[DTid.x * BUFFERSIZE + 11], particleData[DTid.x * BUFFERSIZE + 12]);
-    const int boneID = int(float(particleData[DTid.x * BUFFERSIZE + 13]));
+    int BufferBoneID = int(float(particleData[DTid.x * BUFFERSIZE + 13]));
+    int boneID = BufferBoneID;
+    
+    while (boneID > 100)
+    {
+        boneID -= 100;
+    }
     
     if (currPos.y <= -5)
     {
@@ -64,6 +70,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
         //Get velocity of max 3 bones
         velocities[nrOfBonesEffected] = mul(nPos, DeltaTransformations[boneID]).xyz;
         nrOfBonesEffected++;
+        BufferBoneID = boneID += 100;
     }
     
     if (nrOfBonesEffected > 0)
@@ -78,7 +85,10 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         currentVelocity *= (1 - (drag * dt));
     
-        //currColor = float4(1, 0, 0, 1);
+        while (BufferBoneID > 100)
+        {
+            BufferBoneID -= 100;
+        }
     
         currentVelocity += float3(0, -9.81f, 0) * dt * dt * 10;
         
@@ -104,4 +114,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     particleData[DTid.x * BUFFERSIZE + 7] = currentVelocity.x;
     particleData[DTid.x * BUFFERSIZE + 8] = currentVelocity.y;
     particleData[DTid.x * BUFFERSIZE + 9] = currentVelocity.z;
+    
+    particleData[DTid.x * BUFFERSIZE + 13] = BufferBoneID;
+
 }
