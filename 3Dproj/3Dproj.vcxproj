@@ -172,6 +172,8 @@
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="DeferredRendering.cpp" />
     <ClCompile Include="deltaTime.cpp" />
+    <ClCompile Include="FluidRenderer\fluidRenderD3D11.cpp" />
+    <ClCompile Include="FluidRenderer\renderTargetD3D11.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -219,6 +221,8 @@
     <ClInclude Include="debug.h" />
     <ClInclude Include="DeferredRendering.h" />
     <ClInclude Include="deltaTime.h" />
+    <ClInclude Include="FluidRenderer\fluidRenderD3D11.h" />
+    <ClInclude Include="FluidRenderer\renderTargetD3D11.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
@@ -322,6 +326,15 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="FluidRenderer\blurDepthPS.hlsl" />
+    <FxCompile Include="FluidRenderer\compositePS.hlsl" />
+    <FxCompile Include="FluidRenderer\ellipsoidDepthGS.hlsl" />
+    <FxCompile Include="FluidRenderer\ellipsoidDepthPS.hlsl" />
+    <FxCompile Include="FluidRenderer\ellipsoidDepthVS.hlsl" />
+    <FxCompile Include="FluidRenderer\passThroughVS.hlsl" />
+    <FxCompile Include="FluidRenderer\pointThicknessGS.hlsl" />
+    <FxCompile Include="FluidRenderer\pointThicknessPS.hlsl" />
+    <FxCompile Include="FluidRenderer\pointThicknessVS.hlsl" />
     <FxCompile Include="HullDisplaysment.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Hull</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

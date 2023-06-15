@@ -97,6 +97,9 @@
     <Filter Include="Resource Files\Shaders\DebugDrawObb">
       <UniqueIdentifier>{2f87aa80-af5e-4a1b-b68b-5619ed360835}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\FluidRenderer">
+      <UniqueIdentifier>{30ab2d51-eecc-4bf8-ba25-6a760e1e92b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -233,6 +236,12 @@
     </ClCompile>
     <ClCompile Include="SkeletalAnim.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FluidRenderer\fluidRenderD3D11.cpp">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="FluidRenderer\renderTargetD3D11.cpp">
+      <Filter>Source Files\FluidRenderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -386,6 +395,12 @@
     <ClInclude Include="BuildDefines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FluidRenderer\fluidRenderD3D11.h">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="FluidRenderer\renderTargetD3D11.h">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -488,6 +503,33 @@
     </FxCompile>
     <FxCompile Include="ParticleBoneSetUp.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\blurDepthPS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\compositePS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\ellipsoidDepthGS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\ellipsoidDepthPS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\ellipsoidDepthVS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\passThroughVS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\pointThicknessGS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\pointThicknessPS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderer\pointThicknessVS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
