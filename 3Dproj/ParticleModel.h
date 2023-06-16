@@ -7,6 +7,7 @@
 #include "OBBSkeleton.h"
 //#include <cmath>
 #include <fstream>
+#include "FluidRenderer/fluidRenderD3D11.h"
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : public CB{
@@ -88,5 +89,5 @@ private:
 	Bone rootJoint;
 	bool hasAnimation;
 
-	
+	FluidRendererD3D11 Renderer;
 };

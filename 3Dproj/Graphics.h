@@ -98,6 +98,7 @@ public:
 	Graphics(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow);
 	virtual ~Graphics();
 	void RsetViewPort();
+	DirectX::XMFLOAT3 getInvViewPort();
 private:
 	//D3D11
 	ID3D11Device* device;

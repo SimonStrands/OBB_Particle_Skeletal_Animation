@@ -1,4 +1,4 @@
-#include "shaderCommon.h"
+#include "../shaderCommon.hlsli"
 
 #pragma warning (disable : 3578)
 

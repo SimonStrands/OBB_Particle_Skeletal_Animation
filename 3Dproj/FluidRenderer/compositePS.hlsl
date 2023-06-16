@@ -1,4 +1,4 @@
-#include "shaderCommon.h"
+#include "../shaderCommon.hlsli"
 
 #define ENABLE_SIMPLE_FLUID 1
 

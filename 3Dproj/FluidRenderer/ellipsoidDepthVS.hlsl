@@ -1,5 +1,4 @@
-#include "shaderCommon.h"
-
+#include "../shaderCommon.hlsli"
 cbuffer constBuf : register(b0)
 {
 	FluidShaderConst gParams;

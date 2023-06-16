@@ -227,6 +227,11 @@ void Graphics::RsetViewPort()
 	immediateContext->RSSetViewports(1, &viewPort);
 }
 
+DirectX::XMFLOAT3 Graphics::getInvViewPort()
+{
+	return DirectX::XMFLOAT3(1.0f/WIDTH, ratio / WIDTH, 1.0f);
+}
+
 float nextFpsUpdate = 0;
 void Graphics::Update(float dt, vec3 camPos)
 {

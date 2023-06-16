@@ -401,6 +401,9 @@
     <ClInclude Include="FluidRenderer\renderTargetD3D11.h">
       <Filter>Source Files\FluidRenderer</Filter>
     </ClInclude>
+    <ClInclude Include="shaderCommon.h">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -414,6 +417,9 @@
     </None>
     <None Include="SkeletalData.hlsli">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </None>
+    <None Include="shaderCommon.hlsli">
+      <Filter>Source Files\FluidRenderer</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

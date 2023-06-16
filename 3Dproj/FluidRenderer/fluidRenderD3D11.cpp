@@ -15,6 +15,27 @@
 #include <math.h>
 
 
+void FluidRendererD3D11::calcFluidConstantBuffer(FluidShaderConst& constBuf)
+{	
+	//no model matrix stuck at 0,0,0
+	constBuf.modelViewProjection = (DirectX::XMFLOAT4X4&)(DirectX::XMMatrixMultiply(gfx->getVertexconstbuffer()->view.element, gfx->getVertexconstbuffer()->projection.element));
+	constBuf.modelView = (DirectX::XMFLOAT4X4&)gfx->getVertexconstbuffer()->view.element;
+	constBuf.projection = (DirectX::XMFLOAT4X4&)gfx->getVertexconstbuffer()->projection.element;
+	constBuf.inverseModelView = (DirectX::XMFLOAT4X4&)DirectX::XMMatrixInverse(nullptr, gfx->getVertexconstbuffer()->view.element);
+	constBuf.inverseProjection = (DirectX::XMFLOAT4X4&)DirectX::XMMatrixInverse(nullptr, gfx->getVertexconstbuffer()->projection.element);
+
+	constBuf.invViewport = gfx->getInvViewPort();
+
+	//constBuf.blurRadiusWorld = params.blurRadiusWorld;
+	constBuf.blurRadiusWorld = 0.25f;
+	//constBuf.blurScale = params.blurScale;
+	constBuf.blurScale = gfx->getWH().x / (16/9) * (1.0f/std::tan(90 * 0.5f));
+	constBuf.blurFalloff = 1.0f;
+	constBuf.debug = false;
+
+	constBuf.pointRadius = 0.065f;
+}
+
 struct PassthroughVertex
 {
 	DirectX::XMFLOAT3 position;
@@ -167,6 +188,12 @@ void FluidRendererD3D11::_createScreenQuad()
 	}
 }
 
+void FluidRendererD3D11::setNumberOfParticles(int nrOfParticles)
+{
+	this->m_nrOfParticles = nrOfParticles;
+}
+
+
 void FluidRendererD3D11::drawThickness(const FluidRenderBuffersD3D11* buffers)
 {
 	ID3D11DeviceContext* deviceContext = m_deviceContext;
@@ -181,7 +208,7 @@ void FluidRendererD3D11::drawThickness(const FluidRenderBuffersD3D11* buffers)
 		if (deviceContext->Map(m_constantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource) == S_OK)
 		{
 			FluidShaderConst constBuf;
-			RenderParamsUtilD3D::calcFluidConstantBuffer(*params, constBuf);
+			calcFluidConstantBuffer(constBuf);
 			memcpy(mappedResource.pData, &constBuf, sizeof(FluidShaderConst));
 			deviceContext->Unmap(m_constantBuffer, 0u);
 		}
@@ -219,12 +246,14 @@ void FluidRendererD3D11::drawThickness(const FluidRenderBuffersD3D11* buffers)
 	deviceContext->IASetVertexBuffers(0, 4, vertexBuffers, vertexBufferStrides, vertexBufferOffsets);
 	deviceContext->IASetIndexBuffer(buffers->m_indices, DXGI_FORMAT_R32_UINT, 0u);
 
-	float depthSign = DirectX::XMVectorGetW(params->projection.r[2]);
+	//float depthSign = DirectX::XMVectorGetW(params->projection.r[2]);
+	float depthSign = DirectX::XMVectorGetW(gfx->getVertexconstbuffer()->projection.element.r[2]);
 	if (depthSign < 0.f)
 	{
-		deviceContext->RSSetState(m_rasterizerState[params->renderMode][params->cullMode].Get());
+		deviceContext->RSSetState(m_rasterizerState[1][0]);
 	}
 
+	//n is the number of particles
 	deviceContext->DrawIndexed(params->n, params->offset, 0);
 
 	if (depthSign < 0.f)
@@ -247,7 +276,7 @@ void FluidRendererD3D11::drawEllipsoids(const FluidRenderBuffersD3D11* buffers)
 		if (deviceContext->Map(m_constantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource) == S_OK)
 		{
 			FluidShaderConst constBuf;
-			RenderParamsUtilD3D::calcFluidConstantBuffer(*params, constBuf);
+			calcFluidConstantBuffer(constBuf);
 			memcpy(mappedResource.pData, &constBuf, sizeof(FluidShaderConst));
 			deviceContext->Unmap(m_constantBuffer, 0u);
 		}
@@ -285,12 +314,13 @@ void FluidRendererD3D11::drawEllipsoids(const FluidRenderBuffersD3D11* buffers)
 	deviceContext->IASetVertexBuffers(0, 4, vertexBuffers, vertexBufferStrides, vertexBufferOffsets);
 	deviceContext->IASetIndexBuffer(buffers->m_indices, DXGI_FORMAT_R32_UINT, 0u);
 
-	float depthSign = DirectX::XMVectorGetW(params->projection.r[2]);
+	float depthSign = DirectX::XMVectorGetW(gfx->getVertexconstbuffer()->projection.element.r[2]);
 	if (depthSign < 0.f)
 	{
-		deviceContext->RSSetState(m_rasterizerState[params->renderMode][params->cullMode].Get());
+		deviceContext->RSSetState(m_rasterizerState[1][0]);
 	}
 
+	//n is the number of particles
 	deviceContext->DrawIndexed(params->n, params->offset, 0);
 
 	if (depthSign < 0.f)
@@ -309,7 +339,7 @@ void FluidRendererD3D11::drawBlurDepth()
 		if (deviceContext->Map(m_constantBuffer, 0u, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource) == S_OK)
 		{
 			FluidShaderConst constBuf;
-			RenderParamsUtilD3D::calcFluidConstantBuffer(*params, constBuf);
+			calcFluidConstantBuffer(constBuf);
 			memcpy(mappedResource.pData, &constBuf, sizeof(FluidShaderConst));
 			deviceContext->Unmap(m_constantBuffer, 0u);
 		}
@@ -336,10 +366,10 @@ void FluidRendererD3D11::drawBlurDepth()
 	deviceContext->IASetVertexBuffers(0, 1, &m_quadVertexBuffer, &vertexStride, &offset);
 	deviceContext->IASetIndexBuffer(m_quadIndexBuffer, DXGI_FORMAT_R32_UINT, 0u);
 
-	float depthSign = DirectX::XMVectorGetW(params->projection.r[2]);
+	float depthSign = DirectX::XMVectorGetW(gfx->getVertexconstbuffer()->projection.element.r[2]);
 	if (depthSign < 0.f)
 	{
-		deviceContext->RSSetState(m_rasterizerState[params->renderMode][params->cullMode].Get());
+		deviceContext->RSSetState(m_rasterizerState[1][0]);
 	}
 
 	deviceContext->DrawIndexed((UINT)4, 0, 0);
@@ -403,7 +433,7 @@ void FluidRendererD3D11::drawComposite(ID3D11ShaderResourceView* sceneMap)
 	float depthSign = DirectX::XMVectorGetW(params->projection.r[2]);
 	if (depthSign < 0.f)
 	{
-		deviceContext->RSSetState(m_rasterizerState[params->renderMode][params->cullMode].Get());
+		deviceContext->RSSetState(m_rasterizerState[1][0]);
 	}
 
 	deviceContext->DrawIndexed((UINT)4, 0, 0);

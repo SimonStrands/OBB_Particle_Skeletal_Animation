@@ -51,6 +51,43 @@ struct FluidShaderConst
 	DirectX::XMFLOAT4 shadowTaps[12];
 };
 
+struct FluidShaderConst
+{
+	DirectX::XMFLOAT4X4 modelViewProjection;
+	DirectX::XMFLOAT4X4 modelView;
+	DirectX::XMFLOAT4X4 projection;			// ogl projection
+	DirectX::XMFLOAT4X4 inverseModelView;
+	DirectX::XMFLOAT4X4 inverseProjection;		// ogl inverse projection
+
+	DirectX::XMFLOAT4 invTexScale;
+
+	DirectX::XMFLOAT3 invViewport;
+	float _pad0;
+	//float3 invProjection;
+	//float _pad1;
+
+	float blurRadiusWorld;
+	float blurScale;
+	float blurFalloff;
+	int debug;
+
+	DirectX::XMFLOAT3 lightPos;
+	float _pad1;
+	DirectX::XMFLOAT3 lightDir;
+	float _pad2;
+	DirectX::XMFLOAT4X4 lightTransform;
+
+	DirectX::XMFLOAT4 color;
+	DirectX::XMFLOAT4 clipPosToEye;
+
+	float spotMin;
+	float spotMax;
+	float ior;
+	//float _pad3;
+	float pointRadius;  // point size in world space
+
+	DirectX::XMFLOAT4 shadowTaps[12];
+};
 
 struct FluidRenderBuffersD3D11
 {
@@ -93,12 +130,15 @@ struct FluidRendererD3D11
 	void drawBlurDepth();
 	void drawComposite(ID3D11ShaderResourceView* sceneMap);
 
-	FluidRendererD3D11():
+	FluidRendererD3D11(Graphics*& gfx):
 		m_device(nullptr),
-		m_deviceContext(nullptr)
+		m_deviceContext(nullptr),
+		gfx(gfx)
 	{}
 
 	void _createScreenQuad();
+	void setNumberOfParticles(int nrOfParticles);
+	int m_nrOfParticles;
 
 	ID3D11Device* m_device;
 	ID3D11DeviceContext* m_deviceContext;
@@ -120,9 +160,10 @@ struct FluidRendererD3D11
 	ID3D11PixelShader* m_compositePs;
 
 	ID3D11Buffer* m_constantBuffer;
+	Graphics* gfx;
 
 	// Right handed rasterizer state
-	ID3D11RasterizerState* m_rasterizerState[1][1];
+	ID3D11RasterizerState* m_rasterizerState[2][2];
 
 	ID3D11Buffer* m_quadVertexBuffer;
 	ID3D11Buffer* m_quadIndexBuffer;
@@ -133,6 +174,8 @@ struct FluidRendererD3D11
 
 	int m_sceneWidth;
 	int m_sceneHeight;
+
+	void calcFluidConstantBuffer(FluidShaderConst& constBuf);
 };
 
 

@@ -154,7 +154,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
         position.x, position.y, position.z, 1.0f
     );
 
-
+	Renderer.init(gfx->getDevice(), gfx->get_IMctx(), gfx->getWH().x, gfx->getWH().y);
 
 	//some kind of load file here
 	//but now we just do this for debug
@@ -196,6 +196,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 	}
 
 	this->nrOfVertecies = (UINT)vertecies.size();
+	Renderer.setNumberOfParticles(nrOfVertecies);
 
 	this->VS = gfx->getVS()[4];
 	this->GS = gfx->getGS()[0];
