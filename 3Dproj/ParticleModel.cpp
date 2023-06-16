@@ -326,6 +326,7 @@ void ParticleModel::init(Graphics*& gfx, const std::string& filePath, vec3 posit
 			gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
 #endif // ORGINALPOSITION
 
+			Renderer.init(gfx, vertexBuffer, nrOfVertecies);
 
 std::cout << "hi" << std::endl;
 }
@@ -401,7 +402,9 @@ void ParticleModel::draw(Graphics*& gfx)
 	gfx->get_IMctx()->IASetInputLayout(this->inputLayout);
 
 	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->vertexBuffer, &strid, &offset);
-	gfx->get_IMctx()->Draw(nrOfVertecies, 0);
+	//gfx->get_IMctx()->Draw(nrOfVertecies, 0);
+	Renderer.draw();
+	
 
 	#ifndef TRADITIONALSKELETALANIMATION
 	if(!this->hasAnimation){

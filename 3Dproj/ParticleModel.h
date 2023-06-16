@@ -7,6 +7,7 @@
 #include "OBBSkeleton.h"
 //#include <cmath>
 #include <fstream>
+#include "FluidRenderer.h"
 
 //for skeletal animation and moving particles
 struct ComputerShaderParticleModelConstBuffer : public CB{
@@ -49,6 +50,7 @@ private:
 
 	ID3D11InputLayout* inputLayout;
 	UINT nrOfVertecies;
+	FluidRenderer Renderer;
 
 	//vertex geometry and pixel shader for drawing the particles
 	ID3D11VertexShader* VS;

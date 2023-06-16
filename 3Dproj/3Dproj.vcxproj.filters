@@ -97,6 +97,9 @@
     <Filter Include="Resource Files\Shaders\DebugDrawObb">
       <UniqueIdentifier>{2f87aa80-af5e-4a1b-b68b-5619ed360835}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\FluidRenderer">
+      <UniqueIdentifier>{a9fced4e-99cf-4bd2-b2d2-bb8d8fed127d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -232,6 +235,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SkeletalAnim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FluidRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -386,6 +392,9 @@
     <ClInclude Include="BuildDefines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FluidRenderer.h">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md">
@@ -488,6 +497,21 @@
     </FxCompile>
     <FxCompile Include="ParticleBoneSetUp.hlsl">
       <Filter>Resource Files\Shaders\Volumetric</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderVS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidRenderPS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="Blurer.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="DrawScreenQuad.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
+    </FxCompile>
+    <FxCompile Include="ScreenQuadPS.hlsl">
+      <Filter>Source Files\FluidRenderer</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
