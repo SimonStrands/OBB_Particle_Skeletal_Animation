@@ -234,8 +234,8 @@ void Game::setUpObject()
 
 	//THEMODELCHANGE
 	//particleModel.init(gfx, "objects/StormTrooperFBX.fbx", vec3());
-	particleModel.init(gfx, "objects/Capoeira2.fbx", vec3());
-	//particleModel.init(gfx, "objects/Herobrine.fbx", vec3());
+	//particleModel.init(gfx, "objects/Capoeira2.fbx", vec3());
+	particleModel.init(gfx, "objects/testAnimation.fbx", vec3());
 
 #ifndef TRADITIONALSKELETALANIMATION
 	this->UIManager.takeBoxes(particleModel.getOBBSkeleton().getSizes());

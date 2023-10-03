@@ -13,10 +13,10 @@ struct VertexShaderOutput
     float2 uv : UV;
 };
 
-VertexShaderOutput main(VertexShaderInput input) : SV_POSITION
+VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
-    output.position = input.position;
+    output.position = float4(input.position.xy, 0, 1.0f);
     output.uv = input.uv;
     return output;
 }

@@ -13,7 +13,6 @@ std::pair<unsigned int, float> ParticleModel::getTimeFraction(const std::vector<
 }
 
 void ParticleModel::getPose(Bone& joint, const Animation& anim, float time, DirectX::XMMATRIX parentTransform){
-	
 	DirectX::XMMATRIX newParentTransform = DirectX::XMMatrixIdentity();
 
 	float nTime = fmod(time, anim.length);

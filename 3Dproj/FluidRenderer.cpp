@@ -1,5 +1,5 @@
 #include "FluidRenderer.h"
-
+#include "CreateBuffer.h"
 
 
 void FluidRenderer::init(Graphics*& gfx, ID3D11Buffer* particles, const int nrOfParticles)
@@ -143,7 +143,7 @@ D3D11_TEXTURE2D_DESC textureDesc;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
 
@@ -218,6 +218,50 @@ D3D11_TEXTURE2D_DESC textureDesc;
 		printf("UAV");
 		return;
 	}
+
+	// create a vertex buffer
+	{
+		
+		D3D11_BUFFER_DESC bufDesc;
+		bufDesc.ByteWidth = 4*sizeof(vertex);
+		bufDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufDesc.CPUAccessFlags = DXGI_CPU_ACCESS_NONE;
+		bufDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA data = { 0 };
+
+
+		std::vector<vertex> vertices;
+		std::array<float, 3> pos;
+		std::array<float, 2> UV;
+		std::array<float, 4> Normal;
+
+		pos = {-.5f, -.5f, 0.0f};
+		UV = {0.0f, 1.0f};
+		Normal = {0, 1, 0, 1};
+		vertices.push_back(vertex(pos, UV, Normal));
+		pos = {.5f, -.5f, 0.0f};
+		UV = {1.0f, 1.0f};
+		vertices.push_back(vertex(pos, UV, Normal));
+		pos = {.5f,  .5f, 0.0f};
+		UV = {1.0f, 0.0f};
+		vertices.push_back(vertex(pos, UV, Normal));
+		pos = {-.5f, .5f, 0.0f};
+		UV = {0.0f, 0.0f};
+		vertices.push_back(vertex(pos, UV, Normal));
+
+		data.pSysMem = vertices.data();
+
+		gfx->getDevice()->CreateBuffer(&bufDesc, &data, &QuadVertexBuffer);
+	}
+
+	std::vector<DWORD> indecies = {
+	0,2,1,
+	0,3,2
+	};
+
+	CreateVertexBuffer(gfx->getDevice(), indecies, this->QuadIndeciesBuffer, true);
 }
 
 FluidRenderer::FluidRenderer()
@@ -233,29 +277,42 @@ void FluidRenderer::draw()
 	gfx->get_IMctx()->PSSetShader(m_FluidPs, nullptr, 0);
 	gfx->get_IMctx()->HSSetShader(nullptr, nullptr, 0);
 	gfx->get_IMctx()->DSSetShader(nullptr, nullptr, 0);
-
-	gfx->get_IMctx()->Draw(this->nrOfParticles, 0);
-
-	//blur the texture
-	gfx->get_IMctx()->CSSetShader(m_blurComputeShader, nullptr, 0);
-	gfx->get_IMctx()->CSSetShaderResources(0, 1, &m_Fluid_SRV);
 	
-	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &this->UAV, nullptr);
-	//köra computeShader
-	gfx->get_IMctx()->Dispatch(60, 135, 1);
-	ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
-	gfx->get_IMctx()->CSSetShaderResources(0, 1, nullSRV);
-	//nulla unorderedaccesview
-	ID3D11UnorderedAccessView* nullUAV = nullptr;
-	gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
-
-	//draw the texture on a quad on the camera
+	gfx->get_IMctx()->Draw(this->nrOfParticles, 0);
+	
+	//blur the texture
+	//gfx->get_IMctx()->CSSetShader(m_blurComputeShader, nullptr, 0);
+	//gfx->get_IMctx()->CSSetShaderResources(1, 1, &m_Fluid_SRV);
+	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &this->UAV, nullptr);
+	//
+	////köra computeShader
+	//gfx->get_IMctx()->Dispatch(60, 135, 1);
+	//
+	////nulla unorderedaccesview
+	////ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
+	////gfx->get_IMctx()->CSSetShaderResources(0, 1, nullSRV);
+	//ID3D11UnorderedAccessView* nullUAV = nullptr;
+	//gfx->get_IMctx()->CSSetUnorderedAccessViews(0, 1, &nullUAV, nullptr);
+	//
+	////draw the texture on a quad on the camera
 	gfx->setRenderTarget();
-
-	//TODO : CHANGE THIS SO WE CAN Create the ScreenQuad
-	gfx->get_IMctx()->VSSetShader(m_FluidVs, nullptr, 0);
+	
+	gfx->get_IMctx()->VSSetShader(m_QuadVs, nullptr, 0);
 	gfx->get_IMctx()->GSSetShader(nullptr, nullptr, 0);
-	gfx->get_IMctx()->PSSetShader(m_FluidPs, nullptr, 0);
+	gfx->get_IMctx()->PSSetShader(m_QuadPs, nullptr, 0);
+	
+
+	UINT offset = 0;
+	static UINT strid = sizeof(vertex);
+
+	gfx->get_IMctx()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	gfx->get_IMctx()->IASetInputLayout(gfx->getInputLayout()[0]);
+	//gfx->get_IMctx()->PSSetShaderResources(0, 1, &m_Show_SRV);
+	gfx->get_IMctx()->PSSetShaderResources(0, 1, &m_Fluid_SRV);
+	gfx->get_IMctx()->IASetVertexBuffers(0, 1, &this->QuadVertexBuffer, &strid, &offset);
+	gfx->get_IMctx()->IASetIndexBuffer(QuadIndeciesBuffer, DXGI_FORMAT_R32_UINT, offset);
+
+	gfx->get_IMctx()->DrawIndexed(6,0,0);
 
 
 	float clearColor[4] = {0,0,0,0};
